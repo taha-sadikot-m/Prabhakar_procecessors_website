@@ -7,6 +7,7 @@ import {
   useTransform,
 } from 'framer-motion'
 import { people } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 const CREAM = '#FAF0E6'
 const GOLD = '#D4AF37'
@@ -157,6 +158,9 @@ export function People() {
         </div>
         <div className="relative z-10 px-6 py-10">
           <PeopleQuote reduceMotion={reduceMotion} inView={inView} />
+          <div className="mt-8">
+            <SectionCta label={people.cta} to={people.ctaHref} />
+          </div>
         </div>
       </div>
 
@@ -190,6 +194,9 @@ export function People() {
             <PeopleHeading reduceMotion={reduceMotion} />
             <div className="mt-10 md:mt-14">
               <PeopleQuote reduceMotion={reduceMotion} inView={inView} />
+            </div>
+            <div className="mt-10">
+              <SectionCta label={people.cta} to={people.ctaHref} />
             </div>
           </div>
         </div>

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Link, NavLink } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Logo } from '../assets/logo'
 import { navLinks } from '../data/content'
 
 const GOLD = '#D4AF37'
+
+const pageLinks = navLinks.filter((link) => link.href !== '/contact')
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -42,31 +45,40 @@ export function Header() {
           className="hidden items-center justify-center gap-5 xl:flex xl:gap-7 xl:justify-self-center"
           aria-label="Primary"
         >
-          {navLinks
-            .filter((link) => link.href !== '#contact')
-            .map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="group relative font-sans text-[10px] font-medium tracking-[0.12em] text-ink/80 uppercase transition-colors hover:text-ink"
-              >
-                {link.label}
-                <span
-                  className="absolute inset-x-0 -bottom-1 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
-                  style={{ backgroundColor: GOLD }}
-                  aria-hidden="true"
-                />
-              </a>
-            ))}
+          {pageLinks.map((link) => (
+            <NavLink
+              key={link.label}
+              to={link.href}
+              end={link.href === '/'}
+              className={({ isActive }) =>
+                `group relative font-sans text-[10px] font-medium tracking-[0.12em] uppercase transition-colors hover:text-ink ${
+                  isActive ? 'text-ink' : 'text-ink/80'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {link.label}
+                  <span
+                    className={`absolute inset-x-0 -bottom-1 h-px origin-left transition-transform duration-300 ${
+                      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
+                    style={{ backgroundColor: GOLD }}
+                    aria-hidden="true"
+                  />
+                </>
+              )}
+            </NavLink>
+          ))}
         </nav>
 
         <div className="flex items-center justify-end gap-3 justify-self-end">
-          <a
-            href="#contact"
+          <Link
+            to="/contact"
             className="hidden font-sans text-[11px] font-semibold tracking-[0.16em] text-[#D4AF37] uppercase transition-opacity hover:opacity-75 lg:inline-block"
           >
             Contact
-          </a>
+          </Link>
 
           <button
             type="button"
@@ -118,30 +130,33 @@ export function Header() {
               >
                 Menu
               </p>
-              <nav
-                className="mt-6 flex flex-col gap-1"
-                aria-label="Menu"
-              >
-                {navLinks
-                  .filter((link) => link.href !== '#contact')
-                  .map((link, i) => (
-                    <motion.a
-                      key={link.label}
-                      href={link.href}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.05 * i }}
+              <nav className="mt-6 flex flex-col gap-1" aria-label="Menu">
+                {pageLinks.map((link, i) => (
+                  <motion.div
+                    key={link.label}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * i }}
+                  >
+                    <NavLink
+                      to={link.href}
+                      end={link.href === '/'}
                       onClick={() => setOpen(false)}
-                      className="border-b border-line/80 py-4 font-sans text-sm font-medium tracking-[0.16em] text-ink uppercase transition-colors hover:text-[#D4AF37]"
+                      className={({ isActive }) =>
+                        `block border-b border-line/80 py-4 font-sans text-sm font-medium tracking-[0.16em] uppercase transition-colors hover:text-[#D4AF37] ${
+                          isActive ? 'text-[#D4AF37]' : 'text-ink'
+                        }`
+                      }
                     >
                       {link.label}
-                    </motion.a>
-                  ))}
+                    </NavLink>
+                  </motion.div>
+                ))}
               </nav>
 
               <div className="mt-auto pt-10 pb-6">
-                <a
-                  href="#contact"
+                <Link
+                  to="/contact"
                   onClick={() => setOpen(false)}
                   className="relative inline-block font-sans text-[0.9rem] font-medium tracking-[0.12em] uppercase"
                   style={{ color: GOLD }}
@@ -153,7 +168,7 @@ export function Header() {
                     style={{ backgroundColor: GOLD }}
                     aria-hidden="true"
                   />
-                </a>
+                </Link>
               </div>
             </div>
           </motion.div>

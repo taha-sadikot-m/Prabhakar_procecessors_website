@@ -1,35 +1,26 @@
-import { Closing } from './components/Closing'
-import { Footer } from './components/Footer'
-import { Header } from './components/Header'
-import { WhatsAppButton } from './components/WhatsAppButton'
-import { Hero } from './components/Hero'
-import { Ecosystem } from './components/Ecosystem'
-import { Serve } from './components/Serve'
-import { Journey } from './components/Journey'
-import { People } from './components/People'
-import { Partnerships } from './components/Partnerships'
-import { Quality } from './components/Quality'
-import { Future } from './components/Future'
-import { Transformation } from './components/Transformation'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Layout } from './components/Layout'
+import { AboutPage } from './pages/AboutPage'
+import { CareersPage } from './pages/CareersPage'
+import { ContactPage } from './pages/ContactPage'
+import { HomePage } from './pages/HomePage'
+import { ServicesPage } from './pages/ServicesPage'
+import { TestimonialsPage } from './pages/TestimonialsPage'
 
 export default function App() {
   return (
-    <div className="min-h-svh bg-cream">
-      <Header />
-      <main>
-        <Hero />
-        <Journey />
-        <Transformation />
-        <Quality />
-        <Ecosystem />
-        <Serve />
-        <Partnerships />
-        <Future />
-        <People />
-        <Closing />
-      </main>
-      <Footer />
-      <WhatsAppButton />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="services" element={<ServicesPage />} />
+          <Route path="careers" element={<CareersPage />} />
+          <Route path="testimonials" element={<TestimonialsPage />} />
+          <Route path="contact" element={<ContactPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }

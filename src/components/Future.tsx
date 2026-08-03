@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { future } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 const INDIGO = '#1A237E'
 const CREAM = '#FFF8F0'
@@ -110,6 +111,14 @@ export function Future() {
               </div>
             </motion.article>
           ))}
+        </div>
+
+        <div className="mt-14 md:mt-16">
+          <SectionCta
+            label={future.cta}
+            to={future.ctaHref}
+            variant="cream"
+          />
         </div>
       </div>
     </section>

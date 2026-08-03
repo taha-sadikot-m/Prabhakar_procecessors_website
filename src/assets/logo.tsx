@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 type LogoProps = {
   className?: string
   showText?: boolean
@@ -9,8 +11,8 @@ export function Logo({ className = '', showText = true, variant = 'dark' }: Logo
   const sinceColor = variant === 'light' ? 'text-gold-soft' : 'text-gold'
 
   return (
-    <a
-      href="#top"
+    <Link
+      to="/"
       className={`inline-flex items-center gap-3 ${className}`}
       aria-label="Prabhakar Processors home"
     >
@@ -57,6 +59,6 @@ export function Logo({ className = '', showText = true, variant = 'dark' }: Logo
           </span>
         </span>
       )}
-    </a>
+    </Link>
   )
 }

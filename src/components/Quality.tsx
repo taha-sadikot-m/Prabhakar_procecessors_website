@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { quality } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 const AMBER = '#D69A2D'
 const GOLD_WIRE = '#C9A24A'
@@ -238,6 +239,9 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
         <p className="mt-3 max-w-sm font-sans text-sm leading-relaxed text-[#2C2C2C]/70">
           {quality.body}
         </p>
+        <div className="mt-6">
+          <SectionCta label={quality.cta} to={quality.ctaHref} />
+        </div>
       </motion.div>
 
       {/* Thin gold arc — under cards */}
@@ -401,6 +405,9 @@ export function Quality() {
           <p className="mt-6 max-w-sm font-sans text-sm leading-relaxed text-[#2C2C2C]/75 lg:text-[15px]">
             {quality.body}
           </p>
+          <div className="mt-8">
+            <SectionCta label={quality.cta} to={quality.ctaHref} />
+          </div>
         </motion.div>
 
         <svg

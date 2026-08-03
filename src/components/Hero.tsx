@@ -1,4 +1,5 @@
 import { useRef, type MouseEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { hero } from '../data/content'
 
@@ -138,16 +139,20 @@ export function Hero() {
           </div>
         </div>
 
-        <motion.a
-          href={hero.ctaHref}
+        <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.28 }}
-          className="absolute right-4 bottom-24 z-20 inline-flex items-center gap-2 border-b border-gold pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-gold uppercase transition-colors hover:border-gold-dark hover:text-gold-dark sm:right-5"
+          className="absolute right-4 bottom-24 z-20 sm:right-5"
         >
-          {hero.cta}
-          <span aria-hidden="true">→</span>
-        </motion.a>
+          <Link
+            to={hero.ctaHref}
+            className="inline-flex items-center gap-2 border-b border-gold pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-gold uppercase transition-colors hover:border-gold-dark hover:text-gold-dark"
+          >
+            {hero.cta}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </motion.div>
       </div>
 
       {/* —— Desktop / tablet layout (unchanged structure) —— */}
@@ -182,16 +187,20 @@ export function Hero() {
             {hero.subcopy}
           </motion.p>
 
-          <motion.a
-            href={hero.ctaHref}
+          <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.28 }}
-            className="mt-8 inline-flex items-center gap-2 border-b border-gold pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-gold uppercase transition-colors hover:border-gold-dark hover:text-gold-dark md:mt-10"
+            className="mt-8 md:mt-10"
           >
-            {hero.cta}
-            <span aria-hidden="true">→</span>
-          </motion.a>
+            <Link
+              to={hero.ctaHref}
+              className="inline-flex items-center gap-2 border-b border-gold pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-gold uppercase transition-colors hover:border-gold-dark hover:text-gold-dark"
+            >
+              {hero.cta}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </motion.div>
         </div>
       </div>
 

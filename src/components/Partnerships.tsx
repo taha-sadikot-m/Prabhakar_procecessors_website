@@ -22,6 +22,7 @@ import {
   type LucideProps,
 } from 'lucide-react'
 import { partnerships } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 const GOLD = '#D4AF37'
 const CREAM = '#FAF0E6'
@@ -268,6 +269,9 @@ export function Partnerships() {
         <p className="font-sans text-sm leading-relaxed text-[#2C2C2C]/70 md:text-base">
           {partnerships.body}
         </p>
+        <div className="mt-8 flex justify-center">
+          <SectionCta label={partnerships.cta} to={partnerships.ctaHref} />
+        </div>
       </div>
 
       <style>{`

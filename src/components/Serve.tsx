@@ -12,6 +12,7 @@ import {
 } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { serve } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 const GOLD = '#D4AF37'
 const CREAM = '#FAF0E6'
@@ -237,6 +238,10 @@ export function Serve() {
             >
               <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
             </button>
+          </div>
+
+          <div className="mt-8">
+            <SectionCta label={serve.cta} to={serve.ctaHref} />
           </div>
         </div>
       </div>

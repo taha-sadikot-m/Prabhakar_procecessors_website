@@ -13,6 +13,7 @@ import {
   type LucideProps,
 } from 'lucide-react'
 import { ecosystem } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -313,6 +314,9 @@ export function Ecosystem() {
             <p className="mx-auto mt-5 max-w-xl font-sans text-sm leading-relaxed text-[#2C2C2C]/70 md:mx-0 md:max-w-md md:text-base">
               {ecosystem.body}
             </p>
+            <div className="mt-8 flex justify-center md:justify-start">
+              <SectionCta label={ecosystem.cta} to={ecosystem.ctaHref} />
+            </div>
           </header>
 
           {/* ── Desktop geometric orbital ring ── */}

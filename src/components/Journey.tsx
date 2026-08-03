@@ -1,6 +1,7 @@
 import { journey } from '../data/content'
 import { CountUp } from './motion/CountUp'
 import { FadeIn } from './motion/FadeIn'
+import { SectionCta } from './SectionCta'
 
 function DiamondDivider() {
   return (
@@ -99,6 +100,9 @@ export function Journey() {
           <p className="mt-5 font-serif text-lg leading-snug text-gold md:text-xl">
             {journey.commitment}
           </p>
+          <div className="mt-8">
+            <SectionCta label={journey.cta} to={journey.ctaHref} />
+          </div>
         </FadeIn>
 
         <div className="mt-auto grid grid-cols-2 justify-items-center gap-4 pt-16 pb-4 md:hidden">

@@ -6,6 +6,7 @@ import {
   useTransform,
 } from 'framer-motion'
 import { closing } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 const CREAM = '#FFF8F0'
 const GOLD = '#D4AF37'
@@ -127,29 +128,11 @@ export function Closing() {
             delay: reduceMotion ? 0 : 1,
           }}
         >
-          <a
-            href={`mailto:prabhakardyeing@gmail.com?subject=${encodeURIComponent(
-              'Contact Prabhakar Processors',
-            )}`}
-            className="relative inline-block font-sans text-[0.9rem] font-medium tracking-[0.12em] uppercase"
-            style={{ color: GOLD }}
-          >
-            {closing.cta}
-            <span aria-hidden="true"> →</span>
-            <motion.span
-              className="absolute inset-x-0 -bottom-0.5 h-px origin-left"
-              style={{ backgroundColor: GOLD }}
-              initial={reduceMotion ? false : { scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true, amount: 0.35 }}
-              transition={{
-                duration: reduceMotion ? 0.15 : 0.7,
-                delay: reduceMotion ? 0 : 1,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              aria-hidden="true"
-            />
-          </a>
+          <SectionCta
+            label={closing.cta}
+            to={closing.ctaHref}
+            variant="cream"
+          />
         </motion.div>
 
         <motion.address
