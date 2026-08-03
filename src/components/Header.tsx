@@ -26,9 +26,11 @@ export function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open
-          ? 'border-b border-[#D4AF37]/25 bg-cream/95 backdrop-blur-md'
-          : 'border-b border-transparent bg-transparent'
+        open
+          ? 'border-b border-[#D4AF37]/25 bg-cream'
+          : scrolled
+            ? 'border-b border-[#D4AF37]/25 bg-cream/95 backdrop-blur-md'
+            : 'border-b border-transparent bg-transparent'
       }`}
     >
       <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-5 py-3.5 md:px-8 lg:px-10 xl:grid-cols-[1fr_auto_1fr]">
@@ -106,7 +108,8 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 top-[68px] z-40 flex flex-col bg-cream"
+            className="fixed inset-x-0 top-[68px] bottom-0 z-40 flex flex-col overflow-y-auto bg-cream"
+            style={{ backgroundColor: '#F9F6F0' }}
           >
             <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-6 py-8">
               <p

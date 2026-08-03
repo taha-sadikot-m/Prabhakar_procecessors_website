@@ -85,42 +85,57 @@ export function Hero() {
             />
           </picture>
         </motion.div>
-        {/* Left wash — desktop/tablet only; mobile keeps right-side type clear */}
-        <div className="absolute inset-y-0 left-0 hidden w-[55%] bg-gradient-to-r from-cream/70 via-cream/35 to-transparent md:block md:w-[45%] lg:w-[40%]" />
+        {/* Bottom fade only — side wash removed; mobile copy uses local scrim */}
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-cream/45 to-transparent md:h-40 md:from-cream/50" />
       </div>
 
       {/* —— Mobile layout: top-left copy, bottom-right CTA —— */}
       <div className="relative z-10 flex flex-1 flex-col md:hidden">
-        <div className="mr-auto w-[min(18rem,88%)] px-4 pt-2 text-left sm:px-5">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55 }}
-          >
-            <MobileEyebrow text={hero.eyebrow} />
-          </motion.div>
+        <div className="relative mr-auto w-[min(20rem,92%)] px-4 pt-2 text-left sm:px-5">
+          {/* Local cream scrim behind copy */}
+          <div
+            className="pointer-events-none absolute -inset-x-2 -inset-y-3 z-0 bg-gradient-to-r from-cream via-cream/95 to-transparent sm:-inset-x-3"
+            aria-hidden="true"
+          />
 
-          <motion.h1
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-5 font-serif text-[2.35rem] leading-[1.08] font-medium tracking-tight text-ink"
-          >
-            {hero.headline[0]}
-            <br />
-            {hero.headline[1]}{' '}
-            <span className="text-gold">{hero.highlight}</span>
-          </motion.h1>
+          <div className="relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55 }}
+            >
+              <MobileEyebrow text={hero.eyebrow} />
+            </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-4 max-w-[16rem] font-sans text-sm leading-relaxed text-ink-muted"
-          >
-            {hero.subcopy}
-          </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.7,
+                delay: 0.08,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="mt-5 font-serif text-[2.35rem] leading-[1.08] font-medium tracking-tight text-ink"
+            >
+              {hero.headline[0]}
+              <br />
+              {hero.headline[1]}{' '}
+              <span className="text-gold">{hero.highlight}</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.65,
+                delay: 0.18,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="mt-4 max-w-[16rem] font-sans text-sm leading-relaxed text-ink/75"
+            >
+              {hero.subcopy}
+            </motion.p>
+          </div>
         </div>
 
         <motion.a
