@@ -32,9 +32,9 @@ const MOBILE_ARC = {
 } as const
 const MOBILE_ARC_PATH = `M ${MOBILE_ARC.p0.x} ${MOBILE_ARC.p0.y} Q ${MOBILE_ARC.p1.x} ${MOBILE_ARC.p1.y} ${MOBILE_ARC.p2.x} ${MOBILE_ARC.p2.y}`
 const MOBILE_CARD_COUNT = quality.annotations.length
-/** Full marquee cycle (one set of cards). */
-const MOBILE_MARQUEE_MS = 32000
-const MOBILE_PIN_MS = MOBILE_MARQUEE_MS / MOBILE_CARD_COUNT
+/** Dwell time on each centered card before auto-advancing. */
+const MOBILE_AUTOPLAY_MS = 3500
+const MOBILE_CARD_WIDTH = 'min(16.5rem, 78vw)'
 
 function quadPoint(
   t: number,
@@ -138,12 +138,19 @@ function AnnotationCopy({
 
 function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const [inView, setInView] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [userPaused, setUserPaused] = useState(false)
   const resumeTimer = useRef<number | null>(null)
+  const activeIndexRef = useRef(0)
 
-  const marqueeRunning = inView && !reduceMotion && !userPaused
+  const autoplayRunning = inView && !reduceMotion && !userPaused
+
+  useEffect(() => {
+    activeIndexRef.current = activeIndex
+  }, [activeIndex])
 
   useEffect(() => {
     const el = rootRef.current
@@ -156,13 +163,54 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
     return () => io.disconnect()
   }, [])
 
+  const syncActiveFromScroll = () => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    const center = scroller.scrollLeft + scroller.clientWidth / 2
+    let best = 0
+    let bestDist = Number.POSITIVE_INFINITY
+    cardRefs.current.forEach((card, i) => {
+      if (!card) return
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2
+      const dist = Math.abs(cardCenter - center)
+      if (dist < bestDist) {
+        bestDist = dist
+        best = i
+      }
+    })
+    setActiveIndex(best)
+  }
+
   useEffect(() => {
-    if (!marqueeRunning) return
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    syncActiveFromScroll()
+    scroller.addEventListener('scroll', syncActiveFromScroll, { passive: true })
+    scroller.addEventListener('scrollend', syncActiveFromScroll)
+    return () => {
+      scroller.removeEventListener('scroll', syncActiveFromScroll)
+      scroller.removeEventListener('scrollend', syncActiveFromScroll)
+    }
+  }, [])
+
+  const scrollToIndex = (index: number, behavior: ScrollBehavior = 'smooth') => {
+    const card = cardRefs.current[index]
+    const scroller = scrollerRef.current
+    if (!card || !scroller) return
+    const left =
+      card.offsetLeft - (scroller.clientWidth - card.offsetWidth) / 2
+    scroller.scrollTo({ left, behavior })
+    setActiveIndex(index)
+  }
+
+  useEffect(() => {
+    if (!autoplayRunning) return
     const id = window.setInterval(() => {
-      setActiveIndex((i) => (i + 1) % MOBILE_CARD_COUNT)
-    }, MOBILE_PIN_MS)
+      const next = (activeIndexRef.current + 1) % MOBILE_CARD_COUNT
+      scrollToIndex(next, 'smooth')
+    }, MOBILE_AUTOPLAY_MS)
     return () => window.clearInterval(id)
-  }, [marqueeRunning])
+  }, [autoplayRunning])
 
   const pauseForUser = () => {
     setUserPaused(true)
@@ -187,16 +235,12 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
       className="relative flex min-h-[100svh] flex-col overflow-hidden md:hidden"
     >
       <style>{`
-        @keyframes qualityMarquee {
-          from { transform: translate3d(0, 0, 0); }
-          to { transform: translate3d(-50%, 0, 0); }
+        .quality-snap-scroller {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
-        .quality-marquee-track {
-          animation: qualityMarquee ${MOBILE_MARQUEE_MS}ms linear infinite;
-          will-change: transform;
-        }
-        .quality-marquee-track.is-paused {
-          animation-play-state: paused;
+        .quality-snap-scroller::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
 
@@ -292,60 +336,59 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
         })}
       </div>
 
-      {/* Cards above the wire — infinite marquee */}
+      {/* Snap carousel — one centered card at a time */}
       <div
-        className="relative z-[10] flex-1 overflow-hidden pt-2 pb-8"
+        ref={scrollerRef}
+        className="quality-snap-scroller relative z-[10] flex flex-1 snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden pt-2 pb-8"
+        style={{
+          scrollPaddingInline: `calc((100% - ${MOBILE_CARD_WIDTH}) / 2)`,
+          paddingInline: `calc((100% - ${MOBILE_CARD_WIDTH}) / 2)`,
+        }}
         onTouchStart={pauseForUser}
         onPointerDown={pauseForUser}
+        onScroll={syncActiveFromScroll}
       >
-        <div
-          className={`quality-marquee-track flex w-max ${
-            marqueeRunning ? '' : 'is-paused'
-          }`}
-        >
-          {[0, 1].map((copy) => (
+        {cardSet.map((item, i) => {
+          const active = i === activeIndex
+          return (
             <div
-              key={`copy-${copy}`}
-              className="flex shrink-0 gap-4 pr-4 pl-5"
-              aria-hidden={copy === 1}
+              key={item.id}
+              ref={(el) => {
+                cardRefs.current[i] = el
+              }}
+              className="snap-center shrink-0"
+              style={{ width: MOBILE_CARD_WIDTH }}
             >
-              {cardSet.map((item, i) => {
-                const active = i === activeIndex
-                return (
-                  <div key={`${copy}-${item.id}`} className="w-[16.5rem] shrink-0">
-                    <motion.div
-                      animate={{
-                        scale: active ? 1 : 0.94,
-                        opacity: active ? 1 : 0.62,
-                      }}
-                      transition={{ duration: 0.35, ease: easeOutQuart }}
-                      className="rounded-xl border px-4 py-4 backdrop-blur-md"
-                      style={{
-                        backgroundColor: active
-                          ? 'rgba(250,240,230,0.9)'
-                          : 'rgba(250,240,230,0.68)',
-                        borderColor: active
-                          ? 'rgba(214,154,45,0.5)'
-                          : 'rgba(45,27,14,0.12)',
-                        boxShadow: active
-                          ? '0 12px 32px rgba(45,27,14,0.14)'
-                          : '0 6px 18px rgba(45,27,14,0.07)',
-                      }}
-                    >
-                      <AnnotationCopy
-                        index={String(i + 1).padStart(2, '0')}
-                        title={item.title}
-                        description={item.description}
-                        active={active}
-                        compact
-                      />
-                    </motion.div>
-                  </div>
-                )
-              })}
+              <motion.div
+                animate={{
+                  scale: active ? 1 : 0.92,
+                  opacity: active ? 1 : 0.55,
+                }}
+                transition={{ duration: 0.35, ease: easeOutQuart }}
+                className="rounded-xl border px-4 py-4 backdrop-blur-md"
+                style={{
+                  backgroundColor: active
+                    ? 'rgba(250,240,230,0.92)'
+                    : 'rgba(250,240,230,0.62)',
+                  borderColor: active
+                    ? 'rgba(214,154,45,0.55)'
+                    : 'rgba(45,27,14,0.12)',
+                  boxShadow: active
+                    ? '0 12px 32px rgba(45,27,14,0.14)'
+                    : '0 6px 18px rgba(45,27,14,0.07)',
+                }}
+              >
+                <AnnotationCopy
+                  index={String(i + 1).padStart(2, '0')}
+                  title={item.title}
+                  description={item.description}
+                  active={active}
+                  compact
+                />
+              </motion.div>
             </div>
-          ))}
-        </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -139,17 +139,17 @@ export function People() {
       className="relative scroll-mt-24 overflow-hidden"
       style={{ backgroundColor: CREAM }}
     >
-      {/* —— Mobile: headline on image, quote below —— */}
+      {/* —— Mobile: full uncropped portrait; heading in top blank space; quote below —— */}
       <div className="md:hidden">
-        <div className="relative h-[60vh] w-full overflow-hidden">
+        <div className="relative w-full">
           <img
             src={people.mobileImage}
             alt="Leadership — Anand, Vikas, and Shaleen Poddar"
-            className="h-full w-full object-cover object-center"
+            className="block h-auto w-full"
             draggable={false}
           />
           <div
-            className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[48%] bg-gradient-to-b from-[#FAF0E6]/90 via-[#FAF0E6]/50 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[32%] bg-gradient-to-b from-[#FAF0E6]/90 via-[#FAF0E6]/45 to-transparent"
             aria-hidden="true"
           />
           <div className="absolute inset-x-0 top-0 z-10 px-6 pt-20">
