@@ -60,13 +60,69 @@ function QuoteReveal({
   )
 }
 
+function PeopleHeading({ reduceMotion }: { reduceMotion: boolean | null }) {
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{
+        duration: reduceMotion ? 0.2 : 0.7,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      <p
+        className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
+        style={{ color: GOLD }}
+      >
+        {people.eyebrow}
+      </p>
+      <h2 className="mt-5 font-serif text-[2.35rem] leading-[1.08] font-medium tracking-tight text-ink md:text-4xl lg:text-[2.85rem]">
+        {people.headline[0]}
+        <br />
+        {people.headline[1]}
+      </h2>
+    </motion.div>
+  )
+}
+
+function PeopleQuote({
+  reduceMotion,
+  inView,
+}: {
+  reduceMotion: boolean | null
+  inView: boolean
+}) {
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{
+        duration: reduceMotion ? 0.2 : 0.65,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      <QuoteReveal
+        quote={people.quote}
+        reduceMotion={reduceMotion}
+        inView={inView}
+      />
+      <p className="mt-8 font-sans text-xs tracking-[0.08em] text-ink/55 md:text-sm">
+        {people.attribution}
+      </p>
+    </motion.div>
+  )
+}
+
 export function People() {
   const sectionRef = useRef<HTMLElement>(null)
+  const desktopImageRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
   const inView = useInView(sectionRef, { once: true, amount: 0.35 })
 
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: desktopImageRef,
     offset: ['start end', 'end start'],
   })
   const imageY = useTransform(
@@ -79,74 +135,69 @@ export function People() {
     <section
       ref={sectionRef}
       id="people"
-      className="relative min-h-svh scroll-mt-24 overflow-hidden"
+      className="relative scroll-mt-24 overflow-hidden"
       style={{ backgroundColor: CREAM }}
     >
-      {/* Full-bleed leadership image */}
-      <div className="absolute inset-0" aria-hidden="true">
-        <motion.div
-          className="absolute inset-x-0 top-[-8%] h-[116%] w-full"
-          style={{ y: imageY }}
+      {/* —— Mobile: headline on image, quote below —— */}
+      <div className="md:hidden">
+        <div className="relative h-[60vh] w-full overflow-hidden">
+          <img
+            src={people.mobileImage}
+            alt="Leadership — Anand, Vikas, and Shaleen Poddar"
+            className="h-full w-full object-cover object-center"
+            draggable={false}
+          />
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[48%] bg-gradient-to-b from-[#FAF0E6]/90 via-[#FAF0E6]/50 to-transparent"
+            aria-hidden="true"
+          />
+          <div className="absolute inset-x-0 top-0 z-10 px-6 pt-20">
+            <PeopleHeading reduceMotion={reduceMotion} />
+          </div>
+        </div>
+        <div className="relative z-10 px-6 py-10">
+          <PeopleQuote reduceMotion={reduceMotion} inView={inView} />
+        </div>
+      </div>
+
+      {/* —— Desktop: full-bleed overlay —— */}
+      <div className="relative hidden min-h-svh md:block">
+        <div
+          ref={desktopImageRef}
+          className="absolute inset-0"
+          aria-hidden="true"
         >
-          <picture className="block h-full w-full">
-            <source media="(min-width: 768px)" srcSet={people.desktopImage} />
+          <motion.div
+            className="absolute inset-x-0 top-[-8%] h-[116%] w-full"
+            style={{ y: imageY }}
+          >
             <img
-              src={people.mobileImage}
+              src={people.desktopImage}
               alt=""
-              className="h-full w-full object-cover object-center md:object-right"
+              className="h-full w-full object-cover object-right"
               draggable={false}
             />
-          </picture>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
 
-      {/* Soft left readability gradient — desktop only */}
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 z-[1] hidden w-full max-w-[52%] bg-gradient-to-r from-[#FAF0E6]/95 via-[#FAF0E6]/70 to-transparent md:block"
-        aria-hidden="true"
-      />
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-full max-w-[52%] bg-gradient-to-r from-[#FAF0E6]/95 via-[#FAF0E6]/70 to-transparent"
+          aria-hidden="true"
+        />
 
-      {/* Text overlay — top-aligned */}
-      <div className="relative z-10 flex min-h-svh items-start px-6 pt-20 pb-16 md:px-10 md:pt-28 md:pb-20 lg:px-14 lg:pt-32">
-        <motion.div
-          className="w-full max-w-md md:max-w-[42%]"
-          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{
-            duration: reduceMotion ? 0.2 : 0.7,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        >
-          <p
-            className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-            style={{ color: GOLD }}
-          >
-            {people.eyebrow}
-          </p>
-          <h2 className="mt-5 font-serif text-[2.35rem] leading-[1.08] font-medium tracking-tight text-ink md:text-4xl lg:text-[2.85rem]">
-            {people.headline[0]}
-            <br />
-            {people.headline[1]}
-          </h2>
-
-          <div className="mt-10 md:mt-14">
-            <QuoteReveal
-              quote={people.quote}
-              reduceMotion={reduceMotion}
-              inView={inView}
-            />
+        <div className="relative z-10 flex min-h-svh items-start px-10 pt-28 pb-20 lg:px-14 lg:pt-32">
+          <div className="w-full max-w-[42%]">
+            <PeopleHeading reduceMotion={reduceMotion} />
+            <div className="mt-10 md:mt-14">
+              <PeopleQuote reduceMotion={reduceMotion} inView={inView} />
+            </div>
           </div>
+        </div>
 
-          <p className="mt-8 font-sans text-xs tracking-[0.08em] text-ink/55 md:text-sm">
-            {people.attribution}
-          </p>
-        </motion.div>
+        <span className="sr-only">
+          Leadership — Anand, Vikas, and Shaleen Poddar
+        </span>
       </div>
-
-      <span className="sr-only">
-        Leadership — Anand, Vikas, and Shaleen Poddar
-      </span>
     </section>
   )
 }

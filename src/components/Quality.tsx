@@ -30,19 +30,10 @@ const MOBILE_ARC = {
   p2: { x: 100, y: 22 },
 } as const
 const MOBILE_ARC_PATH = `M ${MOBILE_ARC.p0.x} ${MOBILE_ARC.p0.y} Q ${MOBILE_ARC.p1.x} ${MOBILE_ARC.p1.y} ${MOBILE_ARC.p2.x} ${MOBILE_ARC.p2.y}`
-const MOBILE_CYCLE_MS = 3200
 const MOBILE_CARD_COUNT = quality.annotations.length
-/** Triple the strip so auto-advance can keep scrolling forward forever. */
-const MOBILE_LOOP_COPIES = 3
-const MOBILE_START_INDEX = MOBILE_CARD_COUNT
-const MOBILE_EXTENDED = Array.from(
-  { length: MOBILE_CARD_COUNT * MOBILE_LOOP_COPIES },
-  (_, absolute) => {
-    const logical = absolute % MOBILE_CARD_COUNT
-    const item = quality.annotations[logical]
-    return { ...item, absolute, logical, key: `${item.id}-${absolute}` }
-  },
-)
+/** Full marquee cycle (one set of cards). */
+const MOBILE_MARQUEE_MS = 32000
+const MOBILE_PIN_MS = MOBILE_MARQUEE_MS / MOBILE_CARD_COUNT
 
 function quadPoint(
   t: number,
@@ -146,76 +137,12 @@ function AnnotationCopy({
 
 function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const scrollerRef = useRef<HTMLDivElement>(null)
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const [inView, setInView] = useState(false)
-  /** Logical 0..N-1 for pin highlight. */
   const [activeIndex, setActiveIndex] = useState(0)
-  /** Absolute index in the tripled strip — only the centered clone is emphasized. */
-  const [absActive, setAbsActive] = useState(MOBILE_START_INDEX)
   const [userPaused, setUserPaused] = useState(false)
   const resumeTimer = useRef<number | null>(null)
-  const jumpTimer = useRef<number | null>(null)
-  const autoScrollLock = useRef(false)
-  /** Absolute index into the tripled strip — always advances forward. */
-  const absIndex = useRef(MOBILE_START_INDEX)
 
-  const scrollToAbs = (index: number, behavior: ScrollBehavior = 'smooth') => {
-    const scroller = scrollerRef.current
-    const card = cardRefs.current[index]
-    if (!scroller || !card) return
-    const scrollerRect = scroller.getBoundingClientRect()
-    const cardRect = card.getBoundingClientRect()
-    const delta =
-      cardRect.left +
-      cardRect.width / 2 -
-      (scrollerRect.left + scrollerRect.width / 2)
-    autoScrollLock.current = true
-    scroller.scrollBy({ left: delta, behavior })
-    window.setTimeout(() => {
-      autoScrollLock.current = false
-    }, behavior === 'smooth' ? 450 : 50)
-  }
-
-  /** Keep the viewport in the middle copy so forward looping never hits an edge. */
-  const normalizeLoopPosition = (absolute: number) => {
-    const n = MOBILE_CARD_COUNT
-    if (absolute >= n * 2) {
-      const jumped = absolute - n
-      absIndex.current = jumped
-      setAbsActive(jumped)
-      scrollToAbs(jumped, 'auto')
-      return jumped
-    }
-    if (absolute < n) {
-      const jumped = absolute + n
-      absIndex.current = jumped
-      setAbsActive(jumped)
-      scrollToAbs(jumped, 'auto')
-      return jumped
-    }
-    return absolute
-  }
-
-  const updateActiveFromScroll = () => {
-    const scroller = scrollerRef.current
-    if (!scroller) return
-    const mid = scroller.getBoundingClientRect().left + scroller.clientWidth / 2
-    let best = 0
-    let bestDist = Infinity
-    cardRefs.current.forEach((card, i) => {
-      if (!card) return
-      const rect = card.getBoundingClientRect()
-      const dist = Math.abs(rect.left + rect.width / 2 - mid)
-      if (dist < bestDist) {
-        bestDist = dist
-        best = i
-      }
-    })
-    absIndex.current = best
-    setAbsActive(best)
-    setActiveIndex(best % MOBILE_CARD_COUNT)
-  }
+  const marqueeRunning = inView && !reduceMotion && !userPaused
 
   useEffect(() => {
     const el = rootRef.current
@@ -229,47 +156,12 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
   }, [])
 
   useEffect(() => {
-    const scroller = scrollerRef.current
-    if (!scroller) return
-
-    const onScroll = () => {
-      if (autoScrollLock.current) return
-      updateActiveFromScroll()
-      normalizeLoopPosition(absIndex.current)
-    }
-
-    scroller.addEventListener('scroll', onScroll, { passive: true })
-    absIndex.current = MOBILE_START_INDEX
-    scrollToAbs(MOBILE_START_INDEX, 'auto')
-    setAbsActive(MOBILE_START_INDEX)
-    setActiveIndex(0)
-    return () => scroller.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    if (!inView || reduceMotion || userPaused) return
-
+    if (!marqueeRunning) return
     const id = window.setInterval(() => {
-      const next = absIndex.current + 1
-      absIndex.current = next
-      setAbsActive(next)
-      setActiveIndex(next % MOBILE_CARD_COUNT)
-      scrollToAbs(next, 'smooth')
-
-      if (jumpTimer.current) window.clearTimeout(jumpTimer.current)
-      // After the forward slide, teleport back into the middle copy (invisible).
-      if (next >= MOBILE_CARD_COUNT * 2) {
-        jumpTimer.current = window.setTimeout(() => {
-          normalizeLoopPosition(next)
-        }, 480)
-      }
-    }, MOBILE_CYCLE_MS)
-
-    return () => {
-      window.clearInterval(id)
-      if (jumpTimer.current) window.clearTimeout(jumpTimer.current)
-    }
-  }, [inView, reduceMotion, userPaused])
+      setActiveIndex((i) => (i + 1) % MOBILE_CARD_COUNT)
+    }, MOBILE_PIN_MS)
+    return () => window.clearInterval(id)
+  }, [marqueeRunning])
 
   const pauseForUser = () => {
     setUserPaused(true)
@@ -282,16 +174,31 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
   useEffect(
     () => () => {
       if (resumeTimer.current) window.clearTimeout(resumeTimer.current)
-      if (jumpTimer.current) window.clearTimeout(jumpTimer.current)
     },
     [],
   )
+
+  const cardSet = quality.annotations
 
   return (
     <div
       ref={rootRef}
       className="relative flex min-h-[100svh] flex-col overflow-hidden md:hidden"
     >
+      <style>{`
+        @keyframes qualityMarquee {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-50%, 0, 0); }
+        }
+        .quality-marquee-track {
+          animation: qualityMarquee ${MOBILE_MARQUEE_MS}ms linear infinite;
+          will-change: transform;
+        }
+        .quality-marquee-track.is-paused {
+          animation-play-state: paused;
+        }
+      `}</style>
+
       <img
         src={quality.mobileImage}
         alt=""
@@ -333,8 +240,8 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
         </p>
       </motion.div>
 
-      {/* Thin gold arc — end-to-end, deeper bow + pin dots */}
-      <div className="relative z-[5] mt-5 w-full">
+      {/* Thin gold arc — under cards */}
+      <div className="pointer-events-none relative z-[5] mt-5 w-full">
         <svg
           className="h-14 w-full"
           viewBox="0 0 100 28"
@@ -381,55 +288,60 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
         })}
       </div>
 
-      {/* Cards tight under the wire — feel attached to the dots */}
+      {/* Cards above the wire — infinite marquee */}
       <div
-        ref={scrollerRef}
-        className="relative z-[5] -mt-3 flex flex-1 items-start gap-4 overflow-x-auto px-[calc(50%-8.25rem)] pt-0 pb-8 [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+        className="relative z-[10] flex-1 overflow-hidden pt-2 pb-8"
         onTouchStart={pauseForUser}
         onPointerDown={pauseForUser}
-        onWheel={pauseForUser}
       >
-        {MOBILE_EXTENDED.map((item) => {
-          const active = item.absolute === absActive
-          return (
+        <div
+          className={`quality-marquee-track flex w-max ${
+            marqueeRunning ? '' : 'is-paused'
+          }`}
+        >
+          {[0, 1].map((copy) => (
             <div
-              key={item.key}
-              ref={(el) => {
-                cardRefs.current[item.absolute] = el
-              }}
-              className="w-[16.5rem] shrink-0 snap-center"
+              key={`copy-${copy}`}
+              className="flex shrink-0 gap-4 pr-4 pl-5"
+              aria-hidden={copy === 1}
             >
-              <motion.div
-                animate={{
-                  scale: active ? 1 : 0.92,
-                  opacity: active ? 1 : 0.55,
-                  y: active ? -6 : 0,
-                }}
-                transition={{ duration: 0.35, ease: easeOutQuart }}
-                className="rounded-xl border px-4 py-4 backdrop-blur-md"
-                style={{
-                  backgroundColor: active
-                    ? 'rgba(250,240,230,0.9)'
-                    : 'rgba(250,240,230,0.68)',
-                  borderColor: active
-                    ? 'rgba(214,154,45,0.5)'
-                    : 'rgba(45,27,14,0.12)',
-                  boxShadow: active
-                    ? '0 12px 32px rgba(45,27,14,0.14)'
-                    : '0 6px 18px rgba(45,27,14,0.07)',
-                }}
-              >
-                <AnnotationCopy
-                  index={String(item.logical + 1).padStart(2, '0')}
-                  title={item.title}
-                  description={item.description}
-                  active={active}
-                  compact
-                />
-              </motion.div>
+              {cardSet.map((item, i) => {
+                const active = i === activeIndex
+                return (
+                  <div key={`${copy}-${item.id}`} className="w-[16.5rem] shrink-0">
+                    <motion.div
+                      animate={{
+                        scale: active ? 1 : 0.94,
+                        opacity: active ? 1 : 0.62,
+                      }}
+                      transition={{ duration: 0.35, ease: easeOutQuart }}
+                      className="rounded-xl border px-4 py-4 backdrop-blur-md"
+                      style={{
+                        backgroundColor: active
+                          ? 'rgba(250,240,230,0.9)'
+                          : 'rgba(250,240,230,0.68)',
+                        borderColor: active
+                          ? 'rgba(214,154,45,0.5)'
+                          : 'rgba(45,27,14,0.12)',
+                        boxShadow: active
+                          ? '0 12px 32px rgba(45,27,14,0.14)'
+                          : '0 6px 18px rgba(45,27,14,0.07)',
+                      }}
+                    >
+                      <AnnotationCopy
+                        index={String(i + 1).padStart(2, '0')}
+                        title={item.title}
+                        description={item.description}
+                        active={active}
+                        compact
+                      />
+                    </motion.div>
+                  </div>
+                )
+              })}
             </div>
-          )
-        })}
+          ))}
+        </div>
       </div>
     </div>
   )
