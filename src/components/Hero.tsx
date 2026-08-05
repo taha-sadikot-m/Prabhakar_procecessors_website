@@ -6,13 +6,13 @@ import { hero } from '../data/content'
 function DiamondEyebrow({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="h-px w-8 bg-gold/50 sm:w-12" aria-hidden="true" />
-      <span className="h-1.5 w-1.5 rotate-45 bg-gold" aria-hidden="true" />
+      <span className="h-px w-8 bg-mahogany/30 sm:w-12" aria-hidden="true" />
+      <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" aria-hidden="true" />
       <p className="font-sans text-[10px] font-medium tracking-[0.22em] text-ink-muted uppercase sm:text-[11px]">
         {text}
       </p>
-      <span className="h-1.5 w-1.5 rotate-45 bg-gold" aria-hidden="true" />
-      <span className="h-px w-8 bg-gold/50 sm:w-12" aria-hidden="true" />
+      <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" aria-hidden="true" />
+      <span className="h-px w-8 bg-mahogany/30 sm:w-12" aria-hidden="true" />
     </div>
   )
 }
@@ -27,8 +27,8 @@ function MobileEyebrow({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-2.5">
       <div className="mt-[0.45em] flex shrink-0 items-center gap-2" aria-hidden="true">
-        <span className="h-px w-6 bg-gold/50" />
-        <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+        <span className="h-px w-6 bg-mahogany/30" />
+        <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" />
       </div>
       <p className="text-left font-sans text-[9px] font-medium leading-snug tracking-[0.16em] text-ink-muted uppercase">
         {lines.map((line) => (
@@ -121,7 +121,7 @@ export function Hero() {
               {hero.headline[0]}
               <br />
               {hero.headline[1]}{' '}
-              <span className="text-gold">{hero.highlight}</span>
+              <span className="text-mahogany">{hero.highlight}</span>
             </motion.h1>
 
             <motion.p
@@ -147,7 +147,7 @@ export function Hero() {
         >
           <Link
             to={hero.ctaHref}
-            className="inline-flex items-center gap-2 border-b border-gold pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-gold uppercase transition-colors hover:border-gold-dark hover:text-gold-dark"
+            className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-colors hover:border-mahogany-dark hover:text-mahogany-dark"
           >
             {hero.cta}
             <span aria-hidden="true">→</span>
@@ -175,7 +175,7 @@ export function Hero() {
             {hero.headline[0]}
             <br />
             {hero.headline[1]}{' '}
-            <span className="text-gold">{hero.highlight}</span>
+            <span className="text-mahogany">{hero.highlight}</span>
           </motion.h1>
 
           <motion.p
@@ -195,7 +195,7 @@ export function Hero() {
           >
             <Link
               to={hero.ctaHref}
-              className="inline-flex items-center gap-2 border-b border-gold pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-gold uppercase transition-colors hover:border-gold-dark hover:text-gold-dark"
+              className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-colors hover:border-mahogany-dark hover:text-mahogany-dark"
             >
               {hero.cta}
               <span aria-hidden="true">→</span>
@@ -219,7 +219,7 @@ export function Hero() {
         </span>
         <span className="relative flex h-8 w-5 items-start justify-center rounded-full border border-ink/25 pt-1.5">
           <motion.span
-            className="h-1.5 w-1 rounded-full bg-gold"
+            className="h-1.5 w-1 rounded-full bg-mahogany"
             animate={{ y: [0, 8, 0], opacity: [1, 0.3, 1] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />

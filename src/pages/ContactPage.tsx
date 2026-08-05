@@ -1,6 +1,6 @@
 import { company, contactPage } from '../data/content'
 
-const GOLD = '#D4AF37'
+const MAHOGANY = '#674438'
 
 export function ContactPage() {
   return (
@@ -8,7 +8,7 @@ export function ContactPage() {
       <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
         <p
           className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-          style={{ color: GOLD }}
+          style={{ color: MAHOGANY }}
         >
           {contactPage.eyebrow}
         </p>
@@ -24,13 +24,13 @@ export function ContactPage() {
             <div>
               <p
                 className="font-sans text-[11px] font-medium tracking-[0.2em] uppercase"
-                style={{ color: GOLD }}
+                style={{ color: MAHOGANY }}
               >
                 Phone
               </p>
               <a
                 href={`tel:${company.phone.replace(/\s/g, '')}`}
-                className="mt-2 block font-serif text-2xl text-ink transition-colors hover:text-gold"
+                className="mt-2 block font-serif text-2xl text-ink transition-colors hover:text-mahogany"
               >
                 {company.phone}
               </a>
@@ -38,13 +38,13 @@ export function ContactPage() {
             <div>
               <p
                 className="font-sans text-[11px] font-medium tracking-[0.2em] uppercase"
-                style={{ color: GOLD }}
+                style={{ color: MAHOGANY }}
               >
                 Email
               </p>
               <a
                 href={`mailto:${company.email}`}
-                className="mt-2 block font-serif text-2xl text-ink transition-colors hover:text-gold"
+                className="mt-2 block font-serif text-2xl text-ink transition-colors hover:text-mahogany"
               >
                 {company.email}
               </a>
@@ -52,7 +52,7 @@ export function ContactPage() {
             <div>
               <p
                 className="font-sans text-[11px] font-medium tracking-[0.2em] uppercase"
-                style={{ color: GOLD }}
+                style={{ color: MAHOGANY }}
               >
                 Website
               </p>
@@ -60,7 +60,7 @@ export function ContactPage() {
                 href={company.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 block font-sans text-base text-ink-muted transition-colors hover:text-gold"
+                className="mt-2 block font-sans text-base text-ink-muted transition-colors hover:text-mahogany"
               >
                 {company.website.replace('https://', '')}
               </a>
@@ -70,7 +70,7 @@ export function ContactPage() {
           <div>
             <p
               className="font-sans text-[11px] font-medium tracking-[0.2em] uppercase"
-              style={{ color: GOLD }}
+              style={{ color: MAHOGANY }}
             >
               Visit Us
             </p>
@@ -85,8 +85,8 @@ export function ContactPage() {
               href={company.mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 border-b border-[#D4AF37] pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity hover:opacity-75"
-              style={{ color: GOLD }}
+              className="mt-6 inline-flex items-center gap-2 border-b border-[#674438] pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity hover:opacity-75"
+              style={{ color: MAHOGANY }}
             >
               Open In Google Maps
               <span aria-hidden="true">→</span>
@@ -99,8 +99,8 @@ export function ContactPage() {
             href={`mailto:${company.email}?subject=${encodeURIComponent(
               contactPage.ctaMailSubject,
             )}`}
-            className="inline-flex items-center gap-2 border-b border-[#D4AF37] pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity hover:opacity-75"
-            style={{ color: GOLD }}
+            className="inline-flex items-center gap-2 border-b border-[#674438] pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity hover:opacity-75"
+            style={{ color: MAHOGANY }}
           >
             Send An Enquiry
             <span aria-hidden="true">→</span>

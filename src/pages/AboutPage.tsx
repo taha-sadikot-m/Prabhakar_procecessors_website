@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom'
 import { aboutPage } from '../data/content'
 import { SectionCta } from '../components/SectionCta'
 
-const GOLD = '#D4AF37'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
 
 export function AboutPage() {
   return (
@@ -10,7 +11,7 @@ export function AboutPage() {
       <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
         <p
           className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-          style={{ color: GOLD }}
+          style={{ color: MAHOGANY }}
         >
           {aboutPage.eyebrow}
         </p>
@@ -51,7 +52,7 @@ export function AboutPage() {
                 >
                   <span
                     className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45"
-                    style={{ backgroundColor: GOLD }}
+                    style={{ backgroundColor: ACCENT }}
                     aria-hidden="true"
                   />
                   {item}
@@ -66,7 +67,7 @@ export function AboutPage() {
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
           {aboutPage.stats.map((stat) => (
             <div key={stat.label} className="text-center md:text-left">
-              <p className="font-serif text-4xl font-medium tracking-tight text-gold md:text-5xl">
+              <p className="font-serif text-4xl font-medium tracking-tight text-mahogany md:text-5xl">
                 {stat.value}
               </p>
               <p className="mt-2 font-sans text-[11px] font-medium tracking-[0.16em] text-ink-muted uppercase">
@@ -85,7 +86,7 @@ export function AboutPage() {
           <div className="mx-auto max-w-2xl text-center">
             <p
               className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-              style={{ color: GOLD }}
+              style={{ color: MAHOGANY }}
             >
               Leadership
             </p>
@@ -102,7 +103,7 @@ export function AboutPage() {
               <li key={member.name} className="group">
                 <div
                   className="aspect-[3/4] overflow-hidden border"
-                  style={{ borderColor: 'rgba(212, 175, 55, 0.25)' }}
+                  style={{ borderColor: 'rgba(103, 68, 56, 0.25)' }}
                 >
                   <img
                     src={member.image}
@@ -117,7 +118,7 @@ export function AboutPage() {
                   </p>
                   <p
                     className="mt-1.5 font-sans text-[11px] font-medium tracking-[0.18em] uppercase"
-                    style={{ color: GOLD }}
+                    style={{ color: MAHOGANY }}
                   >
                     {member.role}
                   </p>
@@ -137,10 +138,10 @@ export function AboutPage() {
         </p>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {aboutPage.usp.items.map((item, i) => (
-            <div key={item.title} className="border-t border-[#D4AF37]/40 pt-5">
+            <div key={item.title} className="border-t border-[#674438]/40 pt-5">
               <p
                 className="font-sans text-[10px] font-medium tracking-[0.2em] uppercase"
-                style={{ color: GOLD }}
+                style={{ color: MAHOGANY }}
               >
                 {String(i + 1).padStart(2, '0')}
               </p>
@@ -174,7 +175,7 @@ export function AboutPage() {
               >
                 <span
                   className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45"
-                  style={{ backgroundColor: GOLD }}
+                  style={{ backgroundColor: ACCENT }}
                   aria-hidden="true"
                 />
                 {item}
@@ -185,7 +186,7 @@ export function AboutPage() {
             <SectionCta label="Explore Services" to="/services" />
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-gold hover:text-gold"
+              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
             >
               Contact Us
               <span aria-hidden="true">→</span>

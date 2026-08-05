@@ -8,9 +8,11 @@ import {
 import { closing } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const CREAM = '#FFF8F0'
-const GOLD = '#D4AF37'
-const OVERLAY = 'rgba(20, 10, 4, 0.55)'
+const HEADING = '#20222D'
+const MAHOGANY = '#674438'
+const OVERLAY = 'rgba(250, 240, 230, 0.65)'
+const BODY = 'rgba(45, 27, 14, 0.7)'
+const ADDRESS = 'rgba(45, 27, 14, 0.45)'
 
 export function Closing() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -68,13 +70,13 @@ export function Closing() {
         >
           <p
             className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-            style={{ color: GOLD }}
+            style={{ color: MAHOGANY }}
           >
             {closing.eyebrow}
           </p>
           <h2
             className="mt-6 font-serif text-4xl leading-[1.12] font-light tracking-tight italic md:text-5xl lg:text-[3.4rem]"
-            style={{ color: CREAM }}
+            style={{ color: HEADING }}
           >
             {closing.headline[0]}
             <br />
@@ -82,7 +84,7 @@ export function Closing() {
           </h2>
           <p
             className="mx-auto mt-7 max-w-lg font-sans text-sm leading-relaxed md:text-base"
-            style={{ color: 'rgba(255,248,240,0.78)' }}
+            style={{ color: BODY }}
           >
             {closing.body}
           </p>
@@ -110,7 +112,7 @@ export function Closing() {
                     : undefined
                 }
                 className="font-sans text-[11px] font-medium tracking-[0.16em] uppercase transition-opacity hover:opacity-80 md:text-xs"
-                style={{ color: CREAM }}
+                style={{ color: HEADING }}
               >
                 {item.label}
               </a>
@@ -131,13 +133,13 @@ export function Closing() {
           <SectionCta
             label={closing.cta}
             to={closing.ctaHref}
-            variant="cream"
+            variant="navy"
           />
         </motion.div>
 
         <motion.address
           className="mx-auto mt-12 max-w-sm font-sans text-[11px] leading-relaxed not-italic md:text-xs"
-          style={{ color: 'rgba(255,248,240,0.45)' }}
+          style={{ color: ADDRESS }}
           initial={reduceMotion ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.35 }}

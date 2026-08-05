@@ -17,8 +17,9 @@ import { SectionCta } from './SectionCta'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const GOLD = '#D4AF37'
-const INK = '#2C2C2C'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
+const INK = '#2D1B0E'
 const MILESTONE_COUNT = ecosystem.milestones.length
 
 /** Square geometric orbital ring (viewBox units). */
@@ -98,9 +99,9 @@ function JewelDot({ active, className = '' }: { active: boolean; className?: str
       } ${className}`}
       style={{
         background:
-          'radial-gradient(circle at 35% 30%, #F3E0A8 0%, #D4AF37 48%, #8F6A1F 100%)',
+          'radial-gradient(circle at 35% 30%, #C4A192 0%, #674438 48%, #3A241C 100%)',
         boxShadow: active
-          ? '0 0 0 3px rgba(250,240,230,0.95), 0 0 14px rgba(212,175,55,0.55)'
+          ? '0 0 0 3px rgba(250,240,230,0.95), 0 0 14px rgba(103,68,56,0.55)'
           : '0 0 0 2px rgba(250,240,230,0.95), 0 1px 4px rgba(45,27,14,0.18)',
       }}
     />
@@ -300,18 +301,18 @@ export function Ecosystem() {
           <header className="mx-auto max-w-2xl text-center md:mx-0 md:w-full md:max-w-sm md:shrink-0 md:text-left lg:max-w-md">
             <p
               className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-              style={{ color: GOLD }}
+              style={{ color: MAHOGANY }}
             >
               {ecosystem.eyebrow}
             </p>
-            <h2 className="mt-4 font-serif text-3xl font-medium tracking-tight text-[#1F1A14] md:text-4xl md:leading-[1.12] md:text-[#2C2C2C] lg:text-5xl">
+            <h2 className="mt-4 font-serif text-3xl font-medium tracking-tight text-[#20222D] md:text-4xl md:leading-[1.12] md:text-[#20222D] lg:text-5xl">
               {ecosystem.headline[0]}
               <br />
-              <span className="italic" style={{ color: GOLD }}>
+              <span className="italic" style={{ color: MAHOGANY }}>
                 {ecosystem.headline[1]}
               </span>
             </h2>
-            <p className="mx-auto mt-5 max-w-xl font-sans text-sm leading-relaxed text-[#2C2C2C]/70 md:mx-0 md:max-w-md md:text-base">
+            <p className="mx-auto mt-5 max-w-xl font-sans text-sm leading-relaxed text-[#20222D]/70 md:mx-0 md:max-w-md md:text-base">
               {ecosystem.body}
             </p>
             <div className="mt-8 flex justify-center md:justify-start">
@@ -346,7 +347,7 @@ export function Ecosystem() {
               cy={RING.cy}
               r={RING.rInner}
               fill="none"
-              stroke={GOLD}
+              stroke={ACCENT}
               strokeWidth={0.9}
               strokeDasharray="4 7"
               opacity={0.28}
@@ -359,9 +360,10 @@ export function Ecosystem() {
               cy={RING.cy}
               r={RING.r}
               fill="none"
-              stroke={GOLD}
+              stroke={ACCENT}
               strokeWidth={1.35}
               strokeLinecap="round"
+              opacity={0.5}
             />
 
             {/* Short radial ticks at each station */}
@@ -373,7 +375,7 @@ export function Ecosystem() {
                   y1={s.tickY1}
                   x2={s.tickX2}
                   y2={s.tickY2}
-                  stroke={GOLD}
+                  stroke={ACCENT}
                   strokeWidth={1.1}
                   strokeLinecap="round"
                 />
@@ -393,11 +395,11 @@ export function Ecosystem() {
             >
               <p
                 className="font-serif text-5xl font-medium leading-none tracking-tight"
-                style={{ color: GOLD }}
+                style={{ color: MAHOGANY }}
               >
                 8
               </p>
-              <p className="mt-2 font-sans text-[10px] font-medium tracking-[0.28em] text-[#5C4030] uppercase">
+              <p className="mt-2 font-sans text-[10px] font-medium tracking-[0.28em] text-[#674438] uppercase">
                 Stages
               </p>
             </div>
@@ -442,37 +444,37 @@ export function Ecosystem() {
                     className="flex flex-col items-center gap-1.5 rounded-xl px-2.5 py-2.5 text-center backdrop-blur-sm"
                     style={{
                       backgroundColor: 'rgba(250,240,230,0.92)',
-                      border: '1px solid rgba(212,175,55,0.28)',
+                      border: '1px solid rgba(103,68,56,0.28)',
                       boxShadow: '0 8px 24px rgba(45,27,14,0.08)',
                     }}
                   >
                     <span
                       className="inline-flex size-11 items-center justify-center rounded-full border lg:size-12"
                       style={{
-                        borderColor: 'rgba(212,175,55,0.65)',
+                        borderColor: 'rgba(103,68,56,0.65)',
                         backgroundColor: 'rgba(255,252,247,0.95)',
-                        color: GOLD,
+                        color: ACCENT,
                       }}
                     >
                       <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
                     </span>
                     <p
                       className="font-sans text-[8px] font-medium tracking-[0.22em] uppercase"
-                      style={{ color: GOLD, opacity: 0.8 }}
+                      style={{ color: MAHOGANY, opacity: 0.8 }}
                     >
                       {indexLabel}
                     </p>
                     <div className="flex flex-col items-center">
-                      <p className="font-serif text-base font-semibold tracking-tight text-[#1F1A14] lg:text-lg">
+                      <p className="font-serif text-base font-semibold tracking-tight text-[#20222D] lg:text-lg">
                         {milestone.name}
                       </p>
                       <span
                         className="mt-1.5 block h-[1.5px] w-8"
-                        style={{ backgroundColor: GOLD }}
+                        style={{ backgroundColor: ACCENT }}
                         aria-hidden="true"
                       />
                     </div>
-                    <p className="font-sans text-[10px] leading-snug text-[#2C2C2C]/65">
+                    <p className="font-sans text-[10px] leading-snug text-[#20222D]/65">
                       {milestone.description}
                     </p>
                   </div>
@@ -485,11 +487,11 @@ export function Ecosystem() {
 
         {/* ── Mobile vertical journey ── */}
         <div ref={mobileJourneyRef} className="relative mt-10 md:hidden">
-          {/* Continuous gold spine — CSS rail (no broken SVG stretch) */}
+          {/* Continuous mahogany spine — CSS rail (no broken SVG stretch) */}
           <div
             ref={mobileSpineRef}
             className="pointer-events-none absolute top-6 bottom-6 left-3 z-0 w-[1.5px] -translate-x-1/2 origin-top"
-            style={{ backgroundColor: GOLD }}
+            style={{ backgroundColor: 'rgba(103,68,56,0.3)' }}
             aria-hidden="true"
           />
 
@@ -527,7 +529,7 @@ export function Ecosystem() {
           position: absolute;
           inset: -5px;
           border-radius: 9999px;
-          border: 1px solid rgba(212, 175, 55, 0.5);
+          border: 1px solid rgba(103, 68, 56, 0.5);
           opacity: 0;
           transform: scale(0.55);
           pointer-events: none;
@@ -571,30 +573,30 @@ function MilestoneCopy({
       className="flex max-w-[18rem] flex-1 items-start gap-3 rounded-xl border px-3 py-3 backdrop-blur-sm"
       style={{
         backgroundColor: 'rgba(250,240,230,0.92)',
-        borderColor: 'rgba(212,175,55,0.28)',
+        borderColor: 'rgba(103,68,56,0.28)',
         boxShadow: '0 8px 20px rgba(45,27,14,0.06)',
       }}
     >
       <span
         className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border"
         style={{
-          borderColor: 'rgba(212,175,55,0.6)',
+          borderColor: 'rgba(103,68,56,0.6)',
           backgroundColor: 'rgba(255,252,247,0.95)',
-          color: GOLD,
+          color: ACCENT,
         }}
       >
         <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
       </span>
       <div className="min-w-0 text-left">
-        <p className="font-serif text-base font-semibold tracking-tight text-[#1F1A14]">
+        <p className="font-serif text-base font-semibold tracking-tight text-[#20222D]">
           {name}
         </p>
         <span
           className="mt-1 block h-[1.5px] w-7"
-          style={{ backgroundColor: GOLD }}
+          style={{ backgroundColor: ACCENT }}
           aria-hidden="true"
         />
-        <p className="mt-1.5 font-sans text-sm leading-relaxed text-[#2C2C2C]/65">
+        <p className="mt-1.5 font-sans text-sm leading-relaxed text-[#20222D]/65">
           {description}
         </p>
       </div>

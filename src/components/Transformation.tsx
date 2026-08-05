@@ -10,9 +10,10 @@ import {
 import { transformation } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const IVORY = '#FAF8F3'
-const CHARCOAL = '#2C2C2C'
-const AMBER = '#D69A2D'
+const IVORY = '#FFF8F2'
+const CHARCOAL = '#20222D'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
 
 const stages = transformation.stages
 const STAGE_COUNT = stages.length
@@ -44,11 +45,11 @@ function ProgressRail({
         >
           <div
             className="absolute inset-0 rounded-full"
-            style={{ backgroundColor: 'rgba(44,44,44,0.14)' }}
+            style={{ backgroundColor: 'rgba(45,27,14,0.14)' }}
           />
           <motion.div
             className="absolute inset-y-0 left-0 rounded-full"
-            style={{ backgroundColor: AMBER }}
+            style={{ backgroundColor: ACCENT }}
             animate={{ width: `${fill * 100}%` }}
             transition={{ type: 'spring', stiffness: 110, damping: 24, mass: 0.6 }}
           />
@@ -68,11 +69,11 @@ function ProgressRail({
                   animate={{
                     width: active ? 11 : 8,
                     height: active ? 11 : 8,
-                    backgroundColor: reached ? AMBER : IVORY,
-                    borderColor: reached ? AMBER : 'rgba(44,44,44,0.28)',
+                    backgroundColor: reached ? ACCENT : IVORY,
+                    borderColor: reached ? ACCENT : 'rgba(45,27,14,0.28)',
                     boxShadow: active
-                      ? `0 0 0 3px rgba(214,154,45,0.22)`
-                      : '0 0 0 0px rgba(214,154,45,0)',
+                      ? `0 0 0 3px rgba(103,68,56,0.22)`
+                      : '0 0 0 0px rgba(103,68,56,0)',
                   }}
                   transition={{ type: 'spring', stiffness: 280, damping: 22 }}
                 />
@@ -95,10 +96,10 @@ function ProgressRail({
               className="text-center font-sans text-[9px] tracking-[0.14em] uppercase transition-colors duration-300 md:text-[10px]"
               style={{
                 color: active
-                  ? AMBER
+                  ? MAHOGANY
                   : reached
-                    ? 'rgba(214,154,45,0.72)'
-                    : 'rgba(44,44,44,0.4)',
+                    ? 'rgba(103,68,56,0.72)'
+                    : 'rgba(45,27,14,0.4)',
                 fontWeight: active ? 600 : 500,
               }}
             >
@@ -119,13 +120,13 @@ function StageCopy({
   light?: boolean
 }) {
   const titleColor = light ? '#F7F4EE' : CHARCOAL
-  const bodyColor = light ? 'rgba(247,244,238,0.82)' : 'rgba(44,44,44,0.72)'
+  const bodyColor = light ? 'rgba(247,244,238,0.82)' : 'rgba(45,27,14,0.72)'
 
   return (
     <div className="max-w-md text-left lg:max-w-lg">
       <p
         className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-        style={{ color: AMBER }}
+        style={{ color: MAHOGANY }}
       >
         {stage.step}
       </p>
@@ -244,10 +245,10 @@ function DesktopStickyStory() {
             <h2 className="font-serif text-4xl font-medium tracking-tight lg:text-5xl">
               {transformation.title}
             </h2>
-            <p className="mt-1 font-serif text-2xl italic lg:text-3xl" style={{ color: AMBER }}>
+            <p className="mt-1 font-serif text-2xl italic lg:text-3xl" style={{ color: MAHOGANY }}>
               {transformation.subtitle}
             </p>
-            <p className="mt-3 max-w-md font-sans text-sm leading-relaxed text-[#2C2C2C]/70">
+            <p className="mt-3 max-w-md font-sans text-sm leading-relaxed text-ink-muted">
               {transformation.intro}
             </p>
           </div>
@@ -336,10 +337,10 @@ function MobileSnapStory() {
                     <h2 className="font-serif text-3xl font-medium tracking-tight">
                       {transformation.title}
                     </h2>
-                    <p className="mt-1 font-serif text-xl italic" style={{ color: AMBER }}>
+                    <p className="mt-1 font-serif text-xl italic" style={{ color: MAHOGANY }}>
                       {transformation.subtitle}
                     </p>
-                    <p className="mt-3 font-sans text-sm leading-relaxed text-[#2C2C2C]/70">
+                    <p className="mt-3 font-sans text-sm leading-relaxed text-ink-muted">
                       {transformation.intro}
                     </p>
                   </div>
@@ -373,7 +374,7 @@ export function Transformation() {
     <section id="transformation" className="scroll-mt-24">
       <DesktopStickyStory />
       <MobileSnapStory />
-      <div className="flex justify-center bg-[#FAF8F3] px-5 py-10 md:py-12">
+      <div className="flex justify-center bg-cream-light px-5 py-10 md:py-12">
         <SectionCta
           label={transformation.cta}
           to={transformation.ctaHref}

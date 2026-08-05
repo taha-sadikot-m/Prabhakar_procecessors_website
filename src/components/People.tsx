@@ -10,7 +10,7 @@ import { people } from '../data/content'
 import { SectionCta } from './SectionCta'
 
 const CREAM = '#FAF0E6'
-const GOLD = '#D4AF37'
+const MAHOGANY = '#674438'
 
 function QuoteReveal({
   quote,
@@ -74,11 +74,11 @@ function PeopleHeading({ reduceMotion }: { reduceMotion: boolean | null }) {
     >
       <p
         className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-        style={{ color: GOLD }}
+        style={{ color: MAHOGANY }}
       >
         {people.eyebrow}
       </p>
-      <h2 className="mt-5 font-serif text-[2.35rem] leading-[1.08] font-medium tracking-tight text-ink md:text-4xl lg:text-[2.85rem]">
+      <h2 className="mt-5 font-serif text-[2.35rem] leading-[1.08] font-medium tracking-tight text-heading md:text-4xl lg:text-[2.85rem]">
         {people.headline[0]}
         <br />
         {people.headline[1]}

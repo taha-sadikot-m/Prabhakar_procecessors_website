@@ -2,11 +2,12 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { future } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const INDIGO = '#1A237E'
-const CREAM = '#FFF8F0'
-const GOLD = '#D4AF37'
-const DIVIDER = 'rgba(212,175,55,0.15)'
-const BODY = 'rgba(255,248,240,0.55)'
+const SURFACE = '#F0F2F8'
+const HEADING = '#20222D'
+const MAHOGANY = '#674438'
+const ACCENT = '#674438'
+const DIVIDER = 'rgba(32,34,45,0.08)'
+const BODY = 'rgba(45,27,14,0.6)'
 
 export function Future() {
   const reduceMotion = useReducedMotion()
@@ -15,7 +16,7 @@ export function Future() {
     <section
       id="future"
       className="scroll-mt-24 py-20 md:py-28 lg:py-32"
-      style={{ backgroundColor: INDIGO }}
+      style={{ backgroundColor: SURFACE }}
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8 lg:px-10">
         <motion.div
@@ -30,13 +31,13 @@ export function Future() {
         >
           <p
             className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-            style={{ color: GOLD }}
+            style={{ color: MAHOGANY }}
           >
             {future.eyebrow}
           </p>
           <h2
             className="mt-5 font-serif text-4xl leading-[1.12] font-medium tracking-tight md:text-5xl lg:text-[3.25rem]"
-            style={{ color: CREAM }}
+            style={{ color: HEADING }}
           >
             {future.headline}
           </h2>
@@ -83,14 +84,14 @@ export function Future() {
 
                 <h3
                   className="font-serif text-[1.45rem] leading-snug font-normal tracking-tight md:text-[1.6rem]"
-                  style={{ color: CREAM }}
+                  style={{ color: HEADING }}
                 >
                   {panel.title}
                 </h3>
 
                 <motion.span
                   className="mt-3 mb-4 block h-px origin-left"
-                  style={{ width: 28, backgroundColor: GOLD }}
+                  style={{ width: 28, backgroundColor: ACCENT }}
                   initial={reduceMotion ? false : { scaleX: 0 }}
                   whileInView={{ scaleX: 1 }}
                   viewport={{ once: true, margin: '-40px' }}
@@ -117,7 +118,7 @@ export function Future() {
           <SectionCta
             label={future.cta}
             to={future.ctaHref}
-            variant="cream"
+            variant="navy"
           />
         </div>
       </div>

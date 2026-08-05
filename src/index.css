@@ -1,14 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #f9f6f0;
-  --color-cream-dark: #f0ebe3;
-  --color-ink: #2d3436;
-  --color-ink-muted: #5c6366;
-  --color-gold: #b76e2a;
-  --color-gold-dark: #9a5a20;
-  --color-gold-soft: #d4a574;
-  --color-line: #d9d2c5;
+  /* surfaces */
+  --color-cream: #faf0e6; /* surface-primary */
+  --color-cream-light: #fff8f2; /* surface-secondary */
+  --color-cream-dark: #f2e8d8; /* surface-tertiary — parchment */
+  --color-indigo-tint: #f0f2f8; /* surface-accent */
+
+  /* text */
+  --color-heading: #20222d;
+  --color-ink: #2d1b0e;
+  --color-ink-muted: rgba(45, 27, 14, 0.55);
+  --color-ink-ghost: rgba(45, 27, 14, 0.12);
+  --color-mahogany: #674438;
+  --color-mahogany-dark: #4e332a;
+
+  /* accents */
+  --color-line: rgba(45, 27, 14, 0.12);
+  --color-saffron: #f7941d;
+  --color-crimson: #cc2936;
+  --color-marigold: #ffb627;
+  --color-indigo: #1a237e;
+  --color-teal: #168aad;
+
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
 }
@@ -28,6 +42,6 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-gold) 35%, white);
+  background: color-mix(in srgb, var(--color-mahogany) 22%, white);
   color: var(--color-ink);
 }

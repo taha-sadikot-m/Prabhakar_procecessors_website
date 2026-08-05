@@ -6,9 +6,9 @@ import { SectionCta } from './SectionCta'
 function DiamondDivider() {
   return (
     <div className="mt-6 flex items-center gap-3" aria-hidden="true">
-      <span className="h-px w-10 bg-gold/50" />
-      <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
-      <span className="h-px w-10 bg-gold/50" />
+      <span className="h-px w-10 bg-mahogany/30" />
+      <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" />
+      <span className="h-px w-10 bg-mahogany/30" />
     </div>
   )
 }
@@ -30,7 +30,7 @@ function StatRing({
         aria-hidden="true"
       />
       <svg
-        className="absolute inset-0 z-[1] h-full w-full text-gold"
+        className="absolute inset-0 z-[1] h-full w-full text-mahogany"
         viewBox="0 0 120 120"
         fill="none"
         aria-hidden="true"
@@ -41,7 +41,7 @@ function StatRing({
           r="52"
           stroke="currentColor"
           strokeWidth="1.25"
-          strokeOpacity="0.7"
+          strokeOpacity="0.45"
           strokeDasharray="220 110"
           strokeLinecap="round"
           transform="rotate(-40 60 60)"
@@ -49,7 +49,7 @@ function StatRing({
         <circle cx="108" cy="42" r="2.5" fill="currentColor" />
       </svg>
       <div className="relative z-10 flex max-w-[5.5rem] flex-col items-center px-2 text-center md:max-w-[6.5rem]">
-        <p className="font-serif text-2xl font-medium tracking-tight text-gold md:text-3xl">
+        <p className="font-serif text-2xl font-medium tracking-tight text-mahogany md:text-3xl">
           <CountUp value={value} suffix={suffix} />
         </p>
         <p className="mt-1 font-sans text-[8px] font-medium tracking-[0.14em] text-ink uppercase md:text-[9px]">
@@ -86,18 +86,18 @@ export function Journey() {
 
       <div className="relative z-10 mx-auto flex min-h-[90svh] max-w-7xl flex-col px-5 py-20 md:px-8 md:py-28 lg:px-10">
         <FadeIn className="max-w-md lg:max-w-lg">
-          <p className="font-sans text-[11px] font-medium tracking-[0.22em] text-gold uppercase">
+          <p className="font-sans text-[11px] font-medium tracking-[0.22em] text-mahogany uppercase">
             {journey.eyebrow}
           </p>
           <h2 className="mt-5 font-serif text-4xl leading-[1.12] font-medium tracking-tight text-ink md:text-5xl lg:text-[3.25rem]">
             {journey.headline}{' '}
-            <span className="text-gold">{journey.highlight}</span>
+            <span className="text-mahogany">{journey.highlight}</span>
           </h2>
           <DiamondDivider />
           <p className="mt-7 font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {journey.body}
           </p>
-          <p className="mt-5 font-serif text-lg leading-snug text-gold md:text-xl">
+          <p className="mt-5 font-serif text-lg leading-snug text-mahogany md:text-xl">
             {journey.commitment}
           </p>
           <div className="mt-8">

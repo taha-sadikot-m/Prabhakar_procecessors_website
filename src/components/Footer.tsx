@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom'
 import { Logo } from '../assets/logo'
 import { company, navLinks } from '../data/content'
 
-const GOLD = '#D4AF37'
+const ACCENT = '#674438'
 
 export function Footer() {
   return (
-    <footer className="border-t border-[#D4AF37]/30 bg-cream-dark text-ink">
+    <footer className="border-t border-[#674438]/30 bg-cream-dark text-ink">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-3 md:gap-10 md:px-8 lg:px-10 lg:py-20">
         <div>
           <Logo />
@@ -21,13 +21,13 @@ export function Footer() {
         <div>
           <p
             className="font-sans text-[11px] font-medium tracking-[0.2em] uppercase"
-            style={{ color: GOLD }}
+            style={{ color: ACCENT }}
           >
             Navigate
           </p>
           <span
             className="mt-2.5 mb-5 block h-px w-8"
-            style={{ backgroundColor: GOLD }}
+            style={{ backgroundColor: ACCENT }}
             aria-hidden="true"
           />
           <ul className="space-y-2.5">
@@ -35,7 +35,7 @@ export function Footer() {
               <li key={link.label}>
                 <Link
                   to={link.href}
-                  className="font-sans text-sm text-ink-muted transition-colors hover:text-[#D4AF37]"
+                  className="font-sans text-sm text-ink-muted transition-colors hover:text-mahogany"
                 >
                   {link.label}
                 </Link>
@@ -47,25 +47,25 @@ export function Footer() {
         <div>
           <p
             className="font-sans text-[11px] font-medium tracking-[0.2em] uppercase"
-            style={{ color: GOLD }}
+            style={{ color: ACCENT }}
           >
             Contact
           </p>
           <span
             className="mt-2.5 mb-5 block h-px w-8"
-            style={{ backgroundColor: GOLD }}
+            style={{ backgroundColor: ACCENT }}
             aria-hidden="true"
           />
           <div className="space-y-3 font-sans text-sm">
             <a
               href={`tel:${company.phone.replace(/\s/g, '')}`}
-              className="block font-medium text-ink transition-colors hover:text-[#D4AF37]"
+              className="block font-medium text-ink transition-colors hover:text-mahogany"
             >
               {company.phone}
             </a>
             <a
               href={`mailto:${company.email}`}
-              className="block font-medium text-ink transition-colors hover:text-[#D4AF37]"
+              className="block font-medium text-ink transition-colors hover:text-mahogany"
             >
               {company.email}
             </a>
@@ -80,7 +80,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-[#D4AF37]/20">
+      <div className="border-t border-[#674438]/20">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-5 py-5 font-sans text-xs text-ink-muted sm:flex-row sm:gap-3 md:px-8 lg:px-10">
           <p>
             © {new Date().getFullYear()} {company.legalName}. All rights
@@ -88,7 +88,7 @@ export function Footer() {
           </p>
           <span
             className="hidden h-1 w-1 rotate-45 sm:inline-block"
-            style={{ backgroundColor: GOLD }}
+            style={{ backgroundColor: ACCENT }}
             aria-hidden="true"
           />
           <p>Surat, Gujarat, India</p>

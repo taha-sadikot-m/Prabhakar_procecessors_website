@@ -14,7 +14,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { serve } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const GOLD = '#D4AF37'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
 const CREAM = '#FAF0E6'
 const AUTO_MS = 5000
 const PAUSE_MS = 4500
@@ -168,13 +169,13 @@ export function Serve() {
               >
                 <p
                   className="font-sans text-xs font-semibold tracking-[0.2em] uppercase md:text-[13px]"
-                  style={{ color: GOLD }}
+                  style={{ color: MAHOGANY }}
                 >
                   {slide.category}
                 </p>
                 <span
                   className="mt-3 block h-px w-8"
-                  style={{ backgroundColor: GOLD }}
+                  style={{ backgroundColor: ACCENT }}
                   aria-hidden="true"
                 />
                 <h3 className="mt-4 font-serif text-3xl leading-tight font-medium tracking-tight text-ink md:text-[2.35rem]">
@@ -219,8 +220,8 @@ export function Serve() {
                       animate={{
                         scale: active ? 1.15 : 1,
                         backgroundColor: active
-                          ? GOLD
-                          : 'rgba(44,44,44,0.28)',
+                          ? ACCENT
+                          : 'rgba(45,27,14,0.28)',
                       }}
                       transition={{ duration: reduceMotion ? 0.1 : 0.25 }}
                       style={{ width: 8, height: 8 }}

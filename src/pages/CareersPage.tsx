@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { careersPage, company } from '../data/content'
 
-const GOLD = '#D4AF37'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
 
 const fieldClass =
-  'w-full border border-line bg-cream px-4 py-3 font-sans text-sm text-ink outline-none transition-colors focus:border-[#D4AF37]'
+  'w-full border border-line bg-cream px-4 py-3 font-sans text-sm text-ink outline-none transition-colors focus:border-[#674438]'
 
 export function CareersPage() {
   const [submitted, setSubmitted] = useState(false)
@@ -19,7 +20,7 @@ export function CareersPage() {
       <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
         <p
           className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-          style={{ color: GOLD }}
+          style={{ color: MAHOGANY }}
         >
           {careersPage.eyebrow}
         </p>
@@ -44,7 +45,7 @@ export function CareersPage() {
               >
                 <span
                   className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45"
-                  style={{ backgroundColor: GOLD }}
+                  style={{ backgroundColor: ACCENT }}
                   aria-hidden="true"
                 />
                 {item}
@@ -65,7 +66,7 @@ export function CareersPage() {
           {careersPage.culture.moments.map((moment) => (
             <article
               key={moment.title}
-              className="border-t border-[#D4AF37]/40 pt-5"
+              className="border-t border-[#674438]/40 pt-5"
             >
               <h3 className="font-serif text-xl font-medium text-ink">
                 {moment.title}
@@ -91,14 +92,14 @@ export function CareersPage() {
           </p>
 
           {submitted ? (
-            <div className="mt-10 border border-[#D4AF37]/40 bg-cream px-6 py-8">
+            <div className="mt-10 border border-[#674438]/40 bg-cream px-6 py-8">
               <p className="font-serif text-2xl text-ink">Thank you.</p>
               <p className="mt-3 font-sans text-sm text-ink-muted">
                 Your application has been recorded locally. Please also email
                 your resume to{' '}
                 <a
                   href={`mailto:${company.email}`}
-                  className="text-gold underline-offset-2 hover:underline"
+                  className="text-mahogany underline-offset-2 hover:underline"
                 >
                   {company.email}
                 </a>{' '}
@@ -301,8 +302,8 @@ export function CareersPage() {
 
               <button
                 type="submit"
-                className="mt-2 inline-flex items-center gap-2 border-b border-[#D4AF37] pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity hover:opacity-75"
-                style={{ color: GOLD }}
+                className="mt-2 inline-flex items-center gap-2 border-b border-[#674438] pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity hover:opacity-75"
+                style={{ color: MAHOGANY }}
               >
                 Submit Application
                 <span aria-hidden="true">→</span>

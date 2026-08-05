@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Logo } from '../assets/logo'
 import { navLinks } from '../data/content'
 
-const GOLD = '#D4AF37'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
 
 const pageLinks = navLinks.filter((link) => link.href !== '/contact')
 
@@ -30,9 +31,9 @@ export function Header() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         open
-          ? 'border-b border-[#D4AF37]/25 bg-cream'
+          ? 'border-b border-[#674438]/25 bg-cream'
           : scrolled
-            ? 'border-b border-[#D4AF37]/25 bg-cream/95 backdrop-blur-md'
+            ? 'border-b border-[#674438]/25 bg-cream/95 backdrop-blur-md'
             : 'border-b border-transparent bg-transparent'
       }`}
     >
@@ -63,7 +64,7 @@ export function Header() {
                     className={`absolute inset-x-0 -bottom-1 h-px origin-left transition-transform duration-300 ${
                       isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                     }`}
-                    style={{ backgroundColor: GOLD }}
+                    style={{ backgroundColor: ACCENT }}
                     aria-hidden="true"
                   />
                 </>
@@ -75,7 +76,7 @@ export function Header() {
         <div className="flex items-center justify-end gap-3 justify-self-end">
           <Link
             to="/contact"
-            className="hidden font-sans text-[11px] font-semibold tracking-[0.16em] text-[#D4AF37] uppercase transition-opacity hover:opacity-75 lg:inline-block"
+            className="hidden font-sans text-[11px] font-semibold tracking-[0.16em] text-mahogany uppercase transition-opacity hover:opacity-75 lg:inline-block"
           >
             Contact
           </Link>
@@ -84,8 +85,8 @@ export function Header() {
             type="button"
             className={`relative z-50 flex h-11 w-11 items-center justify-center rounded-full border transition-colors xl:hidden ${
               open
-                ? 'border-[#D4AF37] text-[#D4AF37]'
-                : 'border-ink/25 hover:border-[#D4AF37] hover:text-[#D4AF37]'
+                ? 'border-[#674438] text-[#674438]'
+                : 'border-ink/25 hover:border-[#674438] hover:text-mahogany'
             }`}
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
@@ -121,12 +122,12 @@ export function Header() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
             className="fixed inset-x-0 top-[68px] bottom-0 z-40 flex flex-col overflow-y-auto bg-cream"
-            style={{ backgroundColor: '#F9F6F0' }}
+            style={{ backgroundColor: '#FAF0E6' }}
           >
             <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-6 py-8">
               <p
                 className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-                style={{ color: GOLD }}
+                style={{ color: MAHOGANY }}
               >
                 Menu
               </p>
@@ -143,8 +144,8 @@ export function Header() {
                       end={link.href === '/'}
                       onClick={() => setOpen(false)}
                       className={({ isActive }) =>
-                        `block border-b border-line/80 py-4 font-sans text-sm font-medium tracking-[0.16em] uppercase transition-colors hover:text-[#D4AF37] ${
-                          isActive ? 'text-[#D4AF37]' : 'text-ink'
+                        `block border-b border-line/80 py-4 font-sans text-sm font-medium tracking-[0.16em] uppercase transition-colors hover:text-mahogany ${
+                          isActive ? 'text-mahogany' : 'text-ink'
                         }`
                       }
                     >
@@ -159,13 +160,13 @@ export function Header() {
                   to="/contact"
                   onClick={() => setOpen(false)}
                   className="relative inline-block font-sans text-[0.9rem] font-medium tracking-[0.12em] uppercase"
-                  style={{ color: GOLD }}
+                  style={{ color: MAHOGANY }}
                 >
                   Contact
                   <span aria-hidden="true"> →</span>
                   <span
                     className="absolute inset-x-0 -bottom-0.5 h-px"
-                    style={{ backgroundColor: GOLD }}
+                    style={{ backgroundColor: ACCENT }}
                     aria-hidden="true"
                   />
                 </Link>

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { testimonialsPage } from '../data/content'
 import { SectionCta } from '../components/SectionCta'
 
-const GOLD = '#D4AF37'
+const MAHOGANY = '#674438'
 
 export function TestimonialsPage() {
   return (
@@ -10,7 +10,7 @@ export function TestimonialsPage() {
       <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
         <p
           className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-          style={{ color: GOLD }}
+          style={{ color: MAHOGANY }}
         >
           {testimonialsPage.eyebrow}
         </p>
@@ -32,7 +32,7 @@ export function TestimonialsPage() {
               >
                 <p
                   className="font-sans text-[11px] font-medium tracking-[0.18em] uppercase"
-                  style={{ color: GOLD }}
+                  style={{ color: MAHOGANY }}
                 >
                   {item.type}
                 </p>
@@ -52,7 +52,7 @@ export function TestimonialsPage() {
             <SectionCta label="Start A Partnership" to="/contact" />
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-gold hover:text-gold"
+              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
             >
               View Services
               <span aria-hidden="true">→</span>

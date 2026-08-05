@@ -4,21 +4,25 @@ type SectionCtaProps = {
   label: string
   to: string
   className?: string
-  variant?: 'gold' | 'cream' | 'dark'
+  variant?: 'accent' | 'cream' | 'dark' | 'navy'
 }
 
 const styles = {
-  gold: 'border-gold text-gold hover:border-gold-dark hover:text-gold-dark',
-  cream:
-    'border-[#D4AF37] text-[#D4AF37] hover:opacity-80',
-  dark: 'border-ink/40 text-ink hover:border-gold hover:text-gold',
+  /** Mahogany underline + mahogany text (AA on cream) */
+  accent:
+    'border-mahogany text-mahogany hover:border-mahogany-dark hover:text-mahogany-dark',
+  /** Legacy alias — same as navy for light surfaces */
+  cream: 'border-mahogany text-heading hover:opacity-80',
+  dark: 'border-ink/40 text-ink hover:border-mahogany hover:text-mahogany',
+  /** Navy text + mahogany underline — Closing / Future light CTAs */
+  navy: 'border-mahogany text-heading hover:opacity-80',
 } as const
 
 export function SectionCta({
   label,
   to,
   className = '',
-  variant = 'gold',
+  variant = 'accent',
 }: SectionCtaProps) {
   return (
     <Link

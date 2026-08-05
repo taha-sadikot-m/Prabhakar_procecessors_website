@@ -24,9 +24,10 @@ import {
 import { partnerships } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const GOLD = '#D4AF37'
-const CREAM = '#FAF0E6'
-const INK = '#2C2C2C'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
+const PARCHMENT = '#F2E8D8'
+const INK = '#2D1B0E'
 
 const ICONS: Record<
   (typeof partnerships.partners)[number]['id'],
@@ -109,7 +110,7 @@ function PartnerCard({
         }`}
         style={{
           backgroundColor: 'rgba(250,240,230,0.88)',
-          borderColor: 'rgba(212,175,55,0.3)',
+          borderColor: 'rgba(103,68,56,0.3)',
           boxShadow: expanded
             ? '0 16px 40px rgba(45,27,14,0.14)'
             : '0 8px 24px rgba(45,27,14,0.08)',
@@ -128,19 +129,19 @@ function PartnerCard({
               >
                 <p
                   className="font-sans text-[10px] font-medium tracking-[0.18em] uppercase"
-                  style={{ color: GOLD }}
+                  style={{ color: MAHOGANY }}
                 >
                   {partner.years} Years
                 </p>
-                <p className="mt-1.5 font-serif text-lg font-semibold tracking-tight text-[#1F1A14]">
+                <p className="mt-1.5 font-serif text-lg font-semibold tracking-tight text-heading">
                   {partner.type}
                 </p>
                 <span
                   className="mt-2 block h-[1.5px] w-8"
-                  style={{ backgroundColor: GOLD }}
+                  style={{ backgroundColor: ACCENT }}
                   aria-hidden="true"
                 />
-                <p className="mt-2.5 font-sans text-sm leading-relaxed text-[#2C2C2C]/72 italic">
+                <p className="mt-2.5 font-sans text-sm leading-relaxed text-ink-muted italic">
                   “{partner.quote}”
                 </p>
               </motion.div>
@@ -156,18 +157,18 @@ function PartnerCard({
                 <span
                   className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border"
                   style={{
-                    borderColor: 'rgba(212,175,55,0.45)',
+                    borderColor: 'rgba(103,68,56,0.45)',
                     backgroundColor: 'rgba(255,252,247,0.9)',
-                    color: GOLD,
+                    color: ACCENT,
                   }}
                 >
                   <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="font-sans text-[10px] font-medium tracking-[0.16em] text-[#5C4030] uppercase">
+                  <p className="font-sans text-[10px] font-medium tracking-[0.16em] text-mahogany uppercase">
                     Partner
                   </p>
-                  <p className="mt-0.5 font-serif text-base font-semibold text-[#1F1A14]">
+                  <p className="mt-0.5 font-serif text-base font-semibold text-heading">
                     {partner.years} Years
                   </p>
                 </div>
@@ -200,20 +201,20 @@ export function Partnerships() {
     <section
       id="partnerships"
       className="scroll-mt-24"
-      style={{ backgroundColor: CREAM, color: INK }}
+      style={{ backgroundColor: PARCHMENT, color: INK }}
     >
       <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24 lg:px-10">
         <header className="max-w-xl">
           <p
             className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-            style={{ color: GOLD }}
+            style={{ color: MAHOGANY }}
           >
             {partnerships.eyebrow}
           </p>
-          <h2 className="mt-4 font-serif text-3xl font-medium tracking-tight md:text-5xl md:leading-[1.12]">
+          <h2 className="mt-4 font-serif text-3xl font-medium tracking-tight text-heading md:text-5xl md:leading-[1.12]">
             {partnerships.headline[0]}
             <br />
-            <span className="italic" style={{ color: GOLD }}>
+            <span className="italic" style={{ color: MAHOGANY }}>
               {partnerships.headline[1]}
             </span>
           </h2>
@@ -266,7 +267,7 @@ export function Partnerships() {
       </div>
 
       <div className="mx-auto max-w-2xl px-5 py-14 text-center md:px-8 md:py-16">
-        <p className="font-sans text-sm leading-relaxed text-[#2C2C2C]/70 md:text-base">
+        <p className="font-sans text-sm leading-relaxed text-ink-muted md:text-base">
           {partnerships.body}
         </p>
         <div className="mt-8 flex justify-center">

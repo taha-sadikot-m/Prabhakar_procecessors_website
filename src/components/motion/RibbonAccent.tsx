@@ -7,7 +7,7 @@ type RibbonAccentProps = {
 export function RibbonAccent({
   className = '',
   from = '#C8C2B8',
-  to = '#B76E2A',
+  to = '#674438',
 }: RibbonAccentProps) {
   const id = `ribbon-${from.replace('#', '')}-${to.replace('#', '')}`
 

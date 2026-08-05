@@ -3,8 +3,9 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { quality } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const AMBER = '#D69A2D'
-const GOLD_WIRE = '#C9A24A'
+const AMBER = '#674438'
+const ACCENT = '#674438'
+const HEADING = '#20222D'
 
 /**
  * Arc in % of the full desktop section.
@@ -24,7 +25,7 @@ const CARD_BASE_DELAY = ARC_DELAY + ARC_DURATION
 const CARD_STAGGER = 0.14
 const CARD_DURATION = 0.45
 
-/** Mobile thin gold bow — end-to-end, deeper arch (viewBox 0 0 100 28). */
+/** Mobile thin mahogany bow — end-to-end, deeper arch (viewBox 0 0 100 28). */
 const MOBILE_ARC = {
   p0: { x: 0, y: 22 },
   p1: { x: 50, y: -6 },
@@ -112,7 +113,7 @@ function AnnotationCopy({
         className={`mt-1 font-serif font-medium tracking-tight transition-colors duration-300 ${
           compact ? 'text-xl' : 'text-lg lg:text-xl'
         }`}
-        style={{ color: active ? '#14110C' : '#1F1A14' }}
+        style={{ color: active ? HEADING : HEADING }}
       >
         {title}
       </h3>
@@ -120,7 +121,7 @@ function AnnotationCopy({
         className="mt-2 block h-px transition-colors duration-300"
         style={{
           width: compact ? '2.75rem' : '2.5rem',
-          backgroundColor: active ? AMBER : 'rgba(214,154,45,0.7)',
+          backgroundColor: active ? ACCENT : 'rgba(103,68,56,0.7)',
         }}
         aria-hidden="true"
       />
@@ -128,7 +129,7 @@ function AnnotationCopy({
         className={`font-sans leading-relaxed ${
           compact ? 'mt-3 text-sm' : 'mt-2.5 text-[11px] lg:text-xs'
         }`}
-        style={{ color: 'rgba(44,44,44,0.6)' }}
+        style={{ color: 'rgba(45,27,14,0.6)' }}
       >
         {description}
       </p>
@@ -280,7 +281,7 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
             {quality.headline[1]}
           </span>
         </h2>
-        <p className="mt-3 max-w-sm font-sans text-sm leading-relaxed text-[#2C2C2C]/70">
+        <p className="mt-3 max-w-sm font-sans text-sm leading-relaxed text-ink-muted">
           {quality.body}
         </p>
         <div className="mt-6">
@@ -288,7 +289,7 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
         </div>
       </motion.div>
 
-      {/* Thin gold arc — under cards */}
+      {/* Thin mahogany arc — under cards */}
       <div className="pointer-events-none relative z-[5] mt-5 w-full">
         <svg
           className="h-14 w-full"
@@ -299,8 +300,9 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
           <motion.path
             d={MOBILE_ARC_PATH}
             fill="none"
-            stroke={GOLD_WIRE}
+            stroke={ACCENT}
             strokeWidth={0.85}
+            strokeOpacity={0.5}
             strokeLinecap="round"
             initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
             whileInView={{ pathLength: 1, opacity: 1 }}
@@ -318,9 +320,9 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
                 left: `${dot.x}%`,
                 top: `${(dot.y / 28) * 100}%`,
                 background:
-                  'radial-gradient(circle at 35% 30%, #F3E0A8 0%, #C9A24A 45%, #8F6A1F 100%)',
+                  'radial-gradient(circle at 35% 30%, #C4A192 0%, #674438 45%, #3A241C 100%)',
                 boxShadow: isActive
-                  ? '0 0 0 3px rgba(214,154,45,0.35), 0 0 10px rgba(201,162,74,0.4)'
+                  ? '0 0 0 3px rgba(103,68,56,0.35), 0 0 10px rgba(103,68,56,0.4)'
                   : '0 0 0 2px rgba(250,240,230,0.9)',
               }}
               initial={false}
@@ -371,7 +373,7 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
                     ? 'rgba(250,240,230,0.92)'
                     : 'rgba(250,240,230,0.62)',
                   borderColor: active
-                    ? 'rgba(214,154,45,0.55)'
+                    ? 'rgba(103,68,56,0.55)'
                     : 'rgba(45,27,14,0.12)',
                   boxShadow: active
                     ? '0 12px 32px rgba(45,27,14,0.14)'
@@ -399,7 +401,7 @@ export function Quality() {
   const [hovered, setHovered] = useState<string | null>(null)
 
   return (
-    <section id="quality" className="scroll-mt-24" style={{ color: '#2C2C2C' }}>
+    <section id="quality" className="scroll-mt-24" style={{ color: HEADING }}>
       <MobileQuality reduceMotion={reduceMotion} />
 
       {/* Desktop — full-bleed image across the whole section */}
@@ -445,7 +447,7 @@ export function Quality() {
               {quality.headline[1]}
             </span>
           </h2>
-          <p className="mt-6 max-w-sm font-sans text-sm leading-relaxed text-[#2C2C2C]/75 lg:text-[15px]">
+          <p className="mt-6 max-w-sm font-sans text-sm leading-relaxed text-ink-muted lg:text-[15px]">
             {quality.body}
           </p>
           <div className="mt-8">
@@ -462,8 +464,9 @@ export function Quality() {
           <motion.path
             d={ARC_PATH}
             fill="none"
-            stroke={GOLD_WIRE}
+            stroke={ACCENT}
             strokeWidth={0.6}
+            strokeOpacity={0.5}
             strokeLinecap="round"
             initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
             whileInView={{ pathLength: 1, opacity: 1 }}
@@ -504,9 +507,9 @@ export function Quality() {
                   className="relative block h-3 w-3 rounded-full"
                   style={{
                     background:
-                      'radial-gradient(circle at 35% 30%, #F3E0A8 0%, #C9A24A 45%, #8F6A1F 100%)',
+                      'radial-gradient(circle at 35% 30%, #C4A192 0%, #674438 45%, #3A241C 100%)',
                     boxShadow: active
-                      ? '0 0 0 4px rgba(214,154,45,0.35), 0 0 12px rgba(201,162,74,0.45)'
+                      ? '0 0 0 4px rgba(103,68,56,0.35), 0 0 12px rgba(103,68,56,0.45)'
                       : '0 0 0 2px rgba(250,240,230,0.9), 0 1px 4px rgba(143,106,31,0.35)',
                     transition: 'box-shadow 0.3s ease',
                   }}
@@ -540,7 +543,7 @@ export function Quality() {
                         ? 'rgba(250,240,230,0.9)'
                         : 'rgba(250,240,230,0.74)',
                       borderColor: active
-                        ? 'rgba(214,154,45,0.5)'
+                        ? 'rgba(103,68,56,0.5)'
                         : 'rgba(45,27,14,0.14)',
                       boxShadow: active
                         ? '0 10px 28px rgba(45,27,14,0.14)'

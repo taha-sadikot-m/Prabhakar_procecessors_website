@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { servicesPage } from '../data/content'
 import { SectionCta } from '../components/SectionCta'
 
-const GOLD = '#D4AF37'
+const ACCENT = '#674438'
+const MAHOGANY = '#674438'
+const HEADING = '#20222D'
+const BODY = 'rgba(45, 27, 14, 0.7)'
 
 function SwatchCard({
   name,
@@ -21,7 +24,7 @@ function SwatchCard({
       onClick={() => setFlipped((v) => !v)}
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
-      className="group relative aspect-[2/3] w-full overflow-hidden border border-line/60 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"
+      className="group relative aspect-[2/3] w-full overflow-hidden border border-line/60 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#674438]"
       aria-pressed={flipped}
       aria-label={`${name}: ${description}`}
     >
@@ -34,25 +37,29 @@ function SwatchCard({
         draggable={false}
       />
       <div
-        className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#1a1208]/85 via-[#1a1208]/25 to-transparent p-5 transition-opacity duration-500 ${
+        className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[rgba(250,240,230,0.95)] via-[rgba(250,240,230,0.55)] to-transparent p-5 transition-opacity duration-500 ${
           flipped ? 'opacity-100' : 'opacity-90'
         }`}
       >
         <p
           className="font-sans text-[10px] font-medium tracking-[0.18em] uppercase"
-          style={{ color: GOLD }}
+          style={{ color: MAHOGANY }}
         >
           Service
         </p>
-        <h3 className="mt-1 font-serif text-xl font-medium text-[#FFF8F0] md:text-2xl">
+        <h3
+          className="mt-1 font-serif text-xl font-medium md:text-2xl"
+          style={{ color: HEADING }}
+        >
           {name}
         </h3>
         <p
-          className={`mt-2 font-sans text-sm leading-relaxed text-[#FFF8F0]/85 transition-all duration-500 ${
+          className={`mt-2 font-sans text-sm leading-relaxed transition-all duration-500 ${
             flipped
               ? 'translate-y-0 opacity-100'
               : 'translate-y-2 opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100'
           }`}
+          style={{ color: BODY }}
         >
           {description}
         </p>
@@ -86,11 +93,11 @@ export function ServicesPage() {
       <section className="relative mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
         <p
           className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-          style={{ color: GOLD }}
+          style={{ color: MAHOGANY }}
         >
           {servicesPage.eyebrow}
         </p>
-        <h1 className="mt-5 max-w-2xl font-serif text-4xl leading-[1.12] font-medium tracking-tight text-ink md:text-5xl lg:text-[3.4rem]">
+        <h1 className="mt-5 max-w-2xl font-serif text-4xl leading-[1.12] font-medium tracking-tight text-heading md:text-5xl lg:text-[3.4rem]">
           {servicesPage.headline}
         </h1>
         <p className="mt-6 max-w-xl font-sans text-sm leading-relaxed text-ink-muted md:text-base">
@@ -110,7 +117,7 @@ export function ServicesPage() {
             </h2>
             <span
               className="h-px flex-1 max-w-xs"
-              style={{ backgroundColor: `${GOLD}55` }}
+              style={{ backgroundColor: `${ACCENT}55` }}
               aria-hidden="true"
             />
           </div>
@@ -138,7 +145,7 @@ export function ServicesPage() {
               >
                 <span
                   className="mr-2 inline-block h-1.5 w-1.5 rotate-45 align-middle"
-                  style={{ backgroundColor: GOLD }}
+                  style={{ backgroundColor: ACCENT }}
                   aria-hidden="true"
                 />
                 {item}
