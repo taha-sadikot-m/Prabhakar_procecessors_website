@@ -92,7 +92,7 @@ export function Hero() {
 
       {/* —— Mobile layout: top-left copy, bottom-right CTA —— */}
       <div className="relative z-10 flex flex-1 flex-col md:hidden">
-        <div className="relative mr-auto w-[min(20rem,92%)] px-4 pt-2 text-left sm:px-5">
+        <div className="relative mr-auto w-[min(22rem,92%)] px-4 pt-2 text-left sm:px-5">
           {/* Local cream scrim behind copy */}
           <div
             className="pointer-events-none absolute -inset-x-2 -inset-y-3 z-0 bg-gradient-to-r from-cream via-cream/95 to-transparent sm:-inset-x-3"
@@ -132,7 +132,7 @@ export function Hero() {
                 delay: 0.18,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="mt-4 max-w-[16rem] font-sans text-sm leading-relaxed text-ink/75"
+              className="mt-4 max-w-[20rem] font-sans text-sm leading-relaxed text-ink/75"
             >
               {hero.subcopy}
             </motion.p>

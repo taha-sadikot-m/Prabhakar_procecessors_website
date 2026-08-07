@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   motion,
   useReducedMotion,
@@ -10,10 +10,14 @@ import { journalPage } from '../data/content'
 import { FadeIn } from '../components/motion/FadeIn'
 import { SectionCta } from '../components/SectionCta'
 import {
+  carouselPosterUrls,
+  carouselSlideCount,
   fetchBeholdFeed,
   formatPostDate,
   instagramProfileUrl,
-  postImageUrl,
+  postAspectRatio,
+  postKind,
+  postPosterUrl,
   type BeholdFeed,
   type BeholdPost,
 } from '../lib/behold'
@@ -22,6 +26,9 @@ const MAHOGANY = '#674438'
 const HEADING = '#20222D'
 
 const spring = { type: 'spring' as const, stiffness: 280, damping: 28, mass: 0.85 }
+
+const feedColumnsClass =
+  'm-0 columns-2 gap-x-5 [column-fill:_balance] md:columns-3 md:gap-x-8'
 
 function DiamondRule({ className = '' }: { className?: string }) {
   return (
@@ -58,22 +65,28 @@ function JournalHero({ username }: { username: string | null }) {
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute inset-[-8%] will-change-transform"
+          className="absolute inset-[-6%] will-change-transform"
           style={{ y: bgY }}
         >
-          <img
-            src={journalPage.hero.texture}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.14]"
-            draggable={false}
-          />
+          <picture className="absolute inset-0 block h-full w-full">
+            <source
+              media="(min-width: 768px)"
+              srcSet={journalPage.hero.desktopImage}
+            />
+            <img
+              src={journalPage.hero.mobileImage}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover object-[center_30%] md:object-[center_40%]"
+              draggable={false}
+            />
+          </picture>
         </motion.div>
         <div
-          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/92 to-cream/70"
+          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/90 to-transparent md:via-cream/80 md:to-transparent"
           aria-hidden="true"
         />
         <div
-          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-cream to-transparent"
+          className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cream to-transparent"
           aria-hidden="true"
         />
       </div>
@@ -142,11 +155,19 @@ function JournalHero({ username }: { username: string | null }) {
 }
 
 function FeedSkeleton() {
+  const ratios = [1, 9 / 16, 1, 4 / 5, 1, 1]
   return (
-    <ul className="grid list-none grid-cols-2 gap-5 p-0 md:grid-cols-3 md:gap-8">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <li key={i} className="flex flex-col" aria-hidden="true">
-          <div className="aspect-[4/5] animate-pulse border border-line/50 bg-cream-dark" />
+    <ul className={`list-none p-0 ${feedColumnsClass}`}>
+      {ratios.map((ratio, i) => (
+        <li
+          key={i}
+          className="mb-5 break-inside-avoid md:mb-8"
+          aria-hidden="true"
+        >
+          <div
+            className="w-full animate-pulse border border-line/50 bg-cream-dark"
+            style={{ aspectRatio: String(ratio) }}
+          />
           <div className="mt-3 h-3 w-12 animate-pulse bg-cream-dark" />
           <div className="mt-2 h-4 w-full animate-pulse bg-cream-dark" />
           <div className="mt-1.5 h-4 w-2/3 animate-pulse bg-cream-dark" />
@@ -165,14 +186,42 @@ function PostTile({
   index: number
   reduceMotion: boolean | null
 }) {
-  const src = postImageUrl(post)
+  const kind = postKind(post)
+  const aspect = postAspectRatio(post)
+  const slideCount = carouselSlideCount(post)
+  const posters = useMemo(
+    () =>
+      kind === 'carousel'
+        ? carouselPosterUrls(post, 3)
+        : ([postPosterUrl(post)].filter(Boolean) as string[]),
+    [kind, post],
+  )
+  const cover = posters[0] ?? null
+
+  const [hovering, setHovering] = useState(false)
+  const [slide, setSlide] = useState(0)
+
+  useEffect(() => {
+    if (reduceMotion || kind !== 'carousel' || posters.length < 2 || !hovering) {
+      setSlide(0)
+      return
+    }
+    const id = window.setInterval(() => {
+      setSlide((s) => (s + 1) % posters.length)
+    }, 1200)
+    return () => window.clearInterval(id)
+  }, [hovering, kind, posters, reduceMotion])
+
+  const activeSrc = posters[slide] ?? cover
   const caption = post.prunedCaption || post.caption || ''
   const truncated =
     caption.length > 96 ? `${caption.slice(0, 93).trimEnd()}…` : caption
-  const isVideo = post.mediaType === 'VIDEO'
-  const isCarousel =
-    post.mediaType === 'CAROUSEL_ALBUM' ||
-    (post.children && post.children.length > 1)
+  const altText = truncated || 'Instagram post'
+  const typeLabel =
+    kind === 'video' ? 'Reel' : kind === 'carousel' ? 'Carousel' : 'Photo'
+  const accessibleName = truncated
+    ? `${typeLabel}: ${truncated}`
+    : `${typeLabel} on Instagram`
 
   return (
     <FadeIn delay={reduceMotion ? 0 : 0.04 * (index % 6)}>
@@ -180,6 +229,7 @@ function PostTile({
         href={post.permalink}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={accessibleName}
         className="group flex flex-col outline-none focus-visible:ring-2 focus-visible:ring-mahogany/50 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
         initial={false}
         whileHover={
@@ -190,16 +240,37 @@ function PostTile({
                 transition: spring,
               }
         }
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
       >
-        <div className="relative aspect-[4/5] overflow-hidden border border-mahogany/20 bg-cream-dark transition-shadow duration-500 group-hover:shadow-[0_16px_40px_rgba(45,27,14,0.14)]">
-          {src ? (
-            <img
-              src={src}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-[1.03]"
-              loading="lazy"
-              draggable={false}
-            />
+        <div
+          className="relative w-full overflow-hidden border border-mahogany/20 bg-cream-dark transition-shadow duration-500 group-hover:shadow-[0_16px_40px_rgba(45,27,14,0.14)]"
+          style={{ aspectRatio: String(aspect) }}
+        >
+          {activeSrc ? (
+            posters.length > 1 ? (
+              posters.map((src, i) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt={i === slide ? altText : ''}
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${
+                    i === slide ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  loading={i === 0 ? 'lazy' : 'eager'}
+                  draggable={false}
+                  aria-hidden={i !== slide}
+                />
+              ))
+            ) : (
+              <img
+                src={activeSrc}
+                alt={altText}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-[1.03]"
+                loading="lazy"
+                draggable={false}
+              />
+            )
           ) : (
             <div className="absolute inset-0 bg-cream-dark" />
           )}
@@ -209,16 +280,27 @@ function PostTile({
             aria-hidden="true"
           />
 
-          {(isVideo || isCarousel) && (
+          {kind === 'video' && (
             <span
               className="absolute top-0 right-0 z-10 flex h-7 w-7 items-center justify-center text-cream"
               style={{ backgroundColor: MAHOGANY }}
               aria-hidden="true"
             >
-              {isVideo ? (
-                <Play className="h-3 w-3 fill-current" strokeWidth={1.5} />
-              ) : (
-                <Images className="h-3 w-3" strokeWidth={1.5} />
+              <Play className="h-3 w-3 fill-current" strokeWidth={1.5} />
+            </span>
+          )}
+
+          {kind === 'carousel' && (
+            <span
+              className="absolute top-0 right-0 z-10 flex h-7 min-w-7 items-center justify-center gap-1 px-1.5 text-cream"
+              style={{ backgroundColor: MAHOGANY }}
+              aria-hidden="true"
+            >
+              <Images className="h-3 w-3 shrink-0" strokeWidth={1.5} />
+              {slideCount > 0 && (
+                <span className="font-sans text-[9px] font-semibold tracking-wide">
+                  {slideCount}
+                </span>
               )}
             </span>
           )}
@@ -325,9 +407,9 @@ function FeedSection({
           )}
 
           {!loading && !error && posts.length > 0 && (
-            <ul className="grid list-none grid-cols-2 gap-5 p-0 md:grid-cols-3 md:gap-8">
+            <ul className={`list-none p-0 ${feedColumnsClass}`}>
               {posts.map((post, i) => (
-                <li key={post.id}>
+                <li key={post.id} className="mb-5 break-inside-avoid md:mb-8">
                   <PostTile
                     post={post}
                     index={i}

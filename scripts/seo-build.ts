@@ -149,7 +149,7 @@ function injectHead(
 function prerenderBlog() {
   const distIndex = join(root, 'dist', 'index.html')
   if (!existsSync(distIndex)) {
-    console.warn('dist/index.html missing — skip prerender (run after vite build)')
+    console.warn('dist/index.html missing; skip prerender (run after vite build)')
     return
   }
 
@@ -183,7 +183,7 @@ function prerenderBlog() {
       ${blogPosts
         .map(
           (p) =>
-            `<li><a href="/blog/${p.slug}"><strong>${escapeXml(p.title)}</strong></a> — ${escapeXml(p.excerpt)}</li>`,
+            `<li><a href="/blog/${p.slug}"><strong>${escapeXml(p.title)}</strong></a>: ${escapeXml(p.excerpt)}</li>`,
         )
         .join('\n')}
     </ul>`

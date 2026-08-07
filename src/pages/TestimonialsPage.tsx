@@ -48,22 +48,28 @@ function TestimonialsHero() {
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute inset-[-8%] will-change-transform"
+          className="absolute inset-[-6%] will-change-transform"
           style={{ y: bgY }}
         >
-          <img
-            src={testimonialsPage.hero.texture}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.14]"
-            draggable={false}
-          />
+          <picture className="absolute inset-0 block h-full w-full">
+            <source
+              media="(min-width: 768px)"
+              srcSet={testimonialsPage.hero.desktopImage}
+            />
+            <img
+              src={testimonialsPage.hero.mobileImage}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover object-[center_30%] md:object-[center_40%]"
+              draggable={false}
+            />
+          </picture>
         </motion.div>
         <div
-          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/92 to-cream/70"
+          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/90 to-transparent md:via-cream/80 md:to-transparent"
           aria-hidden="true"
         />
         <div
-          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-cream to-transparent"
+          className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cream to-transparent"
           aria-hidden="true"
         />
       </div>

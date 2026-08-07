@@ -27,7 +27,7 @@ export function SeoHead({
   description,
   path,
   image = '/about_section/about-hero-desktop.png',
-  imageAlt = 'Prabhakar Processors — dyeing, printing and finishing in Surat',
+  imageAlt = 'Prabhakar Processors, dyeing, printing and finishing in Surat',
   type = 'website',
   publishedTime,
   modifiedTime,

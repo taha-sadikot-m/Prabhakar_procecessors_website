@@ -128,45 +128,59 @@ Same ghost layers, same lighting, same style. 1080×1920px portrait.
 ```
 Editorial digital illustration for the brand story section of a premium Indian
 textile processing company website. The feeling is: completeness, confidence,
-everything under one roof.
+the full journey — from raw material to finished product, all under one roof.
 
 Background: Flat warm ivory-cream (#FAF0E6), perfectly solid.
 
 LEFT 40% of frame: COMPLETELY EMPTY — zero elements. Text zone.
 
-RIGHT 60%: A composed editorial arrangement of MULTIPLE TEXTILE TYPES showing
-Prabhakar's full range. Three elements arranged in a layered composition:
+RIGHT 60%: A composed editorial arrangement of THREE ELEMENTS that together
+tell the complete story of what Prabhakar does — arranged as a layered
+left-to-right arc within the right portion of the frame:
 
-1. COTTON FABRIC — neatly folded lengths of premium cotton in warm ivory with
-   subtle woven texture. Stacked at the base of the composition.
-2. DRESS MATERIAL — a panel of vivid printed dress fabric in deep indigo (#1A237E)
-   with intricate white floral motifs. Draped over the cotton stack at an angle.
-3. PRINTED FABRIC — a length of marigold (#FFB627) fabric with Indian block-print
-   geometric border pattern, partially unrolled across the top.
+1. RAW COTTON FABRIC ROLL — at the left edge of the composition. A neatly rolled
+   bolt of unprocessed ivory-grey cotton fabric — plain, uncoloured, full of
+   potential. This is the "before."
 
-The three textiles together tell "everything under one roof." Each has a different
-texture, colour, and character — but they harmonise as a composed still-life.
+2. PROCESSED PRINTED DRESS MATERIAL — in the centre. A panel of vibrant printed
+   dress fabric in deep indigo (#1A237E) with precise white floral block-print
+   motifs. Folded and draped over the cotton roll, showing what processing
+   achieves — colour, pattern, precision. This is the "during."
+
+3. FINISHED DRESS — on the right. A complete, beautifully constructed dress made
+   from Prabhakar-processed printed fabric. The dress is shown hung or draped —
+   not on a person — its silhouette clear, the fabric's colour and print pattern
+   visible in the final garment. Warm saffron (#F7941D) with a delicate Indian
+   print border. This is the "after" — the destination of every metre processed.
+
+The three read together as a journey: raw → processed → finished product.
+The composition is a visual argument: we handle everything from grey fabric
+to the garment your customer will love.
 
 Ghost Mughal architectural line-art at 8% opacity behind the arrangement.
 Delicate floral outlines at 5% opacity, warm gold.
 
-Lighting: Soft even light from upper-left. No dramatic shadows.
-Mood: Confident, complete, everything handled by one expert company.
+Lighting: Soft even light from upper-left. No harsh shadows.
+Mood: Confident, complete, the full journey visible in one image.
 
-No text. No people. 1920×1080px landscape.
+No text. No people wearing the dress. 1920×1080px landscape.
 ```
 
 ### `fabric-mobile.png` — 1080 × 1920
 
 ```
-Same concept as fabric-desktop.png.
+Same concept as fabric-desktop.png — the three-stage journey composition.
 
 TOP 40% of frame: COMPLETELY EMPTY clean cream.
 
-BOTTOM 60%: The three textile types (cotton stack, dress material panel, printed
-fabric roll) are arranged vertically — the printed fabric roll at the top edge
-of the image area, dress material in the middle zone, cotton folded lengths at
-the bottom. Creates a vertical still-life composition. 1080×1920px portrait.
+BOTTOM 60%: The three elements stacked vertically in the image area:
+— TOP of image area: the finished dress (saffron with print border) — the
+  destination, visually most prominent
+— MIDDLE: the processed printed dress material panel in indigo
+— BOTTOM: the raw cotton fabric roll — the starting point
+
+Reading from bottom to top: raw → processed → finished. The vertical arrangement
+mirrors a natural upward journey. 1080×1920px portrait.
 ```
 
 ---
@@ -786,13 +800,22 @@ The fabrics are plain-woven, commercial weight — the workhorses of garment pro
 
 ```
 [Shared serve prefix above]
-Textile featured: SAREE — the pinnacle of Indian fashion.
-RIGHT 62%: A SINGLE LENGTH OF EXQUISITE SAREE FABRIC draped in an artful,
-sculptural arrangement. The saree is in vivid fuchsia (#E0457B) with a
-digitally printed paisley motif in gold and ivory. The drape creates elegant
-flowing forms — the fabric is clearly premium, fashion-forward, distinctive.
-This saree would make a statement in any collection. The fabric itself is the
-fashion product.
+Textile featured: COMPLETE SAREE — presented as a finished luxury retail product.
+RIGHT 62%: A COMPLETE SAREE presented as a finished, ready-to-wear product
+displayed in the manner of a high-end boutique or luxury fashion house.
+
+The saree is in deep fuchsia (#E0457B) silk with a digitally printed paisley
+border and a rich gold zari pallu (decorative end piece). It is displayed as
+a beautiful folded presentation:
+— The body of the saree is neatly accordion-folded into a precise, even stack
+— The decorative pallu is spread open and fanned above the stack, showing
+  the intricate gold print pattern in full
+— A small portion of the gold zari border is draped over the front of the fold
+
+This is how a premium saree is presented in a luxury store — as a PRODUCT,
+not a length of fabric. The image tells fashion brand clients: our fabric
+becomes something this beautiful. No people. No mannequins. The finished
+saree product is the subject, presented with reverence.
 ```
 
 ### `serve-03-export.png` — 1920 × 1080
@@ -966,39 +989,57 @@ No logos. 1920×1080px.
 
 ```
 Editorial digital illustration for the cinematic closing section.
-The feeling is: completion, arrival, the journey fulfilled, begin together.
+The feeling is: completion, arrival, the full journey fulfilled, an invitation
+to begin together.
 
 Background: Flat warm ivory-cream (#FAF0E6).
 
-A single flowing FABRIC RIBBON composed of multiple textile types woven into
-one continuous composition — entering the frame from the BOTTOM-RIGHT corner
-and sweeping upward and left across the frame:
+A sweeping composition that tells the COMPLETE JOURNEY in one image — from raw
+material to finished product — flowing from BOTTOM-RIGHT upward and left:
 
-1. The leading edge: A SAREE in deep crimson (#CC2936) with gold zari border
-2. The middle: PRINTED DRESS MATERIAL in saffron (#F7941D) with white floral print
-3. The trailing edge: COTTON FABRIC in peacock teal (#168AAD) with subtle woven texture
+STAGE 1 — TRAILING EDGE (bottom-right, where the journey begins):
+Raw grey cotton fabric — flat, uncoloured, the starting point. Just visible
+at the lower-right corner, fading into the composition.
 
-The three textiles merge into one flowing movement — representing the complete
-journey: all the textiles Prabhakar processes, all together, delivered with care.
-The composition creates a sense of completion and invitation.
+STAGE 2 — MIDDLE (sweeping through the centre):
+Processed and printed fabrics in mid-flow — PRINTED DRESS MATERIAL in saffron
+(#F7941D) with white floral motifs, and COTTON FABRIC in peacock teal (#168AAD).
+These are the processed textiles, rich with colour and pattern.
 
-UPPER-LEFT 40% of frame: relatively open — less dense fabric — allowing CSS
-overlay and text to read clearly.
-LOWER-RIGHT 60%: rich, dense fabric composition.
+STAGE 3 — LEADING EDGE (upper-left, where the journey arrives):
+A COMPLETE SAREE in deep crimson (#CC2936) with a gold zari border — fully
+formed, finished, magnificent. The saree is shown partially draped as if just
+arriving — the pallu spread beautifully, the pleats formed, the border catching
+light. This is not just fabric — this is the FINISHED PRODUCT that Prabhakar's
+work makes possible. The composition arrives here.
+
+The sweep reads: grey fabric → processed textile → finished saree.
+This is "where grey becomes brilliant" made visible in one final image.
+
+UPPER-LEFT 40% of frame: relatively open — the finished saree is here but the
+composition is less dense, allowing CSS text overlay to read clearly.
+LOWER-RIGHT 60%: rich, layered fabric composition — raw to processed.
 
 Ghost Mughal architecture at 8% opacity. Floral outlines at 5%.
-Lighting: Warm, golden-hour quality. The fabrics glow.
-This image will have a CSS overlay: rgba(250,240,230,0.65) — the image must be
-rich and saturated enough to show through the cream overlay.
-No text. No people. 1920×1080px.
+Lighting: Warm, golden-hour quality. The finished saree glows most brightly.
+CSS overlay will be rgba(250,240,230,0.65) — image must be rich and saturated
+enough to read through the cream overlay. No text. No people. 1920×1080px.
 ```
 
 ### `closing-hero-mobile.png` — 1080 × 1920
 
 ```
-Same concept. The three-fabric ribbon enters from BOTTOM-RIGHT.
-TOP 50% of frame: relatively open and lighter — overlay text zone.
-BOTTOM 50%: rich fabric composition — all three textile types present.
+Same three-stage journey concept — raw fabric → processed textiles → finished saree.
+
+TOP 50% of frame: relatively open composition — the finished crimson saree
+arrives here, partially draped, its gold border catching light. The CSS text
+overlay goes over this area.
+
+BOTTOM 50%: the processed fabric river sweeps upward from the lower-right —
+saffron dress material and teal cotton mid-composition, raw grey fabric just
+visible at the very bottom edge.
+
+The journey reads bottom to top: grey → colour → finished saree.
 1080×1920px portrait.
 ```
 
@@ -1118,7 +1159,7 @@ Generate in this order. Check each when done.
 
 ## Who We Serve (S06) — 1920×1080
 - [ ] `serve-01-garment.png` — Shirting/suiting fabric stacks
-- [ ] `serve-02-fashion.png` — Fuchsia saree draped artistically
+- [ ] `serve-02-fashion.png` — Complete fuchsia saree as luxury retail product
 - [ ] `serve-03-export.png` — Mixed textile bolts export-ready
 - [ ] `serve-04-home.png` — Cotton home textile fabrics
 

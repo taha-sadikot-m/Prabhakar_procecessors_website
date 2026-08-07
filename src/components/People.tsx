@@ -144,7 +144,7 @@ export function People() {
         <div className="relative w-full">
           <img
             src={people.mobileImage}
-            alt="Leadership — Anand, Vikas, and Shaleen Poddar"
+            alt="Leadership: Anand, Vikas, and Shaleen Poddar"
             className="block h-auto w-full"
             draggable={false}
           />
@@ -201,8 +201,7 @@ export function People() {
           </div>
         </div>
 
-        <span className="sr-only">
-          Leadership — Anand, Vikas, and Shaleen Poddar
+        <span className="sr-only">Leadership: Anand, Vikas, and Shaleen Poddar
         </span>
       </div>
     </section>

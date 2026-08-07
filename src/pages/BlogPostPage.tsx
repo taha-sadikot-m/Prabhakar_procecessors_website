@@ -23,7 +23,7 @@ const HEADING = '#20222D'
 
 const DEFAULT_CTA: BlogPostCta = {
   headline: 'Ready To Specify Your Next Run?',
-  body: 'Share your fabric, shade, and volume — we will map the right process.',
+  body: 'Share your fabric, shade, and volume, we will map the right process.',
   primaryLabel: 'Discuss Your Requirements',
   primaryHref: '/contact',
   secondaryLabel: 'View Services',

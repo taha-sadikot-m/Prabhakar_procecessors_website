@@ -12,7 +12,7 @@ export const company = {
     lines: [
       'Plot No. 13/14, Block No. 296',
       'Village Tatithaiyya, Opp. Hotel Horizon Kadodara',
-      'Surat–Bardoli Road, Surat, Gujarat – 394327, India',
+      'Surat-Bardoli Road, Surat, Gujarat - 394327, India',
     ],
   },
 }
@@ -22,15 +22,15 @@ export const navLinks = [
   { label: 'About', href: '/about' },
   { label: 'Services', href: '/services' },
   { label: 'Careers', href: '/careers' },
-  { label: 'Journal', href: '/journal' },
+  { label: 'Instagram', href: '/journal' },
   { label: 'Testimonials', href: '/testimonials' },
   { label: 'Contact', href: '/contact' },
 ]
 
 export const hero = {
   eyebrow: 'Fabric of India. Processed to Perfection.',
-  headline: ['Flowing through process.', 'Delivering'],
-  highlight: 'perfection.',
+  headline: ['The Mill that dyes, prints', 'and delivers'],
+  highlight: 'quality.',
   subcopy:
     'World-class dyeing, printing and finishing solutions that bring life to every thread.',
   cta: 'Explore Our Services',
@@ -43,7 +43,7 @@ export const journey = {
   eyebrow: 'Our Journey',
   headline: 'Every Great Fabric Begins With',
   highlight: 'Possibility.',
-  body: 'For over seventeen years, we’ve transformed raw textiles into premium fabrics trusted by leading brands across India—guided by precision, craftsmanship, and consistency.',
+  body: 'For over seventeen years, we’ve transformed raw textiles into premium fabrics trusted by leading brands across India, guided by precision, craftsmanship, and consistency.',
   commitment: 'Our promise: quality, durability, and finish that exceed expectations.',
   cta: 'Our Story',
   ctaHref: '/about',
@@ -59,7 +59,7 @@ export const transformation = {
   title: 'Grey to Brilliant.',
   subtitle: 'Under One Roof.',
   intro:
-    'Follow a single piece of fabric through our manufacturing journey—from raw grey cloth to finished delivery.',
+    'Follow a single piece of fabric through our manufacturing journey from raw grey cloth to finished delivery.',
   cta: 'View All Services',
   ctaHref: '/services',
   stages: [
@@ -304,7 +304,7 @@ export const partnerships = {
       id: 'wholesale',
       type: 'Wholesale Trader',
       years: 6,
-      quote: 'Volume, speed and quality — all three, consistently.',
+      quote: 'Volume, speed and quality, all three, consistently.',
       x: 48,
       y: 62,
       rot: -1.2,
@@ -330,19 +330,19 @@ export const future = {
   headline: 'Innovation In Every Thread.',
   cta: 'Meet The Team',
   ctaHref: '/about#leadership',
-  secondaryCta: 'From The Floor',
+  secondaryCta: 'On Instagram',
   secondaryHref: '/journal',
   panels: [
     {
       id: 'technology',
       title: 'Modern Technology',
-      body: 'Advanced equipment delivering precision at every stage of production — from dye liquor preparation to final fabric inspection.',
+      body: 'Advanced equipment delivering precision at every stage of production, from dye liquor preparation to final fabric inspection.',
       image: '/8th_section/1.png',
     },
     {
       id: 'innovation',
       title: 'Continuous Innovation',
-      body: 'Refining processes, adopting new techniques and improving efficiency — so that every batch is better than the last.',
+      body: 'Refining processes, adopting new techniques and improving efficiency, so that every batch is better than the last.',
       image: '/8th_section/2.png',
     },
     {
@@ -359,7 +359,7 @@ export const people = {
   headline: ['Meet The People Behind', 'Every Metre.'],
   quote:
     'For us, textile processing isn\'t simply manufacturing. It is the responsibility of transforming every metre entrusted to us into something our customers can confidently build their products upon.',
-  attribution: '— Founder, Prabhakar Processors Pvt Ltd',
+  attribution: 'Founder, Prabhakar Processors Pvt Ltd',
   cta: 'Join Our Team',
   ctaHref: '/careers',
   desktopImage: '/9th_section/3IN1_desktop.png',
@@ -393,7 +393,7 @@ export const closing = {
   address: [
     'Plot No. 13/14, Block No. 296',
     'Village Tatithaiyya, Opp. Hotel Horizon Kadodara',
-    'Surat – Bardoli Road · Gujarat – 394327',
+    'Surat-Bardoli Road · Gujarat - 394327',
   ],
 }
 
@@ -404,7 +404,7 @@ export const aboutPage = {
   headline: ['Quality Is The Foundation', 'Of Everything We Do.'],
   highlight: 'Foundation',
   positioning:
-    'Premium dyeing and printing from Surat — precision, consistency, and trust in every metre since 2009.',
+    'Premium dyeing and printing from Surat, precision, consistency, and trust in every metre since 2009.',
   provenance: 'Since 2009 · Surat, India',
   hero: {
     desktopImage: '/about_section/about-hero-desktop.png',
@@ -448,7 +448,7 @@ export const aboutPage = {
   vision: {
     eyebrow: 'Our Vision',
     quote:
-      'To become one of India’s most trusted textile processing companies — setting the standard for quality, reliability, and partnership.',
+      'To become one of India’s most trusted textile processing companies, setting the standard for quality, reliability, and partnership.',
   },
   principles: [
     {
@@ -475,7 +475,7 @@ export const aboutPage = {
   process: {
     eyebrow: 'How We Work',
     title: 'Grey In. Exceptional Cloth Out.',
-    body: 'One connected journey from pickup to delivery — without the friction of fragmented processing.',
+    body: 'One connected journey from pickup to delivery, without the friction of fragmented processing.',
     cta: 'Explore Services',
     ctaHref: '/services',
     stages: [
@@ -516,7 +516,7 @@ export const aboutPage = {
     body: 'Guided by experience, stewardship, and a shared commitment to craftsmanship.',
     quote:
       'Textile processing isn’t simply manufacturing. It is the responsibility of transforming every metre entrusted to us.',
-    attribution: '— Leadership, Prabhakar Processors',
+    attribution: 'Leadership, Prabhakar Processors',
     members: [
       {
         name: 'Anand Poddar',
@@ -552,7 +552,7 @@ export const servicesPage = {
   eyebrow: 'Our Services',
   headline: ['The', 'Swatch Book.'],
   highlight: 'Swatch',
-  body: 'A comprehensive portfolio of dyeing, printing, and finishing — each service crafted with the same precision we bring to every metre.',
+  body: 'A comprehensive portfolio of dyeing, printing, and finishing, each service crafted with the same precision we bring to every metre.',
   meta: '3 disciplines · 12 core services · 12 on request',
   hero: {
     desktopImage: '/services_section/services-hero-desktop.png',
@@ -588,7 +588,7 @@ export const servicesPage = {
           id: 'cationic-dyeing',
           name: 'Cationic Dyeing',
           description:
-            'Specialised dyeing for synthetic and cationic dyeable fibres — brilliant shades with excellent wash fastness.',
+            'Specialised dyeing for synthetic and cationic dyeable fibres, brilliant shades with excellent wash fastness.',
           image: '/service_section/swatch-03-cationic-dyeing.png',
         },
       ],
@@ -598,7 +598,7 @@ export const servicesPage = {
       title: 'Printing',
       numeral: '02',
       intro:
-        'From traditional screens to digital precision — patterns rendered with clarity and scale.',
+        'From traditional screens to digital precision, patterns rendered with clarity and scale.',
       services: [
         {
           id: 'screen-printing',
@@ -701,7 +701,7 @@ export const servicesPage = {
   },
   closing: {
     headline: ['Ready To Specify', 'Your Next Run?'],
-    body: 'Share your fabric, shade, and volume — we will map the right process.',
+    body: 'Share your fabric, shade, and volume, we will map the right process.',
     primaryCta: 'Discuss Your Requirements',
     primaryHref: '/contact',
     secondaryCta: 'Read The Blog',
@@ -867,7 +867,8 @@ export const testimonialsPage = {
   body: 'Manufacturers, exporters, and brands who value consistency choose Prabhakar Processors for the long term. Relationships measured in years, not orders.',
   meta: '6 partner types · Surat, Gujarat · Since 2009',
   hero: {
-    texture: '/service_section/bg-jali-lattice.png',
+    desktopImage: '/partners_section/partners-hero-desktop.png',
+    mobileImage: '/partners_section/partners-hero-mobile.png',
   },
   quotes: [
     {
@@ -898,7 +899,7 @@ export const testimonialsPage = {
       id: 'wholesale',
       type: 'Wholesale Trader',
       years: 6,
-      quote: 'Volume, speed and quality — all three, consistently.',
+      quote: 'Volume, speed and quality, all three, consistently.',
     },
     {
       id: 'retail',
@@ -910,7 +911,7 @@ export const testimonialsPage = {
   note: 'Full named testimonials and logos will be published with client permission.',
   closing: {
     headline: ['Ready To Build', 'A Partnership?'],
-    body: 'Share your fabric, shade, and volume — we will map the right process.',
+    body: 'Share your fabric, shade, and volume, we will map the right process.',
     primaryCta: 'Start A Partnership',
     primaryHref: '/contact',
     secondaryCta: 'View Services',
@@ -920,17 +921,18 @@ export const testimonialsPage = {
 }
 
 export const journalPage = {
-  eyebrow: 'Journal',
-  headline: ['From The', 'Floor.'],
-  highlight: 'Floor',
-  body: 'Process, colour, and team moments — pulled live from Instagram as they happen on the floor.',
-  feedUrl: 'https://feeds.behold.so/lIg9Y0TkKka1w3RhtiV5',
+  eyebrow: 'Instagram',
+  headline: ['Our', 'Instagram.'],
+  highlight: 'Instagram',
+  body: 'Live photos and updates from our mill floor, pulled straight from Instagram.',
+  feedUrl: 'https://feeds.behold.so/BZ8R4J0rUwlTLGYGvmn4',
   hero: {
-    texture: '/service_section/bg-jali-lattice.png',
+    desktopImage: '/instagram_section/instagram-hero-desktop.png',
+    mobileImage: '/instagram_section/instagram-hero-mobile.png',
   },
   closing: {
     headline: ['Follow The', 'Process.'],
-    body: 'See the work as it unfolds — dyeing floors, print runs, and the people behind every metre.',
+    body: 'See the work as it unfolds, dyeing floors, print runs, and the people behind every metre.',
     primaryCta: 'Follow On Instagram',
     secondaryCta: 'Contact Us',
     secondaryHref: '/contact',
@@ -942,11 +944,11 @@ export const blogPage = {
   eyebrow: 'Insights',
   headline: ['Notes From', 'The Mill.'],
   highlight: 'Mill',
-  body: 'Process, quality, and partnership — written from the floor for the partners who build on every metre.',
+  body: 'Process, quality, and partnership, written from the floor for the partners who build on every metre.',
   meta: 'Process · Quality · Partnership',
   seoTitle: 'Textile Insights & Mill Notes | Prabhakar Processors Blog',
   seoDescription:
-    'Notes from Prabhakar Processors on dyeing, printing, fabric inspection, and partnership — practical insights from our Surat mill.',
+    'Notes from Prabhakar Processors on dyeing, printing, fabric inspection, and partnership, practical insights from our Surat mill.',
   hero: {
     texture: '/service_section/bg-jali-lattice.png',
     primaryCta: 'Discuss A Requirement',
@@ -957,7 +959,7 @@ export const blogPage = {
   featuredCta: 'Read Article',
   closing: {
     headline: ['Have A Brief', 'To Discuss?'],
-    body: 'Share your fabric, shade, and volume — we will map the right process.',
+    body: 'Share your fabric, shade, and volume, we will map the right process.',
     primaryCta: 'Contact Us',
     primaryHref: '/contact',
     secondaryCta: 'View Services',
