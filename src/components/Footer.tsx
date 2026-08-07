@@ -4,6 +4,8 @@ import { company, navLinks } from '../data/content'
 
 const ACCENT = '#674438'
 
+const footerNavLinks = [...navLinks, { label: 'Blog', href: '/blog' }]
+
 export function Footer() {
   return (
     <footer className="border-t border-[#674438]/30 bg-cream-dark text-ink">
@@ -31,7 +33,7 @@ export function Footer() {
             aria-hidden="true"
           />
           <ul className="space-y-2.5">
-            {navLinks.map((link) => (
+            {footerNavLinks.map((link) => (
               <li key={link.label}>
                 <Link
                   to={link.href}

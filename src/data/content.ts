@@ -22,6 +22,7 @@ export const navLinks = [
   { label: 'About', href: '/about' },
   { label: 'Services', href: '/services' },
   { label: 'Careers', href: '/careers' },
+  { label: 'Journal', href: '/journal' },
   { label: 'Testimonials', href: '/testimonials' },
   { label: 'Contact', href: '/contact' },
 ]
@@ -329,6 +330,8 @@ export const future = {
   headline: 'Innovation In Every Thread.',
   cta: 'Meet The Team',
   ctaHref: '/about#leadership',
+  secondaryCta: 'From The Floor',
+  secondaryHref: '/journal',
   panels: [
     {
       id: 'technology',
@@ -369,6 +372,8 @@ export const closing = {
   body: 'Grey fabric in. Exceptional cloth out. One company, one commitment, every time. Let\'s start with a conversation.',
   cta: 'Contact Us',
   ctaHref: '/contact',
+  secondaryCta: 'Read The Blog',
+  secondaryHref: '/blog',
   desktopImage: '/10th_section/desktop.png',
   mobileImage: '/10th_section/mobile.png',
   contacts: [
@@ -396,36 +401,122 @@ export const closing = {
 
 export const aboutPage = {
   eyebrow: 'About Us',
-  headline: 'Quality Is The Foundation Of Everything We Do.',
-  intro: [
-    'At Prabhakar Processors, we believe that every fabric tells a story of quality, craftsmanship, and innovation. As one of Surat’s trusted textile processing companies, we specialize in delivering premium dyeing and printing solutions that meet the evolving needs of the textile industry.',
-    'Since 2009, we have been committed to transforming fabrics with precision, consistency, and excellence. Backed by modern processing technology, skilled professionals, and a customer-first approach, we provide reliable textile processing solutions that combine superior quality with timely delivery.',
-    'Over the years, we have earned the trust of textile manufacturers, garment exporters, wholesalers, and fashion brands by delivering dependable processing services and building long-term business relationships based on integrity and performance.',
+  headline: ['Quality Is The Foundation', 'Of Everything We Do.'],
+  highlight: 'Foundation',
+  positioning:
+    'Premium dyeing and printing from Surat — precision, consistency, and trust in every metre since 2009.',
+  provenance: 'Since 2009 · Surat, India',
+  hero: {
+    desktopImage: '/about_section/about-hero-desktop.png',
+    mobileImage: '/about_section/about-hero-mobile.png',
+  },
+  story: {
+    eyebrow: 'Our Story',
+    title: 'Crafted In Surat. Trusted Across India.',
+    body: 'Born in India’s textile capital, Prabhakar Processors transforms grey fabric into finished cloth with modern technology, skilled hands, and a customer-first promise.',
+    image: '/about_section/about-heritage.png',
+    imageAlt: 'Precision textile machinery and finished fabric detail',
+  },
+  timeline: [
+    {
+      year: '2009',
+      title: 'Foundation',
+      body: 'Established in Surat with a clear commitment to quality dyeing and printing.',
+    },
+    {
+      year: '2014',
+      title: 'Capability',
+      body: 'Expanded production capacity and specialised finishing expertise.',
+    },
+    {
+      year: '2019',
+      title: 'Integration',
+      body: 'Unified pickup, processing, inspection, and delivery into one reliable flow.',
+    },
+    {
+      year: 'Today',
+      title: 'Partnership',
+      body: 'Trusted by manufacturers, exporters, and brands who build on every metre we process.',
+    },
+  ],
+  stats: [
+    { value: 17, suffix: '+', label: 'Years of Experience' },
+    { value: 350, suffix: 'K', label: 'Metres Dyeing / Day' },
+    { value: 250, suffix: 'K', label: 'Metres Printing / Day' },
+    { value: 850, suffix: '+', label: 'Skilled Employees' },
   ],
   vision: {
-    title: 'Our Vision',
-    body: 'To become one of India’s most trusted and innovative textile processing companies by delivering world-class dyeing and printing solutions that set new standards in quality, reliability, and customer satisfaction. We aspire to drive sustainable growth through advanced technology, continuous innovation, and long-term partnerships while contributing to the success of the global textile industry.',
+    eyebrow: 'Our Vision',
+    quote:
+      'To become one of India’s most trusted textile processing companies — setting the standard for quality, reliability, and partnership.',
   },
-  mission: {
-    title: 'Our Mission',
-    items: [
-      'To deliver premium-quality dyeing and printing solutions that consistently exceed customer expectations.',
-      'To maintain the highest standards of quality, precision, and consistency in every stage of textile processing.',
-      'To invest in modern technology and continuous process improvement for enhanced productivity and efficiency.',
-      'To build long-term relationships with our customers through trust, transparency, and timely delivery.',
-      'To create a safe, responsible, and growth-oriented workplace for our employees.',
-      'To promote sustainable manufacturing practices that minimize environmental impact while maximizing value for our customers and stakeholders.',
+  principles: [
+    {
+      id: 'quality',
+      title: 'Quality Without Compromise',
+      body: 'Shade, print, and finish verified so every metre performs as expected.',
+    },
+    {
+      id: 'technology',
+      title: 'Progress Through Technology',
+      body: 'Modern equipment and continuous improvement at every processing stage.',
+    },
+    {
+      id: 'trust',
+      title: 'Partnerships Built On Trust',
+      body: 'Transparent communication and long-term relationships with every customer.',
+    },
+    {
+      id: 'growth',
+      title: 'Responsible Growth',
+      body: 'Safe workplaces and practices that create lasting value for people and partners.',
+    },
+  ],
+  process: {
+    eyebrow: 'How We Work',
+    title: 'Grey In. Exceptional Cloth Out.',
+    body: 'One connected journey from pickup to delivery — without the friction of fragmented processing.',
+    cta: 'Explore Services',
+    ctaHref: '/services',
+    stages: [
+      {
+        id: 'pickup',
+        title: 'Pickup',
+        description: 'Grey fabric collected from markets and customer locations.',
+        image: '/about_section/process/stage-pickup.png',
+      },
+      {
+        id: 'dyeing',
+        title: 'Dyeing',
+        description: 'Consistent shades with controlled liquor and careful finishing.',
+        image: '/about_section/process/stage-dyeing.png',
+      },
+      {
+        id: 'printing',
+        title: 'Printing',
+        description: 'Precise prints with clarity, depth, and lasting colour.',
+        image: '/about_section/process/stage-printing.png',
+      },
+      {
+        id: 'inspection',
+        title: 'Inspection',
+        description: 'Stage-wise checks before fabric leaves our floor.',
+        image: '/about_section/process/stage-inspection.png',
+      },
+      {
+        id: 'delivery',
+        title: 'Delivery',
+        description: 'Finished cloth returned safely and on schedule.',
+        image: '/about_section/process/stage-delivery.png',
+      },
     ],
   },
-  stats: [
-    { value: '17+', label: 'Years of Experience' },
-    { value: '350K', label: 'Metres Dyeing / Day' },
-    { value: '250K', label: 'Metres Printing / Day' },
-    { value: '850+', label: 'Skilled Employees' },
-  ],
   leadership: {
     title: 'Leadership Team',
     body: 'Guided by experience, stewardship, and a shared commitment to craftsmanship.',
+    quote:
+      'Textile processing isn’t simply manufacturing. It is the responsibility of transforming every metre entrusted to us.',
+    attribution: '— Leadership, Prabhakar Processors',
     members: [
       {
         name: 'Anand Poddar',
@@ -444,73 +535,29 @@ export const aboutPage = {
       },
     ],
   },
-  usp: {
-    title: 'End-To-End Solutions',
-    body: 'We provide complete textile processing solutions designed to meet the diverse needs of our customers — from grey fabric collection to finished delivery.',
-    items: [
-      {
-        title: 'Grey Fabric Pickup',
-        description:
-          'Convenient pickup of grey fabric from customers and textile markets.',
-      },
-      {
-        title: 'Fabric Dyeing',
-        description:
-          'High-quality dyeing with consistent shades, superior finish, and strict quality control.',
-      },
-      {
-        title: 'Fabric Printing',
-        description:
-          'Premium printing solutions with precision, vibrant colors, and excellent fabric appearance.',
-      },
-      {
-        title: 'Quality Inspection',
-        description:
-          'Thorough quality checks at every stage to ensure flawless finished fabrics.',
-      },
-      {
-        title: 'Finished Fabric Delivery',
-        description:
-          'Safe and timely delivery of processed fabric to customers.',
-      },
-      {
-        title: 'Customer Support',
-        description:
-          'Dedicated support for production updates, order tracking, and after-sales assistance.',
-      },
-      {
-        title: 'Bulk Order Processing',
-        description:
-          'Efficient handling of both small and large-volume textile processing requirements.',
-      },
-      {
-        title: 'Customized Textile Solutions',
-        description:
-          'Processing services tailored to customer specifications and business requirements.',
-      },
-    ],
-  },
-  capabilities: {
-    title: 'Core Capabilities',
-    body: 'Our strength lies in delivering reliable, high-quality, and customer-focused textile processing solutions.',
-    items: [
-      'Complete textile processing solutions — from grey pickup to finished delivery',
-      'High production capacity with consistent quality',
-      'Advanced dyeing & printing expertise',
-      'Strict quality assurance at every stage',
-      'On-time delivery through planned operations',
-      'Customer-centric support and transparent communication',
-      'Experienced workforce of 850+ skilled professionals',
-      'Reliable supply chain for pickup, processing, and delivery',
-      'Continuous improvement in technology and process efficiency',
-    ],
+  closing: {
+    eyebrow: 'Our Promise',
+    headline: ['Built On Trust.', 'Refined By Process.'],
+    body: 'One company. One commitment. Every metre.',
+    primaryCta: 'Explore Services',
+    primaryHref: '/services',
+    secondaryCta: 'Read The Blog',
+    secondaryHref: '/blog',
+    desktopImage: '/about_section/about-closing-desktop.png',
+    mobileImage: '/about_section/about-closing-mobile.png',
   },
 }
 
 export const servicesPage = {
   eyebrow: 'Our Services',
-  headline: 'The Swatch Book.',
+  headline: ['The', 'Swatch Book.'],
+  highlight: 'Swatch',
   body: 'A comprehensive portfolio of dyeing, printing, and finishing — each service crafted with the same precision we bring to every metre.',
+  meta: '3 disciplines · 12 core services · 12 on request',
+  hero: {
+    desktopImage: '/services_section/services-hero-desktop.png',
+    mobileImage: '/services_section/services-hero-mobile.png',
+  },
   backgrounds: {
     ikat: '/service_section/bg-ikat-texture.png',
     jali: '/service_section/bg-jali-lattice.png',
@@ -519,6 +566,9 @@ export const servicesPage = {
     {
       id: 'dyeing',
       title: 'Dyeing',
+      numeral: '01',
+      intro:
+        'Colour engineered for consistency, depth, and lasting brilliance across every batch.',
       services: [
         {
           id: 'piece-dyeing',
@@ -546,6 +596,9 @@ export const servicesPage = {
     {
       id: 'printing',
       title: 'Printing',
+      numeral: '02',
+      intro:
+        'From traditional screens to digital precision — patterns rendered with clarity and scale.',
       services: [
         {
           id: 'screen-printing',
@@ -587,6 +640,9 @@ export const servicesPage = {
     {
       id: 'finishing',
       title: 'Finishing',
+      numeral: '03',
+      intro:
+        'The final treatments that define hand-feel, performance, and how fabric behaves in use.',
       services: [
         {
           id: 'shearing',
@@ -619,6 +675,12 @@ export const servicesPage = {
       ],
     },
   ],
+  specs: [
+    { value: 350, suffix: 'K', label: 'Metres Dyeing / Day' },
+    { value: 250, suffix: 'K', label: 'Metres Printing / Day' },
+    { value: 12, suffix: '', label: 'Core Services' },
+    { value: 17, suffix: '+', label: 'Years of Experience' },
+  ],
   alsoAvailable: {
     title: 'Also Available',
     body: 'Additional finishes and print techniques offered on request.',
@@ -637,34 +699,79 @@ export const servicesPage = {
       'Spray Print',
     ],
   },
+  closing: {
+    headline: ['Ready To Specify', 'Your Next Run?'],
+    body: 'Share your fabric, shade, and volume — we will map the right process.',
+    primaryCta: 'Discuss Your Requirements',
+    primaryHref: '/contact',
+    secondaryCta: 'Read The Blog',
+    secondaryHref: '/blog',
+    desktopImage: '/services_section/services-closing-desktop.png',
+    mobileImage: '/services_section/services-closing-mobile.png',
+  },
 }
 
 export const careersPage = {
   eyebrow: 'Careers',
-  headline: 'Grow With A Team That Values Craft.',
+  headline: ['Grow With A Team', 'That Values Craft.'],
+  highlight: 'Craft',
   body: 'At Prabhakar Processors, we are committed to creating a workplace where employees feel valued, supported, and empowered to grow.',
+  meta: '19 departments · Surat, Gujarat · Since 2009',
+  hero: {
+    texture: '/service_section/bg-jali-lattice.png',
+  },
+  rail: [
+    { id: 'benefits', label: 'Benefits' },
+    { id: 'culture', label: 'Culture' },
+    { id: 'apply', label: 'Apply' },
+  ],
   benefits: {
     title: 'Employee Benefits & Facilities',
-    items: [
-      'Competitive Salary & Timely Payments',
-      'Employee Provident Fund (PF)',
-      'ESIC Benefits',
-      'Paid Leave & Holidays',
-      'Safe & Healthy Working Environment',
-      'Comfortable Working Environment',
-      'Modern Machinery & Advanced Equipment',
-      'Standard Company Uniform',
-      'Employee Welfare & Safety Measures',
-      'Professional Training & Skill Development',
-      'Advanced SOPs & Training',
-      'Monthly Workshops & Learning Programs',
-      'Career Growth Opportunities',
-      'Supportive & Team-Oriented Work Culture',
-      'Mess & Canteen Facilities',
-      'Complimentary Medical Facilities',
-      'Cultural Celebrations & Employee Engagement',
-      'Sponsored Education Support for Bright Students',
-      'Transportation Assistance (where applicable)',
+    body: 'Support that covers how you work, how you grow, and how you belong.',
+    groups: [
+      {
+        id: 'security',
+        title: 'Security & Pay',
+        items: [
+          'Competitive Salary & Timely Payments',
+          'Employee Provident Fund (PF)',
+          'ESIC Benefits',
+          'Paid Leave & Holidays',
+        ],
+      },
+      {
+        id: 'workplace',
+        title: 'Workplace & Safety',
+        items: [
+          'Safe & Healthy Working Environment',
+          'Comfortable Working Environment',
+          'Modern Machinery & Advanced Equipment',
+          'Standard Company Uniform',
+          'Employee Welfare & Safety Measures',
+        ],
+      },
+      {
+        id: 'learning',
+        title: 'Learning & Growth',
+        items: [
+          'Professional Training & Skill Development',
+          'Advanced SOPs & Training',
+          'Monthly Workshops & Learning Programs',
+          'Career Growth Opportunities',
+        ],
+      },
+      {
+        id: 'life',
+        title: 'Life & Community',
+        items: [
+          'Supportive & Team-Oriented Work Culture',
+          'Mess & Canteen Facilities',
+          'Complimentary Medical Facilities',
+          'Cultural Celebrations & Employee Engagement',
+          'Sponsored Education Support for Bright Students',
+          'Transportation Assistance (where applicable)',
+        ],
+      },
     ],
   },
   culture: {
@@ -716,6 +823,11 @@ export const careersPage = {
   form: {
     title: 'Job Application',
     body: 'Interested in joining Prabhakar Processors? Select a department and share your details below.',
+    steps: [
+      { id: 'role', label: 'Role', title: 'Choose Your Role' },
+      { id: 'about', label: 'About You', title: 'Tell Us About You' },
+      { id: 'documents', label: 'Documents', title: 'Documents & Notes' },
+    ],
     departments: [
       'HR Department',
       'Account Department',
@@ -738,35 +850,120 @@ export const careersPage = {
       'Receptionist',
     ],
   },
+  closing: {
+    headline: ['Ready To Grow', 'With Us?'],
+    body: 'Share your role of interest and we will be in touch.',
+    primaryCta: 'Start Application',
+    primaryHref: '#apply',
+    secondaryCta: 'Email HR',
+    texture: '/service_section/bg-ikat-texture.png',
+  },
 }
 
 export const testimonialsPage = {
   eyebrow: 'Testimonials',
-  headline: 'Trusted Partnerships.',
-  body: 'Manufacturers, exporters, and brands who value consistency choose Prabhakar Processors for the long term. Client stories will appear here as they are shared with us.',
-  placeholders: [
+  headline: ['Trusted', 'Partnerships.'],
+  highlight: 'Partnerships',
+  body: 'Manufacturers, exporters, and brands who value consistency choose Prabhakar Processors for the long term. Relationships measured in years, not orders.',
+  meta: '6 partner types · Surat, Gujarat · Since 2009',
+  hero: {
+    texture: '/service_section/bg-jali-lattice.png',
+  },
+  quotes: [
     {
+      id: 'garment',
       type: 'Garment Manufacturer',
-      years: '14 years',
+      years: 14,
       quote: 'Colour consistency that keeps our production on schedule.',
     },
     {
+      id: 'fashion',
       type: 'Fashion Brand',
-      years: '9 years',
+      years: 9,
       quote: 'Every collection, the shades arrive exactly as specified.',
     },
     {
+      id: 'exporter',
       type: 'Textile Exporter',
-      years: '11 years',
+      years: 11,
       quote: 'International quality without the complexity.',
     },
     {
+      id: 'home',
       type: 'Home Textiles',
-      years: '7 years',
+      years: 7,
       quote: 'The finishing quality transformed our product line.',
+    },
+    {
+      id: 'wholesale',
+      type: 'Wholesale Trader',
+      years: 6,
+      quote: 'Volume, speed and quality — all three, consistently.',
+    },
+    {
+      id: 'retail',
+      type: 'Premium Retailer',
+      years: 5,
+      quote: 'Our customers notice the difference. That matters.',
     },
   ],
   note: 'Full named testimonials and logos will be published with client permission.',
+  closing: {
+    headline: ['Ready To Build', 'A Partnership?'],
+    body: 'Share your fabric, shade, and volume — we will map the right process.',
+    primaryCta: 'Start A Partnership',
+    primaryHref: '/contact',
+    secondaryCta: 'View Services',
+    secondaryHref: '/services',
+    texture: '/service_section/bg-ikat-texture.png',
+  },
+}
+
+export const journalPage = {
+  eyebrow: 'Journal',
+  headline: ['From The', 'Floor.'],
+  highlight: 'Floor',
+  body: 'Process, colour, and team moments — pulled live from Instagram as they happen on the floor.',
+  feedUrl: 'https://feeds.behold.so/lIg9Y0TkKka1w3RhtiV5',
+  hero: {
+    texture: '/service_section/bg-jali-lattice.png',
+  },
+  closing: {
+    headline: ['Follow The', 'Process.'],
+    body: 'See the work as it unfolds — dyeing floors, print runs, and the people behind every metre.',
+    primaryCta: 'Follow On Instagram',
+    secondaryCta: 'Contact Us',
+    secondaryHref: '/contact',
+    texture: '/service_section/bg-ikat-texture.png',
+  },
+}
+
+export const blogPage = {
+  eyebrow: 'Insights',
+  headline: ['Notes From', 'The Mill.'],
+  highlight: 'Mill',
+  body: 'Process, quality, and partnership — written from the floor for the partners who build on every metre.',
+  meta: 'Process · Quality · Partnership',
+  seoTitle: 'Textile Insights & Mill Notes | Prabhakar Processors Blog',
+  seoDescription:
+    'Notes from Prabhakar Processors on dyeing, printing, fabric inspection, and partnership — practical insights from our Surat mill.',
+  hero: {
+    texture: '/service_section/bg-jali-lattice.png',
+    primaryCta: 'Discuss A Requirement',
+    primaryHref: '/contact',
+    secondaryCta: 'Browse Notes',
+    secondaryHref: '#posts',
+  },
+  featuredCta: 'Read Article',
+  closing: {
+    headline: ['Have A Brief', 'To Discuss?'],
+    body: 'Share your fabric, shade, and volume — we will map the right process.',
+    primaryCta: 'Contact Us',
+    primaryHref: '/contact',
+    secondaryCta: 'View Services',
+    secondaryHref: '/services',
+    texture: '/service_section/bg-ikat-texture.png',
+  },
 }
 
 export const contactPage = {

@@ -1,317 +1,505 @@
-import { useState, type FormEvent } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+} from 'react'
+import {
+  GraduationCap,
+  HeartHandshake,
+  ShieldCheck,
+  Wallet,
+  type LucideProps,
+} from 'lucide-react'
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'framer-motion'
 import { careersPage, company } from '../data/content'
+import { CountUp } from '../components/motion/CountUp'
+import { FadeIn } from '../components/motion/FadeIn'
+import { JobApplicationForm } from '../components/JobApplicationForm'
+import { SectionCta } from '../components/SectionCta'
 
-const ACCENT = '#674438'
 const MAHOGANY = '#674438'
+const HEADING = '#20222D'
 
-const fieldClass =
-  'w-full border border-line bg-cream px-4 py-3 font-sans text-sm text-ink outline-none transition-colors focus:border-[#674438]'
+const BENEFIT_ICONS: Record<
+  (typeof careersPage.benefits.groups)[number]['id'],
+  ComponentType<LucideProps>
+> = {
+  security: Wallet,
+  workplace: ShieldCheck,
+  learning: GraduationCap,
+  life: HeartHandshake,
+}
 
-export function CareersPage() {
-  const [submitted, setSubmitted] = useState(false)
+function DiamondRule({ className = '' }: { className?: string }) {
+  return (
+    <div className={`flex items-center gap-3 ${className}`} aria-hidden="true">
+      <span className="h-px w-8 bg-mahogany/30" />
+      <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" />
+      <span className="h-px w-8 bg-mahogany/30" />
+    </div>
+  )
+}
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setSubmitted(true)
-  }
+function CareersHero() {
+  const reduceMotion = useReducedMotion()
+  const sectionRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  })
+  const bgY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    reduceMotion ? ['0%', '0%'] : ['0%', '12%'],
+  )
+
+  const [first, second] = careersPage.headline
+  const highlight = careersPage.highlight
+  const secondParts = second.split(highlight)
 
   return (
-    <main className="bg-cream pt-24">
-      <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
-        <p
-          className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-          style={{ color: MAHOGANY }}
+    <section
+      ref={sectionRef}
+      className="relative flex min-h-[78svh] flex-col overflow-hidden bg-cream pt-24"
+    >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          className="absolute inset-[-8%] will-change-transform"
+          style={{ y: bgY }}
         >
-          {careersPage.eyebrow}
-        </p>
-        <h1 className="mt-5 max-w-3xl font-serif text-4xl leading-[1.12] font-medium tracking-tight text-ink md:text-5xl lg:text-[3.4rem]">
-          {careersPage.headline}
-        </h1>
-        <p className="mt-6 max-w-2xl font-sans text-sm leading-relaxed text-ink-muted md:text-base">
-          {careersPage.body}
-        </p>
-      </section>
+          <img
+            src={careersPage.hero.texture}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.14]"
+            draggable={false}
+          />
+        </motion.div>
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/92 to-cream/70"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-cream to-transparent"
+          aria-hidden="true"
+        />
+      </div>
 
-      <section className="border-y border-line/80 bg-cream-dark">
-        <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-20">
-          <h2 className="font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 py-16 md:px-8 lg:px-10 lg:py-24">
+        <FadeIn className="max-w-xl">
+          <p
+            className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
+            style={{ color: MAHOGANY }}
+          >
+            {careersPage.eyebrow}
+          </p>
+          <h1 className="mt-5 font-serif text-[2.5rem] leading-[1.08] font-medium tracking-tight text-ink md:text-5xl lg:text-[3.5rem]">
+            {first}
+            <br />
+            {secondParts[0]}
+            <span className="text-mahogany">{highlight}</span>
+            {secondParts[1] ?? ''}
+          </h1>
+          <DiamondRule className="mt-6" />
+          <p className="mt-6 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
+            {careersPage.body}
+          </p>
+          <p className="mt-8 font-sans text-[10px] font-medium tracking-[0.18em] text-ink/45 uppercase">
+            {careersPage.meta}
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-8">
+            <SectionCta label="Apply Now" to="#apply" />
+            <a
+              href="#benefits"
+              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
+            >
+              Explore Benefits
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </FadeIn>
+      </div>
+
+      <a
+        href="#benefits"
+        className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
+      >
+        <span className="font-sans text-[9px] font-medium tracking-[0.24em] text-ink-muted uppercase">
+          Scroll
+        </span>
+        <span
+          className="h-8 w-px origin-top bg-mahogany/40"
+          aria-hidden="true"
+        />
+      </a>
+    </section>
+  )
+}
+
+function CareersRail() {
+  const [active, setActive] = useState(careersPage.rail[0]?.id ?? '')
+
+  useEffect(() => {
+    const sections = careersPage.rail
+      .map((r) => document.getElementById(r.id))
+      .filter((el): el is HTMLElement => Boolean(el))
+
+    if (!sections.length) return
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        if (visible[0]?.target.id) {
+          setActive(visible[0].target.id)
+        }
+      },
+      {
+        rootMargin: '-30% 0px -50% 0px',
+        threshold: [0.15, 0.35, 0.55],
+      },
+    )
+
+    sections.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <nav
+      aria-label="Careers sections"
+      className="sticky top-[68px] z-40 border-b border-mahogany/20 bg-cream/95 backdrop-blur-md sm:top-[72px]"
+    >
+      <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-5 py-3 [-ms-overflow-style:none] [scrollbar-width:none] md:px-8 lg:px-10 [&::-webkit-scrollbar]:hidden">
+        {careersPage.rail.map((item) => {
+          const isActive = active === item.id
+          return (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`relative shrink-0 px-4 py-2 font-sans text-[11px] font-semibold tracking-[0.16em] uppercase transition-colors ${
+                isActive ? 'text-mahogany' : 'text-ink/55 hover:text-ink'
+              }`}
+            >
+              {item.label}
+              <span
+                className={`absolute inset-x-4 -bottom-0.5 h-px origin-left bg-mahogany transition-transform duration-300 ${
+                  isActive ? 'scale-x-100' : 'scale-x-0'
+                }`}
+                aria-hidden="true"
+              />
+            </a>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
+
+function ProofRibbon() {
+  const benefitCount = careersPage.benefits.groups.reduce(
+    (sum, g) => sum + g.items.length,
+    0,
+  )
+  const years = new Date().getFullYear() - company.since
+
+  const stats = [
+    {
+      value: careersPage.form.departments.length,
+      suffix: '',
+      label: 'Open Departments',
+    },
+    {
+      value: benefitCount,
+      suffix: '',
+      label: 'Benefits & Facilities',
+    },
+    {
+      value: careersPage.culture.moments.length,
+      suffix: '',
+      label: 'Engagement Programmes',
+    },
+    {
+      value: years,
+      suffix: '+',
+      label: 'Years of Growth',
+    },
+  ]
+
+  return (
+    <section className="border-b border-line/70 bg-cream-dark">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-10 px-5 py-14 md:grid-cols-4 md:gap-0 md:px-8 md:py-16 lg:px-10">
+        {stats.map((stat, i) => (
+          <FadeIn
+            key={stat.label}
+            delay={0.05 * i}
+            className={`text-center md:text-left ${
+              i > 0 ? 'md:border-l md:border-mahogany/20 md:pl-8 lg:pl-10' : ''
+            }`}
+          >
+            <p className="font-serif text-4xl font-medium tracking-tight text-mahogany md:text-5xl">
+              <CountUp value={stat.value} suffix={stat.suffix} />
+            </p>
+            <p className="mt-2 font-sans text-[10px] font-medium tracking-[0.16em] text-ink-muted uppercase md:text-[11px]">
+              {stat.label}
+            </p>
+          </FadeIn>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function BenefitPillars() {
+  return (
+    <section
+      id="benefits"
+      className="scroll-mt-[140px] border-t border-line/60 sm:scroll-mt-[148px]"
+    >
+      <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
+        <FadeIn>
+          <p
+            className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase"
+            style={{ color: MAHOGANY }}
+          >
+            How We Support You
+          </p>
+          <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
             {careersPage.benefits.title}
           </h2>
-          <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {careersPage.benefits.items.map((item) => (
-              <li
-                key={item}
-                className="flex gap-3 border border-line/70 bg-cream px-4 py-3.5 font-sans text-sm text-ink-muted"
-              >
-                <span
-                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45"
-                  style={{ backgroundColor: ACCENT }}
-                  aria-hidden="true"
-                />
-                {item}
+          <p className="mt-3 max-w-xl font-sans text-sm leading-relaxed text-ink-muted md:text-base">
+            {careersPage.benefits.body}
+          </p>
+        </FadeIn>
+
+        <ul className="mt-12 grid list-none gap-4 p-0 md:grid-cols-2 md:gap-5 lg:gap-6">
+          {careersPage.benefits.groups.map((group, i) => {
+            const Icon = BENEFIT_ICONS[group.id]
+            return (
+              <li key={group.id}>
+                <FadeIn delay={0.06 * i} className="h-full">
+                  <article className="flex h-full flex-col border border-line/70 bg-cream px-5 py-6 md:px-7 md:py-8">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <Icon
+                          className="h-5 w-5 text-mahogany"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                        <h3 className="mt-4 font-serif text-xl font-medium tracking-tight text-ink md:text-2xl">
+                          {group.title}
+                        </h3>
+                      </div>
+                      <span className="font-sans text-[10px] font-medium tracking-[0.16em] text-ink/35 uppercase">
+                        {String(group.items.length).padStart(2, '0')} items
+                      </span>
+                    </div>
+                    <span
+                      className="mt-4 block h-px w-8 bg-mahogany"
+                      aria-hidden="true"
+                    />
+                    <ul className="mt-5 flex list-none flex-col gap-0 p-0">
+                      {group.items.map((item) => (
+                        <li
+                          key={item}
+                          className="flex gap-3 border-t border-line/50 py-3 font-sans text-sm leading-snug text-ink-muted first:border-t-0 first:pt-0 last:pb-0"
+                        >
+                          <span
+                            className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45 bg-mahogany"
+                            aria-hidden="true"
+                          />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                </FadeIn>
               </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+            )
+          })}
+        </ul>
+      </div>
+    </section>
+  )
+}
 
-      <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-20">
-        <h2 className="font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
-          {careersPage.culture.title}
-        </h2>
-        <p className="mt-3 max-w-xl font-sans text-sm text-ink-muted">
-          {careersPage.culture.body}
-        </p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {careersPage.culture.moments.map((moment) => (
-            <article
-              key={moment.title}
-              className="border-t border-[#674438]/40 pt-5"
-            >
-              <h3 className="font-serif text-xl font-medium text-ink">
-                {moment.title}
-              </h3>
-              <p className="mt-2 font-sans text-sm leading-relaxed text-ink-muted">
-                {moment.description}
-              </p>
-            </article>
+function CultureLedger() {
+  const reduceMotion = useReducedMotion()
+
+  return (
+    <section
+      id="culture"
+      className="scroll-mt-[140px] border-t border-line/60 bg-cream-dark sm:scroll-mt-[148px]"
+    >
+      <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
+        <FadeIn>
+          <p
+            className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase"
+            style={{ color: MAHOGANY }}
+          >
+            Life At Prabhakar
+          </p>
+          <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
+            {careersPage.culture.title}
+          </h2>
+          <p className="mt-3 max-w-xl font-sans text-sm leading-relaxed text-ink-muted md:text-base">
+            {careersPage.culture.body}
+          </p>
+        </FadeIn>
+
+        <ul className="mt-14 grid list-none gap-x-10 gap-y-0 p-0 md:grid-cols-2">
+          {careersPage.culture.moments.map((moment, i) => (
+            <li key={moment.title}>
+              <FadeIn delay={reduceMotion ? 0 : 0.04 * i}>
+                <article className="relative py-7 md:py-8">
+                  <motion.span
+                    className="mb-5 block h-px origin-left bg-mahogany/40"
+                    initial={reduceMotion ? { scaleX: 1 } : { scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{
+                      duration: reduceMotion ? 0 : 0.7,
+                      delay: reduceMotion ? 0 : 0.05 * i,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="pointer-events-none absolute top-7 right-0 font-serif text-5xl font-light leading-none tracking-tight select-none md:top-8 md:text-6xl"
+                    style={{ color: 'rgba(103,68,56,0.14)' }}
+                    aria-hidden="true"
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="relative pr-16 font-serif text-xl font-medium tracking-tight text-ink md:text-2xl">
+                    {moment.title}
+                  </h3>
+                  <p className="relative mt-2 max-w-sm font-sans text-sm leading-relaxed text-ink-muted">
+                    {moment.description}
+                  </p>
+                </article>
+              </FadeIn>
+            </li>
           ))}
-        </div>
-      </section>
+        </ul>
+      </div>
+    </section>
+  )
+}
 
-      <section
-        id="apply"
-        className="scroll-mt-24 border-t border-line/80 bg-cream-dark"
-      >
-        <div className="mx-auto max-w-3xl px-5 py-16 md:px-8 lg:px-10 lg:py-20">
-          <h2 className="font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
+function ApplySection() {
+  return (
+    <section
+      id="apply"
+      className="scroll-mt-[140px] border-t border-line/60 sm:scroll-mt-[148px]"
+    >
+      <div className="mx-auto max-w-3xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
+        <FadeIn>
+          <p
+            className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase"
+            style={{ color: MAHOGANY }}
+          >
+            Join The Team
+          </p>
+          <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
             {careersPage.form.title}
           </h2>
-          <p className="mt-3 font-sans text-sm text-ink-muted">
+          <p className="mt-3 font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {careersPage.form.body}
           </p>
+        </FadeIn>
 
-          {submitted ? (
-            <div className="mt-10 border border-[#674438]/40 bg-cream px-6 py-8">
-              <p className="font-serif text-2xl text-ink">Thank you.</p>
-              <p className="mt-3 font-sans text-sm text-ink-muted">
-                Your application has been recorded locally. Please also email
-                your resume to{' '}
-                <a
-                  href={`mailto:${company.email}`}
-                  className="text-mahogany underline-offset-2 hover:underline"
-                >
-                  {company.email}
-                </a>{' '}
-                so our HR team can follow up.
-              </p>
-            </div>
-          ) : (
-            <form className="mt-10 space-y-5" onSubmit={onSubmit}>
-              <div>
-                <label
-                  htmlFor="department"
-                  className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                >
-                  Department Applying For
-                </label>
-                <select
-                  id="department"
-                  name="department"
-                  required
-                  className={fieldClass}
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select a department
-                  </option>
-                  {careersPage.form.departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <FadeIn delay={0.08} className="mt-10">
+          <JobApplicationForm />
+        </FadeIn>
+      </div>
+    </section>
+  )
+}
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="fullName"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Full Name
-                  </label>
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    required
-                    className={fieldClass}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="mobile"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Mobile Number
-                  </label>
-                  <input
-                    id="mobile"
-                    name="mobile"
-                    type="tel"
-                    required
-                    className={fieldClass}
-                  />
-                </div>
-              </div>
+function CareersClosing() {
+  const reduceMotion = useReducedMotion()
+  const sectionRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  })
+  const bgScale = useTransform(
+    scrollYProgress,
+    [0, 1],
+    reduceMotion ? [1, 1] : [1, 1.06],
+  )
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className={fieldClass}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="city"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Current City
-                  </label>
-                  <input id="city" name="city" required className={fieldClass} />
-                </div>
-              </div>
+  return (
+    <section
+      ref={sectionRef}
+      className="relative flex min-h-[56svh] items-center justify-center overflow-hidden"
+    >
+      <motion.div
+        className="absolute inset-0"
+        style={{ scale: bgScale }}
+        aria-hidden="true"
+      >
+        <img
+          src={careersPage.closing.texture}
+          alt=""
+          className="h-full w-full object-cover opacity-30"
+          draggable={false}
+        />
+      </motion.div>
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: 'rgba(250, 240, 230, 0.82)' }}
+        aria-hidden="true"
+      />
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="qualification"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Highest Qualification
-                  </label>
-                  <input
-                    id="qualification"
-                    name="qualification"
-                    required
-                    className={fieldClass}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="experience"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Total Work Experience
-                  </label>
-                  <input
-                    id="experience"
-                    name="experience"
-                    required
-                    className={fieldClass}
-                  />
-                </div>
-              </div>
+      <div className="relative z-10 mx-auto max-w-2xl px-6 py-20 text-center md:px-8">
+        <FadeIn>
+          <h2
+            className="font-serif text-3xl leading-[1.12] font-light tracking-tight italic md:text-4xl lg:text-[2.75rem]"
+            style={{ color: HEADING }}
+          >
+            {careersPage.closing.headline[0]}
+            <br />
+            {careersPage.closing.headline[1]}
+          </h2>
+          <p className="mx-auto mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
+            {careersPage.closing.body}
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+            <SectionCta
+              label={careersPage.closing.primaryCta}
+              to={careersPage.closing.primaryHref}
+            />
+            <a
+              href={`mailto:${company.email}`}
+              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
+            >
+              {careersPage.closing.secondaryCta}
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  )
+}
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="currentCompany"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Current Company (Optional)
-                  </label>
-                  <input
-                    id="currentCompany"
-                    name="currentCompany"
-                    className={fieldClass}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="expectedSalary"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Expected Salary (Optional)
-                  </label>
-                  <input
-                    id="expectedSalary"
-                    name="expectedSalary"
-                    className={fieldClass}
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="resume"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Upload Resume (PDF/DOC)
-                  </label>
-                  <input
-                    id="resume"
-                    name="resume"
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    className="w-full font-sans text-sm text-ink-muted file:mr-3 file:border file:border-line file:bg-cream file:px-3 file:py-2 file:font-sans file:text-xs file:uppercase file:tracking-wider"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="photo"
-                    className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                  >
-                    Photograph (Optional)
-                  </label>
-                  <input
-                    id="photo"
-                    name="photo"
-                    type="file"
-                    accept="image/*"
-                    className="w-full font-sans text-sm text-ink-muted file:mr-3 file:border file:border-line file:bg-cream file:px-3 file:py-2 file:font-sans file:text-xs file:uppercase file:tracking-wider"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="remarks"
-                  className="mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase"
-                >
-                  Additional Remarks (Optional)
-                </label>
-                <textarea
-                  id="remarks"
-                  name="remarks"
-                  rows={4}
-                  className={fieldClass}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="mt-2 inline-flex items-center gap-2 border-b border-[#674438] pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity hover:opacity-75"
-                style={{ color: MAHOGANY }}
-              >
-                Submit Application
-                <span aria-hidden="true">→</span>
-              </button>
-            </form>
-          )}
-        </div>
-      </section>
+export function CareersPage() {
+  return (
+    <main className="bg-cream">
+      <CareersHero />
+      <CareersRail />
+      <ProofRibbon />
+      <BenefitPillars />
+      <CultureLedger />
+      <ApplySection />
+      <CareersClosing />
     </main>
   )
 }
