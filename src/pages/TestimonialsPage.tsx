@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   motion,
@@ -10,6 +10,10 @@ import { company, testimonialsPage } from '../data/content'
 import { CountUp } from '../components/motion/CountUp'
 import { FadeIn } from '../components/motion/FadeIn'
 import { SectionCta } from '../components/SectionCta'
+import {
+  fetchPublicTestimonials,
+  type TestimonialDto,
+} from '../lib/cms-api'
 
 const MAHOGANY = '#674438'
 const HEADING = '#20222D'
@@ -125,10 +129,11 @@ function TestimonialsHero() {
   )
 }
 
-function ProofRibbon() {
-  const quotes = testimonialsPage.quotes
+function ProofRibbon({ quotes }: { quotes: TestimonialDto[] }) {
   const combinedYears = quotes.reduce((sum, q) => sum + q.years, 0)
-  const longest = Math.max(...quotes.map((q) => q.years))
+  const longest = quotes.length
+    ? Math.max(...quotes.map((q) => q.years))
+    : 0
   const yearsSince = new Date().getFullYear() - company.since
 
   const stats = [
@@ -166,8 +171,8 @@ function StoriesSection({
   featured,
   rest,
 }: {
-  featured: (typeof testimonialsPage.quotes)[number]
-  rest: (typeof testimonialsPage.quotes)[number][]
+  featured: TestimonialDto
+  rest: TestimonialDto[]
 }) {
   const reduceMotion = useReducedMotion()
 
@@ -359,17 +364,34 @@ function TestimonialsClosing() {
 }
 
 export function TestimonialsPage() {
-  const { featured, rest } = useMemo(() => {
-    const sorted = [...testimonialsPage.quotes].sort(
-      (a, b) => b.years - a.years,
-    )
-    return { featured: sorted[0], rest: sorted.slice(1) }
+  const [quotes, setQuotes] = useState<TestimonialDto[]>(
+    () => testimonialsPage.quotes,
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    fetchPublicTestimonials()
+      .then((data) => {
+        if (cancelled) return
+        if (data.quotes?.length) setQuotes(data.quotes)
+      })
+      .catch(() => {
+        /* keep static fallback */
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
+
+  const { featured, rest } = useMemo(() => {
+    const sorted = [...quotes].sort((a, b) => b.years - a.years)
+    return { featured: sorted[0], rest: sorted.slice(1) }
+  }, [quotes])
 
   return (
     <main className="bg-cream">
       <TestimonialsHero />
-      <ProofRibbon />
+      <ProofRibbon quotes={quotes} />
       {featured && <StoriesSection featured={featured} rest={rest} />}
       <TestimonialsClosing />
     </main>

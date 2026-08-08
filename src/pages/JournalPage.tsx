@@ -40,6 +40,37 @@ function DiamondRule({ className = '' }: { className?: string }) {
   )
 }
 
+function SocialIcon({ id }: { id: string }) {
+  const common = {
+    viewBox: '0 0 24 24',
+    fill: 'currentColor',
+    'aria-hidden': true as const,
+    className: 'h-[18px] w-[18px]',
+  }
+
+  if (id === 'instagram') {
+    return (
+      <svg {...common}>
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.344 3.608 1.32.975.975 1.257 2.242 1.319 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.344 2.633-1.32 3.608-.975.975-2.242 1.257-3.608 1.319-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.344-3.608-1.32-.975-.975-1.257-2.242-1.319-3.608C2.175 15.747 2.163 15.367 2.163 12s.012-3.584.07-4.85c.062-1.366.344-2.633 1.32-3.608C4.527 2.577 5.794 2.295 7.16 2.233 8.426 2.175 8.806 2.163 12 2.163zm0 1.838c-3.15 0-3.522.012-4.763.07-1.03.047-1.59.218-1.963.362-.494.192-.847.422-1.218.793-.371.371-.601.724-.793 1.218-.144.373-.315.933-.362 1.963-.058 1.241-.07 1.613-.07 4.763s.012 3.522.07 4.763c.047 1.03.218 1.59.362 1.963.192.494.422.847.793 1.218.371.371.724.601 1.218.793.373.144.933.315 1.963.362 1.241.058 1.613.07 4.763.07s3.522-.012 4.763-.07c1.03-.047 1.59-.218 1.963-.362.494-.192.847-.422 1.218-.793.371-.371.601-.724.793-1.218.144-.373.315-.933.362-1.963.058-1.241.07-1.613.07-4.763s-.012-3.522-.07-4.763c-.047-1.03-.218-1.59-.362-1.963-.192-.494-.422-.847-.793-1.218-.371-.371-.724-.601-1.218-.793-.373-.144-.933-.315-1.963-.362-1.241-.058-1.613-.07-4.763-.07zm0 3.338a4.662 4.662 0 1 1 0 9.324 4.662 4.662 0 0 1 0-9.324zm0 1.838a2.824 2.824 0 1 0 0 5.648 2.824 2.824 0 0 0 0-5.648zm5.338-2.43a1.09 1.09 0 1 1 0 2.18 1.09 1.09 0 0 1 0-2.18z" />
+      </svg>
+    )
+  }
+
+  if (id === 'linkedin') {
+    return (
+      <svg {...common}>
+        <path d="M20.447 20.452H16.89v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.348V9h3.414v1.561h.049c.476-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.986 1.986 0 1 1 0-3.972 1.986 1.986 0 0 1 0 3.972zM7.119 20.452H3.554V9h3.565v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg {...common}>
+      <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.49 0-1.956.93-1.956 1.886v2.24h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
+    </svg>
+  )
+}
+
 function JournalHero({ username }: { username: string | null }) {
   const reduceMotion = useReducedMotion()
   const sectionRef = useRef<HTMLElement>(null)
@@ -56,7 +87,9 @@ function JournalHero({ username }: { username: string | null }) {
   const [first, second] = journalPage.headline
   const highlight = journalPage.highlight
   const secondParts = second.split(highlight)
-  const profileHref = username ? instagramProfileUrl(username) : null
+  const instagramHref =
+    journalPage.socials.find((s) => s.id === 'instagram')?.href ??
+    (username ? instagramProfileUrl(username) : null)
 
   return (
     <section
@@ -111,12 +144,31 @@ function JournalHero({ username }: { username: string | null }) {
             {journalPage.body}
           </p>
           <p className="mt-8 font-sans text-[10px] font-medium tracking-[0.18em] text-ink/45 uppercase">
-            {username ? `@${username}` : 'Instagram'} · Live feed
+            {username
+              ? `@${username} · Live from the floor`
+              : 'Find Us · Live from the floor'}
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-8">
-            {profileHref ? (
+
+          <ul className="mt-8 flex list-none items-center gap-3 p-0">
+            {journalPage.socials.map((social) => (
+              <li key={social.id}>
+                <a
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-mahogany/35 text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mahogany/50"
+                >
+                  <SocialIcon id={social.id} />
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-8 flex flex-wrap items-center gap-8">
+            {instagramHref ? (
               <a
-                href={profileHref}
+                href={instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-opacity hover:opacity-75"
@@ -363,7 +415,7 @@ function FeedSection({
             className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase"
             style={{ color: MAHOGANY }}
           >
-            On Instagram
+            From The Floor
           </p>
           <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
             Recent Posts

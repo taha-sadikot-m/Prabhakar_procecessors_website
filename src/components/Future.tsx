@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { future } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const SURFACE = '#F0F2F8'
+const SURFACE = '#FAF0E6'
 const HEADING = '#20222D'
 const MAHOGANY = '#674438'
 const ACCENT = '#674438'

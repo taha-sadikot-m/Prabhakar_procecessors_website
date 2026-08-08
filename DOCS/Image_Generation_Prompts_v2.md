@@ -72,49 +72,158 @@ Every single image on this website must follow these rules without exception:
 
 ## A1 · Hero Section
 
-**Textile featured:** Rich silk saree — the most prestigious Indian textile.
+The hero uses a 3-slide auto-scrolling carousel. The TEXT overlay is the same across all three slides ("Where Grey Becomes Brilliant." / eyebrow / meta line). Only the background image changes. All three images must have the same text zone in the same position — LEFT 38% completely empty — so the text reads cleanly on every slide.
 
-### `hero-desktop.png` — 1920 × 1080
+---
+
+### SLIDE 1 — The Mill
+**Textile featured:** Fabric running through dyeing equipment at industrial scale.
+*This is the opening image — it must immediately communicate: dyeing mill.*
+
+#### `hero-slide-01-desktop.png` — 1920 × 1080
 
 ```
 Editorial digital illustration for the hero section of a premium Indian textile
-processing company website. The feeling is: arrival, drama, brilliance.
+processing dyeing mill website. The feeling is: industrial scale, craft precision,
+the energy of a working factory. This must feel like a DYEING MILL instantly.
 
 Background: Flat warm ivory-cream (#FAF0E6), perfectly solid.
 
-LEFT 38% of frame: COMPLETELY EMPTY — zero elements, no ghost motifs, no fabric edges.
-This is the text zone. Nothing at all.
+LEFT 38% of frame: COMPLETELY EMPTY — zero elements, no ghost motifs, no fabric
+edges. Nothing at all. Text zone.
 
-RIGHT 62%: A dramatically draped SILK SAREE in deep crimson (#CC2936) with a rich
-gold zari border. The saree fabric is lustrous, catching light — you can see the
-sheen of the silk weave. The pallu (decorative end) is spread dramatically upward,
-creating a sense of rising, becoming, transforming. The fabric cascades from
-upper-right downward, with generous folds showing the fabric's weight and quality.
-Fine gold thread (zari) is visible in the border — intricate, precise, brilliant.
+RIGHT 62%: A wide-angle editorial illustration of a DYEING MILL INTERIOR in action.
+This is the hero image — it must communicate scale, process, and transformation.
 
-Ghost Mughal palace facade at 8% opacity, warm sepia, behind the fabric.
-Scattered lotus and paisley outlines at 5% opacity, warm gold.
+The scene shows:
+— Long lengths of FABRIC running continuously through the dyeing process —
+  entering grey/ivory on one side, emerging rich saffron (#F7941D) and crimson
+  (#CC2936) on the other. The fabric flows in long, unbroken runs.
+— Stylised dyeing equipment — large cylindrical vats, rollers, guide rails —
+  illustrated in warm sepia line-art and navy, NOT photorealistic machinery.
+  The equipment is rendered as elegant editorial illustration, not industrial
+  photography. Think: how a luxury brand would illustrate a factory.
+— Steam or dye mist rising softly around the fabric as colour blooms into it.
+— The fabric itself is the star — you see it transforming as it moves.
 
-Lighting: Dramatic soft light from upper-left — catches the saree's sheen perfectly.
-Mood: Aspirational, brilliant, the finest Indian textile. This is the transformation
-from grey to brilliant.
+The scale communicates 3,50,000 metres per day. The illustration style keeps
+it aspirational, not utilitarian.
 
-No text. No hands. No people. 1920×1080px landscape.
+Ghost Mughal palace facade at 8% opacity, warm sepia, woven into the background.
+Scattered floral outlines at 5% opacity, warm gold.
+
+Lighting: Warm industrial light from upper-left — catches the wet fabric's sheen.
+Mood: The energy of a working mill — but illustrated with craft and warmth.
+No text. No people's faces. 1920×1080px landscape.
 ```
 
-### `hero-mobile.png` — 1080 × 1920
+#### `hero-slide-01-mobile.png` — 1080 × 1920
 
 ```
-Same visual concept as hero-desktop.png.
+Same dyeing mill concept. TOP 42% empty cream text zone.
+BOTTOM 58%: The dyeing mill scene — fabric flowing through equipment, colour
+emerging, steam rising. The composition focuses on the fabric transformation
+moment — grey entering from the right, saffron/crimson emerging upward.
+Same ghost layers. 1080×1920px portrait.
+```
 
-TOP 42% of frame: COMPLETELY EMPTY clean cream — zero elements.
+---
 
-BOTTOM 58%: The crimson silk saree enters from the BOTTOM-RIGHT, sweeping upward
-through the lower half of the frame. The gold zari border is prominent at the
-lower edge. The fabric rises into the upper portion creating the sense of
-transformation and uplift.
+### SLIDE 2 — The Transformation
+**Textile featured:** Grey fabric becoming brilliant colour — the core miracle of dyeing.*
 
-Same ghost layers, same lighting, same style. 1080×1920px portrait.
+#### `hero-slide-02-desktop.png` — 1920 × 1080
+
+```
+Editorial digital illustration for hero carousel slide 2.
+The feeling is: transformation, the precise moment colour enters fabric, chemistry
+as craft.
+
+Background: Flat warm ivory-cream (#FAF0E6), perfectly solid.
+
+LEFT 38% of frame: COMPLETELY EMPTY — zero elements. Text zone.
+
+RIGHT 62%: A dramatic CLOSE-UP of the dyeing transformation moment — the most
+visually striking instant in textile processing. A long length of fabric is shown
+mid-transformation:
+
+— THE LEFT PORTION of the fabric (entering the dye): plain grey polyester-viscose
+  — flat, uncoloured, raw.
+— THE TRANSITION ZONE (centre): the dye front — where colour is actively
+  spreading into the grey fibres. The colour blooms organically, like ink
+  spreading through wet paper. Not a hard line — a living, moving edge.
+— THE RIGHT PORTION of the fabric (emerging): fully transformed CRIMSON (#CC2936),
+  deep and rich, the colour sitting in every thread.
+
+Below this, partially visible: a second fabric undergoing the same transformation
+but into DEEP INDIGO (#1A237E) — adding depth to the composition.
+
+The transition from grey to colour is the entire message. This is the miracle
+Prabhakar performs 3,50,000 times every day.
+
+Ghost architectural line-art at 8% opacity. Floral outlines at 5%.
+Lighting: Dramatic soft light revealing the fabric texture and dye saturation.
+Mood: Precise, transformative, almost alchemical.
+No text. No machinery visible. No people. 1920×1080px.
+```
+
+#### `hero-slide-02-mobile.png` — 1080 × 1920
+
+```
+Same transformation concept. TOP 42% empty cream text zone.
+BOTTOM 58%: The grey-to-crimson dye transformation runs horizontally across
+the lower portion — grey on the right, transition in the centre, rich crimson
+on the left. The colour bloom is the hero of the image.
+1080×1920px portrait.
+```
+
+---
+
+### SLIDE 3 — The Promise
+**Textile featured:** Complete sarees + processed dress material — the delivered result.*
+
+#### `hero-slide-03-desktop.png` — 1920 × 1080
+
+```
+Editorial digital illustration for hero carousel slide 3.
+The feeling is: completion, promise fulfilled, brilliant results delivered.
+
+Background: Flat warm ivory-cream (#FAF0E6), perfectly solid.
+
+LEFT 38% of frame: COMPLETELY EMPTY — zero elements. Text zone.
+
+RIGHT 62%: A composed editorial arrangement of FINISHED TEXTILE PRODUCTS —
+the destination of every grey fabric bolt that enters Prabhakar's facility:
+
+1. A COMPLETE SAREE — neatly folded with the decorative pallu fanned open
+   at the top. Deep crimson (#CC2936) silk with gold zari border. Presented
+   as a finished luxury product, the way it would appear in a premium boutique.
+
+2. A STACK OF PROCESSED DRESS MATERIAL — folded lengths of printed dress fabric
+   in saffron (#F7941D) with a precise block-print floral border, stacked
+   beside the saree. Clean edges, uniform folds — quality and consistency.
+
+3. A ROLL OF FINISHED TEAL FABRIC — peacock teal (#168AAD) polyester with a
+   sueded surface finish, standing upright behind the other pieces.
+
+The three finished products together tell the full range of Prabhakar's output.
+They are arranged as a composed still-life — the same care that went into
+processing them is visible in how they are presented.
+
+Ghost Mughal architecture at 8% opacity. Floral outlines at 5%.
+Lighting: Warm, even — every finished product glows with quality.
+Mood: Fulfilled, brilliant, the promise kept. This is where grey became brilliant.
+No text. No people. 1920×1080px.
+```
+
+#### `hero-slide-03-mobile.png` — 1080 × 1920
+
+```
+Same finished products concept. TOP 42% empty cream text zone.
+BOTTOM 58%: The complete saree (folded, pallu fanned) sits most prominently,
+the dress material stack and teal fabric roll arranged around it. The saree
+is the centrepiece — the most recognisable finished textile product.
+1080×1920px portrait.
 ```
 
 ---
@@ -1106,9 +1215,13 @@ No fabric. No subject. Used for S08 Future/Innovation section.
 
 Generate in this order. Check each when done.
 
-## Landing Images
-- [ ] `hero-desktop.png` — 1920×1080 — Crimson silk saree
-- [ ] `hero-mobile.png` — 1080×1920 — Same
+## Landing Images — Hero Carousel (3 slides × 2 variants = 6 images)
+- [ ] `hero-slide-01-desktop.png` — 1920×1080 — Dyeing mill in action, fabric transforming
+- [ ] `hero-slide-01-mobile.png` — 1080×1920 — Same
+- [ ] `hero-slide-02-desktop.png` — 1920×1080 — Grey-to-crimson dye transformation close-up
+- [ ] `hero-slide-02-mobile.png` — 1080×1920 — Same
+- [ ] `hero-slide-03-desktop.png` — 1920×1080 — Finished saree + dress material + teal fabric
+- [ ] `hero-slide-03-mobile.png` — 1080×1920 — Same
 - [ ] `fabric-desktop.png` — 1920×1080 — Cotton + dress material + printed fabric trio
 - [ ] `fabric-mobile.png` — 1080×1920 — Same
 - [ ] `process-desktop.png` — 1920×1080 — Grey-to-brilliant transition
@@ -1186,7 +1299,7 @@ Generate in this order. Check each when done.
 
 ---
 
-**TOTAL: 58 images**
+**TOTAL: 62 images** *(hero carousel expanded from 2 to 6 images)*
 
 ---
 

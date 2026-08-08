@@ -11,9 +11,9 @@ import { SectionCta } from './SectionCta'
 
 const HEADING = '#20222D'
 const MAHOGANY = '#674438'
-const OVERLAY = 'rgba(250, 240, 230, 0.65)'
-const BODY = 'rgba(45, 27, 14, 0.7)'
-const ADDRESS = 'rgba(45, 27, 14, 0.45)'
+const OVERLAY = 'rgba(250, 240, 230, 0.84)'
+const BODY = 'rgba(45, 27, 14, 0.82)'
+const ADDRESS = 'rgba(45, 27, 14, 0.65)'
 
 export function Closing() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -70,13 +70,13 @@ export function Closing() {
           }}
         >
           <p
-            className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
+            className="font-sans text-xs font-medium tracking-[0.22em] uppercase"
             style={{ color: MAHOGANY }}
           >
             {closing.eyebrow}
           </p>
           <h2
-            className="mt-6 font-serif text-4xl leading-[1.12] font-light tracking-tight italic md:text-5xl lg:text-[3.4rem]"
+            className="mt-6 font-serif text-4xl leading-[1.12] font-medium tracking-tight italic md:text-5xl lg:text-[3.4rem]"
             style={{ color: HEADING }}
           >
             {closing.headline[0]}
@@ -84,7 +84,7 @@ export function Closing() {
             {closing.headline[1]}
           </h2>
           <p
-            className="mx-auto mt-7 max-w-lg font-sans text-sm leading-relaxed md:text-base"
+            className="mx-auto mt-7 max-w-lg font-sans text-base leading-relaxed md:text-lg"
             style={{ color: BODY }}
           >
             {closing.body}
@@ -112,7 +112,7 @@ export function Closing() {
                     ? 'noopener noreferrer'
                     : undefined
                 }
-                className="font-sans text-[11px] font-medium tracking-[0.16em] uppercase transition-opacity hover:opacity-80 md:text-xs"
+                className="font-sans text-sm font-medium tracking-[0.12em] uppercase transition-opacity hover:opacity-80 md:text-[15px]"
                 style={{ color: HEADING }}
               >
                 {item.label}
@@ -148,7 +148,7 @@ export function Closing() {
         </motion.div>
 
         <motion.address
-          className="mx-auto mt-12 max-w-sm font-sans text-[11px] leading-relaxed not-italic md:text-xs"
+          className="mx-auto mt-12 max-w-sm font-sans text-sm leading-relaxed not-italic"
           style={{ color: ADDRESS }}
           initial={reduceMotion ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}

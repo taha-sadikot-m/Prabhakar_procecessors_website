@@ -15,11 +15,12 @@ import {
   useInView,
   useReducedMotion,
 } from 'framer-motion'
-import { servicesPage } from '../data/content'
+import type { ServiceCategoryDto } from '../lib/cms-api'
+import { resolveDisplayImageUrl } from '../lib/media-url'
 
 const MAHOGANY = '#674438'
 
-type Category = (typeof servicesPage.categories)[number]
+type Category = ServiceCategoryDto
 
 type FlightSource = {
   rect: DOMRect
@@ -363,7 +364,7 @@ export function SwatchFan({
               }}
             >
               <motion.img
-                src={service.image}
+                src={resolveDisplayImageUrl(service.image)}
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover"
                 animate={{ scale: isHovered ? 1.06 : 1 }}
@@ -430,7 +431,7 @@ export function SwatchFan({
         <AnimatePresence mode="wait" initial={false}>
           <motion.img
             key={active.id}
-            src={active.image}
+            src={resolveDisplayImageUrl(active.image)}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
             initial={{ opacity: 0 }}

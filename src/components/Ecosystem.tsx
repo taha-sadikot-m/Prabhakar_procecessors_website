@@ -290,7 +290,7 @@ export function Ecosystem() {
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
           background:
-            'linear-gradient(180deg, rgba(250,240,230,0.35) 0%, rgba(250,240,230,0.18) 40%, rgba(250,240,230,0.28) 100%)',
+            'linear-gradient(180deg, rgba(250,240,230,0.52) 0%, rgba(250,240,230,0.38) 40%, rgba(250,240,230,0.48) 100%)',
         }}
         aria-hidden="true"
       />
@@ -430,7 +430,7 @@ export function Ecosystem() {
                 </span>
 
                 <div
-                  className="absolute z-[3] w-[8.75rem] lg:w-[9.5rem]"
+                  className="absolute z-[3] w-[9.5rem] lg:w-[10.5rem]"
                   style={{
                     left: `${(station.labelX / RING.size) * 100}%`,
                     top: `${(station.labelY / RING.size) * 100}%`,
@@ -441,26 +441,26 @@ export function Ecosystem() {
                     ref={(el) => {
                       desktopLabelRefs.current[i] = el
                     }}
-                    className="flex flex-col items-center gap-1.5 rounded-xl px-2.5 py-2.5 text-center backdrop-blur-sm"
+                    className="flex flex-col items-center gap-1.5 rounded-xl px-2.5 py-2.5 text-center backdrop-blur-md"
                     style={{
-                      backgroundColor: 'rgba(250,240,230,0.92)',
-                      border: '1px solid rgba(103,68,56,0.28)',
-                      boxShadow: '0 8px 24px rgba(45,27,14,0.08)',
+                      backgroundColor: 'rgba(250,240,230,0.97)',
+                      border: '1px solid rgba(103,68,56,0.35)',
+                      boxShadow: '0 8px 24px rgba(45,27,14,0.1)',
                     }}
                   >
                     <span
                       className="inline-flex size-11 items-center justify-center rounded-full border lg:size-12"
                       style={{
                         borderColor: 'rgba(103,68,56,0.65)',
-                        backgroundColor: 'rgba(255,252,247,0.95)',
+                        backgroundColor: 'rgba(255,252,247,0.98)',
                         color: ACCENT,
                       }}
                     >
                       <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
                     </span>
                     <p
-                      className="font-sans text-[8px] font-medium tracking-[0.22em] uppercase"
-                      style={{ color: MAHOGANY, opacity: 0.8 }}
+                      className="font-sans text-[10px] font-medium tracking-[0.22em] uppercase"
+                      style={{ color: MAHOGANY }}
                     >
                       {indexLabel}
                     </p>
@@ -474,7 +474,10 @@ export function Ecosystem() {
                         aria-hidden="true"
                       />
                     </div>
-                    <p className="font-sans text-[10px] leading-snug text-[#20222D]/65">
+                    <p
+                      className="font-sans text-[11px] leading-snug lg:text-xs"
+                      style={{ color: 'rgba(45,27,14,0.78)' }}
+                    >
                       {milestone.description}
                     </p>
                   </div>
@@ -570,18 +573,18 @@ function MilestoneCopy({
 }) {
   return (
     <div
-      className="flex max-w-[18rem] flex-1 items-start gap-3 rounded-xl border px-3 py-3 backdrop-blur-sm"
+      className="flex max-w-[18rem] flex-1 items-start gap-3 rounded-xl border px-3 py-3 backdrop-blur-md"
       style={{
-        backgroundColor: 'rgba(250,240,230,0.92)',
-        borderColor: 'rgba(103,68,56,0.28)',
-        boxShadow: '0 8px 20px rgba(45,27,14,0.06)',
+        backgroundColor: 'rgba(250,240,230,0.97)',
+        borderColor: 'rgba(103,68,56,0.35)',
+        boxShadow: '0 8px 20px rgba(45,27,14,0.08)',
       }}
     >
       <span
         className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border"
         style={{
           borderColor: 'rgba(103,68,56,0.6)',
-          backgroundColor: 'rgba(255,252,247,0.95)',
+          backgroundColor: 'rgba(255,252,247,0.98)',
           color: ACCENT,
         }}
       >
@@ -596,7 +599,10 @@ function MilestoneCopy({
           style={{ backgroundColor: ACCENT }}
           aria-hidden="true"
         />
-        <p className="mt-1.5 font-sans text-sm leading-relaxed text-[#20222D]/65">
+        <p
+          className="mt-1.5 font-sans text-sm leading-relaxed"
+          style={{ color: 'rgba(45,27,14,0.78)' }}
+        >
           {description}
         </p>
       </div>

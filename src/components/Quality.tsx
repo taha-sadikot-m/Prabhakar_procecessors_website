@@ -8,21 +8,20 @@ const ACCENT = '#674438'
 const HEADING = '#20222D'
 
 /**
- * Arc in % of the full desktop section.
- * Shifted left into the cream mid-zone; endpoints still top-right → bottom-right.
+ * Desktop arc — right side; pins carry titles (descriptions on hover).
  */
-const ARC = { cx: 94, cy: 50, r: 52 } as const
+const ARC = { cx: 118, cy: 50, r: 46 } as const
 
 const ANNOTATION_IDS = ['colour', 'print', 'surface', 'inspection', 'delivery'] as const
 
-/** Mid-arc pins only — clear of top/bottom section edges. */
-const PIN_ANGLES = [222, 201, 180, 159, 138] as const
+/** Equal vertical slots (~14/32/50/68/86%). */
+const PIN_ANGLES = [232, 203, 180, 157, 128] as const
 
-/** Entrance timing — arc draws first, then cards/pins rise. */
+/** Entrance timing — arc draws first, then pin labels rise. */
 const ARC_DURATION = 1.3
 const ARC_DELAY = 0.15
 const CARD_BASE_DELAY = ARC_DELAY + ARC_DURATION
-const CARD_STAGGER = 0.14
+const CARD_STAGGER = 0.1
 const CARD_DURATION = 0.45
 
 /** Mobile thin mahogany bow — end-to-end, deeper arch (viewBox 0 0 100 28). */
@@ -111,14 +110,14 @@ function AnnotationCopy({
       </p>
       <h3
         className={`mt-1 font-serif font-medium tracking-tight transition-colors duration-300 ${
-          compact ? 'text-xl' : 'text-lg lg:text-xl'
+          compact ? 'text-xl' : 'text-base lg:text-lg'
         }`}
-        style={{ color: active ? HEADING : HEADING }}
+        style={{ color: HEADING }}
       >
         {title}
       </h3>
       <span
-        className="mt-2 block h-px transition-colors duration-300"
+        className="mt-1.5 block h-px transition-colors duration-300 lg:mt-2"
         style={{
           width: compact ? '2.75rem' : '2.5rem',
           backgroundColor: active ? ACCENT : 'rgba(103,68,56,0.7)',
@@ -398,13 +397,13 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
 
 export function Quality() {
   const reduceMotion = useReducedMotion()
-  const [hovered, setHovered] = useState<string | null>(null)
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (
     <section id="quality" className="scroll-mt-24" style={{ color: HEADING }}>
       <MobileQuality reduceMotion={reduceMotion} />
 
-      {/* Desktop — full-bleed image across the whole section */}
+      {/* Desktop — pins + titles; description opens on hover */}
       <div className="relative hidden min-h-svh overflow-hidden md:block">
         <motion.img
           src={quality.desktopImage}
@@ -417,12 +416,11 @@ export function Quality() {
           transition={{ duration: 1.4, ease: easeOutQuart }}
         />
 
-        {/* Soft left wash for editorial copy */}
         <div
-          className="pointer-events-none absolute inset-0 z-[1]"
+          className="pointer-events-none absolute inset-0 z-[1] backdrop-blur-[3px]"
           style={{
             background:
-              'linear-gradient(90deg, rgba(250,240,230,0.92) 0%, rgba(250,240,230,0.72) 28%, rgba(250,240,230,0.28) 48%, transparent 68%)',
+              'linear-gradient(90deg, rgba(250,240,230,0.82) 0%, rgba(250,240,230,0.48) 40%, rgba(250,240,230,0.28) 100%)',
           }}
           aria-hidden="true"
         />
@@ -465,8 +463,8 @@ export function Quality() {
             d={ARC_PATH}
             fill="none"
             stroke={ACCENT}
-            strokeWidth={0.6}
-            strokeOpacity={0.5}
+            strokeWidth={0.55}
+            strokeOpacity={0.45}
             strokeLinecap="round"
             initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
             whileInView={{ pathLength: 1, opacity: 1 }}
@@ -482,18 +480,21 @@ export function Quality() {
         {PINS.map((pin, i) => {
           const content = quality.annotations.find((item) => item.id === pin.id)
           if (!content) return null
-          const active = hovered === pin.id
+          const active = hoveredId === pin.id
           const itemDelay = CARD_BASE_DELAY + i * CARD_STAGGER
 
           return (
-            <div key={pin.id}>
-              <motion.div
-                className="pointer-events-none absolute z-[3]"
-                style={{
-                  left: `${pin.x}%`,
-                  top: `${pin.y}%`,
-                  transform: 'translate(-50%, -50%)',
-                }}
+            <div
+              key={pin.id}
+              className={`absolute ${active ? 'z-[6]' : 'z-[4]'}`}
+              style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+              onMouseEnter={() => setHoveredId(pin.id)}
+              onMouseLeave={() => setHoveredId(null)}
+            >
+              <motion.button
+                type="button"
+                aria-label={content.title}
+                className="absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#674438]/60"
                 initial={reduceMotion ? false : { opacity: 0, scale: 0.4 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={viewportOnce}
@@ -502,9 +503,11 @@ export function Quality() {
                   delay: itemDelay,
                   ease: easeOutQuart,
                 }}
+                onFocus={() => setHoveredId(pin.id)}
+                onBlur={() => setHoveredId(null)}
               >
                 <span
-                  className="relative block h-3 w-3 rounded-full"
+                  className="block h-3 w-3 rounded-full"
                   style={{
                     background:
                       'radial-gradient(circle at 35% 30%, #C4A192 0%, #674438 45%, #3A241C 100%)',
@@ -514,18 +517,18 @@ export function Quality() {
                     transition: 'box-shadow 0.3s ease',
                   }}
                 />
-              </motion.div>
+              </motion.button>
 
               <div
-                className="absolute z-[4] w-[13.5rem] lg:w-[15.5rem]"
+                className="absolute w-[12rem] lg:w-[14rem]"
                 style={{
-                  left: `${pin.x}%`,
-                  top: `${pin.y}%`,
-                  transform: 'translate(calc(-100% - 14px), -50%)',
+                  left: '-12px',
+                  top: 0,
+                  transform: 'translate(calc(-100% - 0px), -50%)',
                 }}
               >
                 <motion.div
-                  initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+                  initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={viewportOnce}
                   transition={{
@@ -537,30 +540,58 @@ export function Quality() {
                   <div
                     role="group"
                     tabIndex={0}
-                    className="rounded-xl border px-4 py-3.5 backdrop-blur-md transition-[transform,border-color,box-shadow,background-color] duration-300 outline-none lg:px-4 lg:py-4"
+                    className="rounded-xl border px-3.5 py-2.5 text-left backdrop-blur-md outline-none transition-[border-color,box-shadow,background-color] duration-300 lg:px-4 lg:py-3"
                     style={{
                       backgroundColor: active
-                        ? 'rgba(250,240,230,0.9)'
-                        : 'rgba(250,240,230,0.74)',
+                        ? 'rgba(250,240,230,0.95)'
+                        : 'rgba(250,240,230,0.88)',
                       borderColor: active
-                        ? 'rgba(103,68,56,0.5)'
+                        ? 'rgba(103,68,56,0.45)'
                         : 'rgba(45,27,14,0.14)',
                       boxShadow: active
                         ? '0 10px 28px rgba(45,27,14,0.14)'
-                        : '0 6px 20px rgba(45,27,14,0.08)',
-                      transform: active ? 'translateY(-2px)' : 'translateY(0)',
+                        : '0 6px 18px rgba(45,27,14,0.08)',
                     }}
-                    onMouseEnter={() => setHovered(pin.id)}
-                    onMouseLeave={() => setHovered(null)}
-                    onFocus={() => setHovered(pin.id)}
-                    onBlur={() => setHovered(null)}
+                    onFocus={() => setHoveredId(pin.id)}
+                    onBlur={() => setHoveredId(null)}
+                    aria-expanded={active}
+                    aria-describedby={
+                      active ? `quality-desc-${pin.id}` : undefined
+                    }
                   >
-                    <AnnotationCopy
-                      index={pin.index}
-                      title={content.title}
-                      description={content.description}
-                      active={active}
-                    />
+                    <span
+                      className="block font-sans text-[10px] font-semibold tracking-[0.2em] lg:text-[11px]"
+                      style={{ color: AMBER }}
+                    >
+                      {pin.index}
+                    </span>
+                    <span
+                      className="mt-0.5 block font-serif text-base font-medium tracking-tight lg:text-lg"
+                      style={{ color: HEADING }}
+                    >
+                      {content.title}
+                    </span>
+
+                    <div
+                      id={`quality-desc-${pin.id}`}
+                      className="overflow-hidden transition-[max-height,opacity] duration-300 ease-out"
+                      style={{
+                        maxHeight: active ? '4.5rem' : '0',
+                        opacity: active ? 1 : 0,
+                      }}
+                    >
+                      <span
+                        className="mt-2 block h-px w-10"
+                        style={{ backgroundColor: ACCENT }}
+                        aria-hidden="true"
+                      />
+                      <p
+                        className="mt-2 font-sans text-[11px] leading-relaxed lg:text-xs"
+                        style={{ color: 'rgba(45,27,14,0.65)' }}
+                      >
+                        {content.description}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               </div>

@@ -4,14 +4,20 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm:dev:api\" \"vite\"",
+    "dev:api": "node --env-file=.env --import tsx scripts/dev-api.mjs",
+    "dev:vite": "vite",
     "build": "tsc -b && vite build && tsx scripts/seo-build.ts",
     "preview": "vite preview",
-    "seo": "tsx scripts/seo-build.ts"
+    "seo": "tsx scripts/seo-build.ts",
+    "seed:cms": "node --env-file=.env scripts/seed-cms.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@vercel/node": "^5.9.6",
     "framer-motion": "^12.23.12",
     "gsap": "^3.15.0",
+    "jose": "^6.2.8",
     "lucide-react": "^1.28.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -20,9 +26,13 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.11",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.2.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^10.0.4",
+    "express": "^5.2.1",
     "tailwindcss": "^4.1.11",
     "tsx": "^4.23.9",
     "typescript": "~5.8.3",

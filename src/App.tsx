@@ -5,19 +5,34 @@ import { BlogPage } from './pages/BlogPage'
 import { BlogPostPage } from './pages/BlogPostPage'
 import { CareersPage } from './pages/CareersPage'
 import { ContactPage } from './pages/ContactPage'
+import { GalleryPage } from './pages/GalleryPage'
 import { HomePage } from './pages/HomePage'
 import { JournalPage } from './pages/JournalPage'
 import { ServicesPage } from './pages/ServicesPage'
 import { TestimonialsPage } from './pages/TestimonialsPage'
+import { AdminGalleryPage } from './pages/admin/AdminGalleryPage'
+import { AdminLayout } from './pages/admin/AdminLayout'
+import { AdminLoginPage } from './pages/admin/AdminLoginPage'
+import { AdminServicesPage } from './pages/admin/AdminServicesPage'
+import { AdminTestimonialsPage } from './pages/admin/AdminTestimonialsPage'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="admin/login" element={<AdminLoginPage />} />
+        <Route path="admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="services" replace />} />
+          <Route path="services" element={<AdminServicesPage />} />
+          <Route path="gallery" element={<AdminGalleryPage />} />
+          <Route path="testimonials" element={<AdminTestimonialsPage />} />
+        </Route>
+
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="services" element={<ServicesPage />} />
+          <Route path="gallery" element={<GalleryPage />} />
           <Route path="careers" element={<CareersPage />} />
           <Route path="journal" element={<JournalPage />} />
           <Route path="blog" element={<BlogPage />} />

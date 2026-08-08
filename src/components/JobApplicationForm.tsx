@@ -24,12 +24,15 @@ export function JobApplicationForm() {
   const [announce, setAnnounce] = useState('')
   const stepRefs = useRef<(HTMLFieldSetElement | null)[]>([])
   const headingRefs = useRef<(HTMLHeadingElement | null)[]>([])
+  const prevStep = useRef<number | null>(null)
 
   useEffect(() => {
     if (submitted) return
-    const heading = headingRefs.current[step]
-    heading?.focus()
     setAnnounce(`Step ${step + 1} of ${STEPS.length}: ${STEPS[step].title}`)
+    if (prevStep.current !== null && prevStep.current !== step) {
+      headingRefs.current[step]?.focus({ preventScroll: true })
+    }
+    prevStep.current = step
   }, [step, submitted])
 
   const validateStep = (index: number) => {

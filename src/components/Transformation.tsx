@@ -1,384 +1,254 @@
-import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type TouchEvent,
+} from 'react'
 import {
   AnimatePresence,
   motion,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
+  useReducedMotion,
 } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { transformation } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-const IVORY = '#FFF8F2'
-const CHARCOAL = '#20222D'
 const ACCENT = '#674438'
 const MAHOGANY = '#674438'
+const CREAM = '#FAF0E6'
+const AUTO_MS = 5000
+const PAUSE_MS = 4500
 
 const stages = transformation.stages
-const STAGE_COUNT = stages.length
 
-function ProgressRail({
-  progress,
-  activeIndex,
-}: {
-  progress: number
-  activeIndex: number
-}) {
-  const fill = Math.min(Math.max(progress, 0), 1)
-  const edgeInset = `calc(100% / ${STAGE_COUNT} / 2)`
+export function Transformation() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [current, setCurrent] = useState(0)
+  const [direction, setDirection] = useState(0)
+  const [inView, setInView] = useState(false)
+  const pauseUntilRef = useRef(0)
+  const reduceMotion = useReducedMotion()
+  const count = stages.length
+  const stage = stages[current]
 
-  return (
-    <div
-      className="w-full max-w-lg"
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(fill * 100)}
-      aria-label="Transformation progress"
-    >
-      <div className="relative h-3">
-        {/* Track spans marker centers so fill and dots share one coordinate system */}
-        <div
-          className="absolute top-1/2 h-0.5 -translate-y-1/2 overflow-hidden rounded-full"
-          style={{ left: edgeInset, right: edgeInset }}
-        >
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{ backgroundColor: 'rgba(45,27,14,0.14)' }}
-          />
-          <motion.div
-            className="absolute inset-y-0 left-0 rounded-full"
-            style={{ backgroundColor: ACCENT }}
-            animate={{ width: `${fill * 100}%` }}
-            transition={{ type: 'spring', stiffness: 110, damping: 24, mass: 0.6 }}
-          />
-        </div>
-
-        <div
-          className="relative grid h-full"
-          style={{ gridTemplateColumns: `repeat(${STAGE_COUNT}, minmax(0, 1fr))` }}
-        >
-          {stages.map((stage, i) => {
-            const reached = i <= activeIndex
-            const active = i === activeIndex
-            return (
-              <div key={stage.label} className="flex items-center justify-center">
-                <motion.span
-                  className="relative z-10 block rounded-full border"
-                  animate={{
-                    width: active ? 11 : 8,
-                    height: active ? 11 : 8,
-                    backgroundColor: reached ? ACCENT : IVORY,
-                    borderColor: reached ? ACCENT : 'rgba(45,27,14,0.28)',
-                    boxShadow: active
-                      ? `0 0 0 3px rgba(103,68,56,0.22)`
-                      : '0 0 0 0px rgba(103,68,56,0)',
-                  }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-                />
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      <div
-        className="mt-2.5 grid"
-        style={{ gridTemplateColumns: `repeat(${STAGE_COUNT}, minmax(0, 1fr))` }}
-      >
-        {stages.map((stage, i) => {
-          const active = i === activeIndex
-          const reached = i <= activeIndex
-          return (
-            <span
-              key={stage.label}
-              className="text-center font-sans text-[9px] tracking-[0.14em] uppercase transition-colors duration-300 md:text-[10px]"
-              style={{
-                color: active
-                  ? MAHOGANY
-                  : reached
-                    ? 'rgba(103,68,56,0.72)'
-                    : 'rgba(45,27,14,0.4)',
-                fontWeight: active ? 600 : 500,
-              }}
-            >
-              {stage.label}
-            </span>
-          )
-        })}
-      </div>
-    </div>
+  const goTo = useCallback(
+    (index: number, fromUser = false) => {
+      const next = ((index % count) + count) % count
+      if (next === current) return
+      const wrappingForward = current === count - 1 && next === 0
+      const wrappingBack = current === 0 && next === count - 1
+      setDirection(
+        wrappingForward ? 1 : wrappingBack ? -1 : next > current ? 1 : -1,
+      )
+      setCurrent(next)
+      if (fromUser) pauseUntilRef.current = Date.now() + PAUSE_MS
+    },
+    [count, current],
   )
-}
 
-function StageCopy({
-  stage,
-  light = false,
-}: {
-  stage: (typeof stages)[number]
-  light?: boolean
-}) {
-  const titleColor = light ? '#F7F4EE' : CHARCOAL
-  const bodyColor = light ? 'rgba(247,244,238,0.82)' : 'rgba(45,27,14,0.72)'
-
-  return (
-    <div className="max-w-md text-left lg:max-w-lg">
-      <p
-        className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
-        style={{ color: MAHOGANY }}
-      >
-        {stage.step}
-      </p>
-      <h3
-        className="mt-2 font-serif text-4xl font-medium tracking-tight md:text-5xl lg:text-[3.4rem]"
-        style={{ color: titleColor }}
-      >
-        {stage.heading}
-      </h3>
-      <p
-        className="mt-1 font-serif text-2xl italic md:text-3xl"
-        style={{ color: titleColor }}
-      >
-        {stage.subheading}
-      </p>
-      <p
-        className="mt-4 max-w-md font-sans text-sm leading-relaxed md:text-base"
-        style={{ color: bodyColor }}
-      >
-        {stage.description}
-      </p>
-    </div>
+  const next = useCallback(
+    (fromUser = false) => goTo(current + 1, fromUser),
+    [current, goTo],
   )
-}
-
-function DesktopStickyStory() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [progress, setProgress] = useState(0)
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  })
+  const prev = useCallback(
+    (fromUser = false) => goTo(current - 1, fromUser),
+    [current, goTo],
+  )
 
   useEffect(() => {
-    stages.forEach((s) => {
-      const img = new Image()
-      img.src = s.desktopImage
-    })
+    const el = sectionRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) =>
+        setInView(entry.isIntersecting && entry.intersectionRatio >= 0.5),
+      { threshold: [0, 0.5, 1] },
+    )
+    io.observe(el)
+    return () => io.disconnect()
   }, [])
 
   useEffect(() => {
-    return scrollYProgress.on('change', (v) => {
-      setProgress(v)
-      const idx = Math.min(STAGE_COUNT - 1, Math.floor(v * STAGE_COUNT + 0.001))
-      setActiveIndex(idx)
-    })
-  }, [scrollYProgress])
+    if (reduceMotion || !inView) return
+    const id = window.setInterval(() => {
+      if (Date.now() < pauseUntilRef.current) return
+      setCurrent((c) => {
+        const n = (c + 1) % count
+        setDirection(1)
+        return n
+      })
+    }, AUTO_MS)
+    return () => window.clearInterval(id)
+  }, [reduceMotion, inView, count])
 
-  const mx = useMotionValue(0)
-  const my = useMotionValue(0)
-  const springX = useSpring(mx, { stiffness: 50, damping: 22 })
-  const springY = useSpring(my, { stiffness: 50, damping: 22 })
-  const imgX = useTransform(springX, [-0.5, 0.5], [-16, 16])
-  const imgY = useTransform(springY, [-0.5, 0.5], [-10, 10])
+  const touchStartX = useRef<number | null>(null)
 
-  const onMove = (e: MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    mx.set((e.clientX - rect.left) / rect.width - 0.5)
-    my.set((e.clientY - rect.top) / rect.height - 0.5)
+  const onTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.changedTouches[0]?.clientX ?? null
   }
 
-  const stage = stages[activeIndex]
+  const onTouchEnd = (e: TouchEvent) => {
+    if (touchStartX.current == null) return
+    const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current
+    touchStartX.current = null
+    if (Math.abs(dx) < 48) return
+    if (dx < 0) next(true)
+    else prev(true)
+  }
+
+  const textDuration = reduceMotion ? 0.15 : 0.45
+  const imageDuration = reduceMotion ? 0.2 : 0.6
 
   return (
-    <div ref={containerRef} className="relative hidden h-[500vh] md:block">
-      <div
-        className="sticky top-0 h-svh overflow-hidden"
-        style={{ backgroundColor: IVORY, color: CHARCOAL }}
-        onMouseMove={onMove}
-        onMouseLeave={() => {
-          mx.set(0)
-          my.set(0)
-        }}
-      >
-        {/* Full-bleed stage background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <AnimatePresence mode="sync">
-            <motion.img
-              key={stage.desktopImage}
-              src={stage.desktopImage}
-              alt=""
-              className="absolute inset-[-3%] h-[106%] w-[106%] max-w-none select-none object-cover"
-              style={{ x: imgX, y: imgY }}
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              draggable={false}
-            />
-          </AnimatePresence>
-
-          {/* Left readability wash */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(90deg, rgba(250,248,243,0.92) 0%, rgba(250,248,243,0.78) 28%, rgba(250,248,243,0.25) 52%, transparent 72%)',
-            }}
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
-            style={{
-              background:
-                'linear-gradient(to top, rgba(250,248,243,0.55), transparent)',
-            }}
-            aria-hidden="true"
-          />
-        </div>
-
-        {/* Left editorial content */}
-        <div className="relative z-10 flex h-full flex-col justify-between px-10 pt-24 pb-12 lg:px-16 lg:pt-28 lg:pb-14 xl:px-20">
-          <div className="max-w-lg text-left">
-            <h2 className="font-serif text-4xl font-medium tracking-tight lg:text-5xl">
-              {transformation.title}
-            </h2>
-            <p className="mt-1 font-serif text-2xl italic lg:text-3xl" style={{ color: MAHOGANY }}>
-              {transformation.subtitle}
-            </p>
-            <p className="mt-3 max-w-md font-sans text-sm leading-relaxed text-ink-muted">
-              {transformation.intro}
-            </p>
-          </div>
-
-          <div className="py-6">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={stage.step}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <StageCopy stage={stage} />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <ProgressRail progress={progress} activeIndex={activeIndex} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function MobileSnapStory() {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const scrollerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    stages.forEach((s) => {
-      const img = new Image()
-      img.src = s.mobileImage
-    })
-  }, [])
-
-  useEffect(() => {
-    const el = scrollerRef.current
-    if (!el) return
-
-    const onScroll = () => {
-      const h = el.clientHeight || 1
-      const maxScroll = el.scrollHeight - el.clientHeight
-      const nextProgress =
-        maxScroll > 0 ? Math.min(1, Math.max(0, el.scrollTop / maxScroll)) : 0
-      setProgress(nextProgress)
-      setActiveIndex(Math.min(STAGE_COUNT - 1, Math.round(el.scrollTop / h)))
-    }
-
-    onScroll()
-    el.addEventListener('scroll', onScroll, { passive: true })
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [])
-
-  return (
-    <div className="relative md:hidden" style={{ color: CHARCOAL }}>
-      <div
-        ref={scrollerRef}
-        className="h-[100svh] snap-y snap-mandatory overflow-y-auto"
-      >
-        {stages.map((stage, i) => (
-          <article
-            key={stage.step}
-            className="relative h-[100svh] snap-start overflow-hidden"
+    <section
+      ref={sectionRef}
+      id="transformation"
+      className="relative min-h-svh scroll-mt-24 overflow-hidden"
+      style={{ backgroundColor: CREAM }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      <div className="absolute inset-0" aria-hidden="true">
+        {stages.map((s) => (
+          <motion.div
+            key={s.step}
+            className="absolute inset-0"
+            initial={false}
+            animate={{ opacity: s.step === stage.step ? 1 : 0 }}
+            transition={{ duration: imageDuration, ease: 'easeInOut' }}
           >
-            <img
-              src={stage.mobileImage}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-              draggable={false}
-            />
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(180deg, rgba(250,248,243,0.88) 0%, rgba(250,248,243,0.55) 38%, rgba(250,248,243,0.78) 100%)',
-              }}
-              aria-hidden="true"
-            />
-
-            <div className="relative z-10 flex h-full flex-col px-5 pt-24 pb-28">
-              {i === 0 ? (
-                <>
-                  <div className="max-w-sm text-left">
-                    <h2 className="font-serif text-3xl font-medium tracking-tight">
-                      {transformation.title}
-                    </h2>
-                    <p className="mt-1 font-serif text-xl italic" style={{ color: MAHOGANY }}>
-                      {transformation.subtitle}
-                    </p>
-                    <p className="mt-3 font-sans text-sm leading-relaxed text-ink-muted">
-                      {transformation.intro}
-                    </p>
-                  </div>
-                  <div className="mt-auto">
-                    <StageCopy stage={stage} />
-                  </div>
-                </>
-              ) : (
-                <StageCopy stage={stage} />
-              )}
-            </div>
-          </article>
+            <picture>
+              <source media="(min-width: 768px)" srcSet={s.desktopImage} />
+              <img
+                src={s.mobileImage}
+                alt=""
+                className="h-full w-full object-cover object-center"
+                draggable={false}
+              />
+            </picture>
+          </motion.div>
         ))}
       </div>
 
       <div
-        className="absolute inset-x-0 bottom-0 z-30 px-5 pb-5 pt-6 backdrop-blur-md md:hidden"
-        style={{
-          background:
-            'linear-gradient(to top, rgba(250,248,243,0.82) 35%, rgba(250,248,243,0.45) 70%, transparent 100%)',
-        }}
-      >
-        <ProgressRail progress={progress} activeIndex={activeIndex} />
-      </div>
-    </div>
-  )
-}
+        className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-full max-w-xl bg-gradient-to-r from-[#FAF0E6]/92 via-[#FAF0E6]/55 to-transparent md:max-w-[48%]"
+        aria-hidden="true"
+      />
 
-export function Transformation() {
-  return (
-    <section id="transformation" className="scroll-mt-24">
-      <DesktopStickyStory />
-      <MobileSnapStory />
-      <div className="flex justify-center bg-cream-light px-5 py-10 md:py-12">
-        <SectionCta
-          label={transformation.cta}
-          to={transformation.ctaHref}
-        />
+      <div className="relative z-10 flex min-h-svh items-center px-6 py-14 md:px-10 md:py-16 lg:px-14">
+        <div className="w-full max-w-md md:max-w-[40%]">
+          <h2 className="font-serif text-[2.35rem] leading-[1.08] font-medium tracking-tight text-ink/90 md:text-4xl lg:text-[2.65rem]">
+            {transformation.title}
+            <br />
+            <span className="italic" style={{ color: MAHOGANY }}>
+              {transformation.subtitle}
+            </span>
+          </h2>
+          <p className="mt-3 max-w-sm font-sans text-sm leading-relaxed text-ink/70 md:text-[0.95rem]">
+            {transformation.intro}
+          </p>
+
+          <div className="relative mt-10 min-h-[11.5rem] md:mt-12 md:min-h-[12.5rem]">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={stage.step}
+                custom={direction}
+                initial={
+                  reduceMotion ? { opacity: 0 } : { opacity: 0, y: -16 }
+                }
+                animate={{ opacity: 1, y: 0 }}
+                exit={
+                  reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }
+                }
+                transition={{
+                  duration: textDuration,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <p
+                  className="font-sans text-xs font-semibold tracking-[0.2em] uppercase md:text-[13px]"
+                  style={{ color: MAHOGANY }}
+                >
+                  {stage.step} · {stage.label}
+                </p>
+                <span
+                  className="mt-3 block h-px w-8"
+                  style={{ backgroundColor: ACCENT }}
+                  aria-hidden="true"
+                />
+                <h3 className="mt-4 font-serif text-3xl leading-tight font-medium tracking-tight text-ink md:text-[2.35rem]">
+                  {stage.heading}
+                </h3>
+                <p className="mt-1 font-serif text-xl italic text-ink/85 md:text-2xl">
+                  {stage.subheading}
+                </p>
+                <p className="mt-4 max-w-sm font-sans text-sm leading-relaxed text-ink/70 md:text-[0.95rem]">
+                  {stage.description}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="mt-10 flex items-center gap-4 md:mt-12">
+            <button
+              type="button"
+              aria-label="Previous stage"
+              onClick={() => prev(true)}
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-ink/15 bg-[#FAF0E6]/40 text-ink/70 backdrop-blur-sm transition hover:border-ink/30 hover:text-ink md:inline-flex"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+
+            <div
+              className="flex items-center gap-2.5"
+              role="tablist"
+              aria-label="Process stages"
+            >
+              {stages.map((s, i) => {
+                const active = i === current
+                return (
+                  <button
+                    key={s.step}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    aria-label={`Show ${s.label} stage`}
+                    onClick={() => goTo(i, true)}
+                    className="relative flex h-3 w-3 items-center justify-center"
+                  >
+                    <motion.span
+                      className="block rounded-full"
+                      animate={{
+                        scale: active ? 1.15 : 1,
+                        backgroundColor: active
+                          ? ACCENT
+                          : 'rgba(45,27,14,0.28)',
+                      }}
+                      transition={{ duration: reduceMotion ? 0.1 : 0.25 }}
+                      style={{ width: 8, height: 8 }}
+                    />
+                  </button>
+                )
+              })}
+            </div>
+
+            <button
+              type="button"
+              aria-label="Next stage"
+              onClick={() => next(true)}
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-ink/15 bg-[#FAF0E6]/40 text-ink/70 backdrop-blur-sm transition hover:border-ink/30 hover:text-ink md:inline-flex"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+          </div>
+
+          <div className="mt-8">
+            <SectionCta
+              label={transformation.cta}
+              to={transformation.ctaHref}
+            />
+          </div>
+        </div>
       </div>
     </section>
   )

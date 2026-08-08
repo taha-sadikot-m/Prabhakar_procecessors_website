@@ -1,9 +1,11 @@
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ComponentType,
   type CSSProperties,
+  type RefObject,
 } from 'react'
 import {
   AnimatePresence,
@@ -28,6 +30,9 @@ const ACCENT = '#674438'
 const MAHOGANY = '#674438'
 const PARCHMENT = '#F2E8D8'
 const INK = '#2D1B0E'
+const GAP = 14
+const PAD = 12
+const ITERATIONS = 3
 
 const ICONS: Record<
   (typeof partnerships.partners)[number]['id'],
@@ -43,6 +48,10 @@ const ICONS: Record<
 
 type Partner = (typeof partnerships.partners)[number]
 
+type Pos = { left: number; top: number }
+
+type Rect = { x: number; y: number; w: number; h: number }
+
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
 
@@ -57,24 +66,185 @@ function useIsMobile() {
   return isMobile
 }
 
+function usePanelSize(ref: RefObject<HTMLElement | null>) {
+  const [size, setSize] = useState({ w: 0, h: 0 })
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const update = () => {
+      const r = el.getBoundingClientRect()
+      setSize({ w: r.width, h: r.height })
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [ref])
+
+  return size
+}
+
+function cardSize(
+  expanded: boolean,
+  isMobile: boolean,
+  panelW: number,
+): { w: number; h: number } {
+  if (expanded) {
+    const w = Math.min(panelW * 0.88, 280)
+    return { w, h: isMobile ? 220 : 200 }
+  }
+  return isMobile ? { w: 168, h: 68 } : { w: 200, h: 72 }
+}
+
+function intersects(a: Rect, b: Rect, gap: number) {
+  return !(
+    a.x + a.w + gap <= b.x ||
+    b.x + b.w + gap <= a.x ||
+    a.y + a.h + gap <= b.y ||
+    b.y + b.h + gap <= a.y
+  )
+}
+
+function clampRect(rect: Rect, panelW: number, panelH: number): Rect {
+  const w = Math.min(rect.w, panelW - PAD * 2)
+  const h = Math.min(rect.h, panelH - PAD * 2)
+  return {
+    w,
+    h,
+    x: Math.min(Math.max(rect.x, PAD), Math.max(PAD, panelW - w - PAD)),
+    y: Math.min(Math.max(rect.y, PAD), Math.max(PAD, panelH - h - PAD)),
+  }
+}
+
+function resolvePositions(
+  partners: readonly Partner[],
+  expandedId: string | null,
+  isMobile: boolean,
+  panelW: number,
+  panelH: number,
+): Record<string, Pos> {
+  const base: Record<string, Pos> = {}
+  for (const p of partners) {
+    base[p.id] = {
+      left: isMobile ? p.mobileX : p.x,
+      top: isMobile ? p.mobileY : p.y,
+    }
+  }
+
+  if (!expandedId || panelW < 1 || panelH < 1) return base
+
+  const sizes = Object.fromEntries(
+    partners.map((p) => [
+      p.id,
+      cardSize(p.id === expandedId, isMobile, panelW),
+    ]),
+  ) as Record<string, { w: number; h: number }>
+
+  const rects: Record<string, Rect> = {}
+  for (const p of partners) {
+    const { w, h } = sizes[p.id]
+    rects[p.id] = {
+      x: (base[p.id].left / 100) * panelW,
+      y: (base[p.id].top / 100) * panelH,
+      w,
+      h,
+    }
+  }
+
+  rects[expandedId] = clampRect(rects[expandedId], panelW, panelH)
+
+  for (let iter = 0; iter < ITERATIONS; iter++) {
+    const expanded = rects[expandedId]
+    for (const p of partners) {
+      if (p.id === expandedId) continue
+      const r = rects[p.id]
+      if (!intersects(expanded, r, GAP)) continue
+
+      const ex = expanded.x + expanded.w / 2
+      const ey = expanded.y + expanded.h / 2
+      const rx = r.x + r.w / 2
+      const ry = r.y + r.h / 2
+      let dx = rx - ex
+      let dy = ry - ey
+      const len = Math.hypot(dx, dy) || 1
+      dx /= len
+      dy /= len
+
+      const overlapX =
+        expanded.w / 2 + r.w / 2 + GAP - Math.abs(rx - ex)
+      const overlapY =
+        expanded.h / 2 + r.h / 2 + GAP - Math.abs(ry - ey)
+      const push = Math.max(overlapX, overlapY, 8)
+
+      r.x += dx * push
+      r.y += dy * push
+      const clamped = clampRect(r, panelW, panelH)
+      r.x = clamped.x
+      r.y = clamped.y
+      r.w = clamped.w
+      r.h = clamped.h
+    }
+
+    // Keep neighbors from stacking on each other after a push
+    for (let i = 0; i < partners.length; i++) {
+      for (let j = i + 1; j < partners.length; j++) {
+        const aId = partners[i].id
+        const bId = partners[j].id
+        if (aId === expandedId || bId === expandedId) continue
+        const a = rects[aId]
+        const b = rects[bId]
+        if (!intersects(a, b, GAP * 0.6)) continue
+        const ax = a.x + a.w / 2
+        const ay = a.y + a.h / 2
+        const bx = b.x + b.w / 2
+        const by = b.y + b.h / 2
+        let dx = bx - ax
+        let dy = by - ay
+        const len = Math.hypot(dx, dy) || 1
+        dx /= len
+        dy /= len
+        const push = 10
+        a.x -= dx * push * 0.5
+        a.y -= dy * push * 0.5
+        b.x += dx * push * 0.5
+        b.y += dy * push * 0.5
+        Object.assign(a, clampRect(a, panelW, panelH))
+        Object.assign(b, clampRect(b, panelW, panelH))
+      }
+    }
+  }
+
+  const out: Record<string, Pos> = {}
+  for (const p of partners) {
+    out[p.id] = {
+      left: (rects[p.id].x / panelW) * 100,
+      top: (rects[p.id].y / panelH) * 100,
+    }
+  }
+  return out
+}
+
 function PartnerCard({
   partner,
   index,
   expanded,
   onToggle,
   reduceMotion,
-  isMobile,
+  left,
+  top,
+  floatPaused,
 }: {
   partner: Partner
   index: number
   expanded: boolean
   onToggle: () => void
   reduceMotion: boolean | null
-  isMobile: boolean
+  left: number
+  top: number
+  floatPaused: boolean
 }) {
   const Icon = ICONS[partner.id]
-  const left = isMobile ? partner.mobileX : partner.x
-  const top = isMobile ? partner.mobileY : partner.y
 
   const floatStyle = {
     ['--float-delay' as string]: `${index * 0.45}s`,
@@ -83,19 +253,38 @@ function PartnerCard({
 
   return (
     <motion.div
-      className="partner-float absolute z-[2]"
-      style={{
-        ...floatStyle,
-        left: `${left}%`,
-        top: `${top}%`,
-      }}
+      className={`absolute ${floatPaused ? '' : 'partner-float'} ${
+        expanded ? 'z-[5]' : 'z-[2]'
+      }`}
+      style={floatStyle}
       initial={reduceMotion ? false : { opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
+      animate={{
+        left: `${left}%`,
+        top: `${top}%`,
+      }}
       transition={{
-        duration: 0.45,
-        delay: reduceMotion ? 0 : index * 0.15,
-        ease: [0.22, 1, 0.36, 1],
+        left: {
+          type: 'spring',
+          stiffness: reduceMotion ? 400 : 220,
+          damping: reduceMotion ? 40 : 26,
+        },
+        top: {
+          type: 'spring',
+          stiffness: reduceMotion ? 400 : 220,
+          damping: reduceMotion ? 40 : 26,
+        },
+        opacity: {
+          duration: 0.45,
+          delay: reduceMotion ? 0 : index * 0.15,
+          ease: [0.22, 1, 0.36, 1],
+        },
+        y: {
+          duration: 0.45,
+          delay: reduceMotion ? 0 : index * 0.15,
+          ease: [0.22, 1, 0.36, 1],
+        },
       }}
     >
       <motion.button
@@ -105,7 +294,7 @@ function PartnerCard({
         aria-expanded={expanded}
         className={`rounded-xl border text-left backdrop-blur-md ${
           expanded
-            ? 'z-[4] w-[min(88vw,17.5rem)]'
+            ? 'w-[min(88vw,17.5rem)]'
             : 'w-[10.5rem] md:w-[12.5rem]'
         }`}
         style={{
@@ -185,7 +374,21 @@ export function Partnerships() {
   const reduceMotion = useReducedMotion()
   const isMobile = useIsMobile()
   const panelRef = useRef<HTMLDivElement>(null)
+  const scatterRef = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState<string | null>(null)
+  const panelSize = usePanelSize(scatterRef)
+
+  const positions = useMemo(
+    () =>
+      resolvePositions(
+        partnerships.partners,
+        expanded,
+        isMobile,
+        panelSize.w,
+        panelSize.h,
+      ),
+    [expanded, isMobile, panelSize.w, panelSize.h],
+  )
 
   const { scrollYProgress } = useScroll({
     target: panelRef,
@@ -249,20 +452,28 @@ export function Partnerships() {
           aria-hidden="true"
         />
 
-        <div className="relative z-[2] h-full min-h-[70vh] w-full md:min-h-[72vh]">
-          {partnerships.partners.map((partner, index) => (
-            <PartnerCard
-              key={partner.id}
-              partner={partner}
-              index={index}
-              expanded={expanded === partner.id}
-              onToggle={() =>
-                setExpanded((id) => (id === partner.id ? null : partner.id))
-              }
-              reduceMotion={reduceMotion}
-              isMobile={isMobile}
-            />
-          ))}
+        <div
+          ref={scatterRef}
+          className="relative z-[2] h-full min-h-[70vh] w-full md:min-h-[72vh]"
+        >
+          {partnerships.partners.map((partner, index) => {
+            const pos = positions[partner.id]
+            return (
+              <PartnerCard
+                key={partner.id}
+                partner={partner}
+                index={index}
+                expanded={expanded === partner.id}
+                onToggle={() =>
+                  setExpanded((id) => (id === partner.id ? null : partner.id))
+                }
+                reduceMotion={reduceMotion}
+                left={pos.left}
+                top={pos.top}
+                floatPaused={Boolean(expanded) || Boolean(reduceMotion)}
+              />
+            )
+          })}
         </div>
       </div>
 

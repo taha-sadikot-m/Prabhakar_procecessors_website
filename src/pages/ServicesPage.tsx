@@ -11,11 +11,15 @@ import { CountUp } from '../components/motion/CountUp'
 import { FadeIn } from '../components/motion/FadeIn'
 import { SectionCta } from '../components/SectionCta'
 import { SwatchFan } from '../components/SwatchFan'
+import {
+  fetchPublicServices,
+  type ServiceCategoryDto,
+} from '../lib/cms-api'
 
 const MAHOGANY = '#674438'
 const HEADING = '#20222D'
 
-type Category = (typeof servicesPage.categories)[number]
+type Category = ServiceCategoryDto
 
 function DiamondRule({ className = '' }: { className?: string }) {
   return (
@@ -101,11 +105,15 @@ function ServicesHero() {
   )
 }
 
-function CategoryRail() {
-  const [active, setActive] = useState(servicesPage.categories[0]?.id ?? '')
+function CategoryRail({ categories }: { categories: Category[] }) {
+  const [active, setActive] = useState(categories[0]?.id ?? '')
 
   useEffect(() => {
-    const sections = servicesPage.categories
+    setActive(categories[0]?.id ?? '')
+  }, [categories])
+
+  useEffect(() => {
+    const sections = categories
       .map((c) => document.getElementById(c.id))
       .filter((el): el is HTMLElement => Boolean(el))
 
@@ -128,7 +136,7 @@ function CategoryRail() {
 
     sections.forEach((el) => io.observe(el))
     return () => io.disconnect()
-  }, [])
+  }, [categories])
 
   return (
     <nav
@@ -136,7 +144,7 @@ function CategoryRail() {
       className="sticky top-[68px] z-40 border-b border-mahogany/20 bg-cream/95 backdrop-blur-md sm:top-[72px]"
     >
       <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-5 py-3 [-ms-overflow-style:none] [scrollbar-width:none] md:px-8 lg:px-10 [&::-webkit-scrollbar]:hidden">
-        {servicesPage.categories.map((category) => {
+        {categories.map((category) => {
           const isActive = active === category.id
           const count = category.services.length
           return (
@@ -340,11 +348,30 @@ function ServicesClosing() {
 }
 
 export function ServicesPage() {
+  const [categories, setCategories] = useState<Category[]>(
+    () => servicesPage.categories as Category[],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    fetchPublicServices()
+      .then((data) => {
+        if (cancelled) return
+        if (data.categories?.length) setCategories(data.categories)
+      })
+      .catch(() => {
+        /* keep static fallback */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <main className="bg-cream">
       <ServicesHero />
-      <CategoryRail />
-      {servicesPage.categories.map((category, index) => (
+      <CategoryRail categories={categories} />
+      {categories.map((category, index) => (
         <CategorySection
           key={category.id}
           category={category}
