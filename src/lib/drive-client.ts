@@ -30,14 +30,36 @@ export function driveThumbnailUrl(fileId: string, size = 1600) {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`
 }
 
+/** Same-origin proxy for a controllable HTML5 <video> player (inline disposition). */
+export function driveVideoUrl(fileId: string) {
+  return `/api/drive-media?id=${encodeURIComponent(fileId)}`
+}
+
+function isLocalMp4(url: string) {
+  return /^\/.+\.mp4(?:$|\?)/i.test(url.trim())
+}
+
 export function resolveDriveUrls(driveUrl: string) {
-  const id = parseDriveFileId(driveUrl)
+  const trimmed = (driveUrl || '').trim()
+  if (isLocalMp4(trimmed)) {
+    const poster = trimmed.replace(/\.mp4(?:$|\?)/i, '.jpg')
+    return {
+      fileId: null as string | null,
+      previewUrl: trimmed,
+      viewUrl: trimmed,
+      thumbUrl: poster,
+      videoUrl: trimmed,
+    }
+  }
+
+  const id = parseDriveFileId(trimmed)
   if (!id) {
     return {
       fileId: null as string | null,
-      previewUrl: driveUrl,
-      viewUrl: driveUrl,
-      thumbUrl: driveUrl,
+      previewUrl: trimmed,
+      viewUrl: trimmed,
+      thumbUrl: trimmed,
+      videoUrl: null as string | null,
     }
   }
   return {
@@ -45,5 +67,6 @@ export function resolveDriveUrls(driveUrl: string) {
     previewUrl: drivePreviewUrl(id),
     viewUrl: driveViewUrl(id),
     thumbUrl: driveThumbnailUrl(id),
+    videoUrl: driveVideoUrl(id),
   }
 }

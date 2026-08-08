@@ -23,7 +23,7 @@ export function AdminMediaPreview({
 
   return (
     <div
-      className={`relative w-28 shrink-0 overflow-hidden border border-line bg-cream-dark sm:w-36 ${className}`}
+      className={`relative w-28 shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-cream-dark shadow-[0_1px_3px_rgba(45,27,14,0.06)] sm:w-36 ${className}`}
       style={{ aspectRatio: '4 / 5' }}
     >
       {resolvedKind === 'drive' ? (

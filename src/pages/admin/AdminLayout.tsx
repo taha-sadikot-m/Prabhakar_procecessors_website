@@ -7,21 +7,22 @@ const links = [
   { to: '/admin/services', label: 'Services', end: false },
   { to: '/admin/gallery', label: 'Gallery', end: false },
   { to: '/admin/testimonials', label: 'Testimonials', end: false },
+  { to: '/admin/blog', label: 'Blog', end: false },
 ]
 
 function navClass({ isActive }: { isActive: boolean }) {
-  return `block border-l-2 px-3 py-2 font-sans text-sm transition-colors ${
+  return `block rounded-lg px-3 py-2.5 font-sans text-sm transition-colors ${
     isActive
-      ? 'border-mahogany bg-cream font-medium text-mahogany'
-      : 'border-transparent text-ink-muted hover:border-mahogany/30 hover:text-ink'
+      ? 'bg-cream-dark font-medium text-mahogany shadow-[inset_0_0_0_1px_rgba(103,68,56,0.12)]'
+      : 'text-ink-muted hover:bg-cream-light hover:text-ink'
   }`
 }
 
 function mobileNavClass({ isActive }: { isActive: boolean }) {
-  return `shrink-0 px-3 py-2 font-sans text-xs font-semibold tracking-[0.1em] uppercase transition-colors ${
+  return `shrink-0 rounded-lg px-3 py-2 font-sans text-xs font-semibold tracking-[0.1em] uppercase transition-colors ${
     isActive
-      ? 'border-b-2 border-mahogany text-mahogany'
-      : 'border-b-2 border-transparent text-ink-muted hover:text-ink'
+      ? 'bg-cream-dark text-mahogany'
+      : 'text-ink-muted hover:bg-cream-light hover:text-ink'
   }`
 }
 
@@ -38,15 +39,27 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="min-h-svh bg-cream-light text-ink md:flex">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-cream md:flex">
-        <div className="border-b border-line px-5 py-6">
+    <div className="relative min-h-svh bg-cream-light text-ink md:flex">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-90"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse 70% 45% at 20% -5%, rgba(103,68,56,0.1), transparent), radial-gradient(ellipse 50% 40% at 90% 10%, rgba(247,148,29,0.06), transparent)',
+        }}
+        aria-hidden="true"
+      />
+
+      <aside className="relative z-10 sticky top-0 hidden h-svh w-60 shrink-0 flex-col border-r border-ink/10 bg-cream/90 backdrop-blur-sm md:flex">
+        <div className="shrink-0 border-b border-ink/10 px-5 py-6">
           <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-mahogany uppercase">
             Prabhakar Processors
           </p>
           <p className="mt-1 font-serif text-xl font-medium text-ink">CMS</p>
         </div>
-        <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4" aria-label="Admin">
+        <nav
+          className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-4"
+          aria-label="Admin"
+        >
           {links.map((link) => (
             <NavLink
               key={link.to}
@@ -58,10 +71,10 @@ export function AdminLayout() {
             </NavLink>
           ))}
         </nav>
-        <div className="space-y-2 border-t border-line px-4 py-4">
+        <div className="mt-auto shrink-0 space-y-2 border-t border-ink/10 px-4 py-4">
           <Link
             to="/"
-            className="block font-sans text-xs font-medium text-ink-muted hover:text-mahogany"
+            className="block rounded-lg px-2 py-1.5 font-sans text-xs font-medium text-ink-muted transition-colors hover:bg-cream-light hover:text-mahogany"
           >
             ← View site
           </Link>
@@ -71,8 +84,8 @@ export function AdminLayout() {
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-40 border-b border-line bg-cream/95 backdrop-blur-md md:hidden">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-40 border-b border-ink/10 bg-cream/90 shadow-[0_4px_16px_rgba(45,27,14,0.04)] backdrop-blur-md md:hidden">
           <div className="flex items-center justify-between gap-3 px-4 py-3">
             <div>
               <p className="font-sans text-[10px] font-semibold tracking-[0.16em] text-mahogany uppercase">
@@ -83,7 +96,7 @@ export function AdminLayout() {
             <div className="flex items-center gap-2">
               <Link
                 to="/"
-                className="font-sans text-xs text-ink-muted hover:text-mahogany"
+                className="rounded-lg px-2 py-1.5 font-sans text-xs text-ink-muted hover:bg-cream-dark/50 hover:text-mahogany"
               >
                 Site
               </Link>
@@ -93,7 +106,7 @@ export function AdminLayout() {
             </div>
           </div>
           <nav
-            className="flex gap-1 overflow-x-auto px-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex gap-1 overflow-x-auto px-3 pb-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             aria-label="Admin"
           >
             {links.map((link) => (

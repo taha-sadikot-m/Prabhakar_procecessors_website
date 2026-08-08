@@ -1,5 +1,4 @@
 import { useRef } from 'react'
-import { Link } from 'react-router-dom'
 import {
   motion,
   useReducedMotion,
@@ -122,7 +121,7 @@ export function Closing() {
         </ul>
 
         <motion.div
-          className="mt-10 flex flex-wrap items-center justify-center gap-8"
+          className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5"
           initial={reduceMotion ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.35 }}
@@ -131,19 +130,13 @@ export function Closing() {
             delay: reduceMotion ? 0 : 1,
           }}
         >
-          <SectionCta
-            label={closing.cta}
-            to={closing.ctaHref}
-            variant="navy"
-          />
+          <SectionCta label={closing.cta} to={closing.ctaHref} />
           {closing.secondaryCta && closing.secondaryHref && (
-            <Link
+            <SectionCta
+              label={closing.secondaryCta}
               to={closing.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {closing.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="outline"
+            />
           )}
         </motion.div>
 

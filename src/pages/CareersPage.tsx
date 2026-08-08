@@ -70,22 +70,28 @@ function CareersHero() {
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute inset-[-8%] will-change-transform"
+          className="absolute inset-[-6%] will-change-transform"
           style={{ y: bgY }}
         >
-          <img
-            src={careersPage.hero.texture}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.14]"
-            draggable={false}
-          />
+          <picture className="absolute inset-0 block h-full w-full">
+            <source
+              media="(min-width: 768px)"
+              srcSet={careersPage.hero.desktopImage}
+            />
+            <img
+              src={careersPage.hero.mobileImage}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover object-[center_30%] md:object-[center_40%]"
+              draggable={false}
+            />
+          </picture>
         </motion.div>
         <div
-          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/92 to-cream/70"
+          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/90 to-transparent md:via-cream/80 md:to-transparent"
           aria-hidden="true"
         />
         <div
-          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-cream to-transparent"
+          className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cream to-transparent"
           aria-hidden="true"
         />
       </div>
@@ -112,15 +118,13 @@ function CareersHero() {
           <p className="mt-8 font-sans text-[10px] font-medium tracking-[0.18em] text-ink/45 uppercase">
             {careersPage.meta}
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center gap-4 sm:gap-5">
             <SectionCta label="Apply Now" to="#apply" />
-            <a
-              href="#benefits"
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              Explore Benefits
-              <span aria-hidden="true">→</span>
-            </a>
+            <SectionCta
+              label="Explore Benefits"
+              to="#benefits"
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>
@@ -283,40 +287,55 @@ function BenefitPillars() {
             return (
               <li key={group.id}>
                 <FadeIn delay={0.06 * i} className="h-full">
-                  <article className="flex h-full flex-col border border-line/70 bg-cream px-5 py-6 md:px-7 md:py-8">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <Icon
-                          className="h-5 w-5 text-mahogany"
-                          strokeWidth={1.5}
-                          aria-hidden="true"
-                        />
-                        <h3 className="mt-4 font-serif text-xl font-medium tracking-tight text-ink md:text-2xl">
-                          {group.title}
-                        </h3>
-                      </div>
-                      <span className="font-sans text-[10px] font-medium tracking-[0.16em] text-ink/35 uppercase">
-                        {String(group.items.length).padStart(2, '0')} items
-                      </span>
+                  <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-line/70 bg-cream transition-all duration-300 hover:-translate-y-0.5 hover:border-mahogany/35 hover:shadow-[0_12px_32px_rgba(45,27,14,0.1)]">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-cream-dark">
+                      <img
+                        src={group.image}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                        loading="lazy"
+                        draggable={false}
+                      />
+                      <div
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#2d1b0e]/25 via-transparent to-transparent"
+                        aria-hidden="true"
+                      />
                     </div>
-                    <span
-                      className="mt-4 block h-px w-8 bg-mahogany"
-                      aria-hidden="true"
-                    />
-                    <ul className="mt-5 flex list-none flex-col gap-0 p-0">
-                      {group.items.map((item) => (
-                        <li
-                          key={item}
-                          className="flex gap-3 border-t border-line/50 py-3 font-sans text-sm leading-snug text-ink-muted first:border-t-0 first:pt-0 last:pb-0"
-                        >
-                          <span
-                            className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45 bg-mahogany"
+                    <div className="flex flex-1 flex-col px-5 py-6 md:px-7 md:py-8">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <Icon
+                            className="h-5 w-5 text-mahogany"
+                            strokeWidth={1.5}
                             aria-hidden="true"
                           />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
+                          <h3 className="mt-4 font-serif text-xl font-medium tracking-tight text-ink md:text-2xl">
+                            {group.title}
+                          </h3>
+                        </div>
+                        <span className="font-sans text-[10px] font-medium tracking-[0.16em] text-ink/35 uppercase">
+                          {String(group.items.length).padStart(2, '0')} items
+                        </span>
+                      </div>
+                      <span
+                        className="mt-4 block h-px w-8 bg-mahogany"
+                        aria-hidden="true"
+                      />
+                      <ul className="mt-5 flex list-none flex-col gap-0 p-0">
+                        {group.items.map((item) => (
+                          <li
+                            key={item}
+                            className="flex gap-3 border-t border-line/50 py-3 font-sans text-sm leading-snug text-ink-muted first:border-t-0 first:pt-0 last:pb-0"
+                          >
+                            <span
+                              className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45 bg-mahogany"
+                              aria-hidden="true"
+                            />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </article>
                 </FadeIn>
               </li>
@@ -471,18 +490,16 @@ function CareersClosing() {
           <p className="mx-auto mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {careersPage.closing.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             <SectionCta
               label={careersPage.closing.primaryCta}
               to={careersPage.closing.primaryHref}
             />
-            <a
-              href={`mailto:${company.email}`}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {careersPage.closing.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </a>
+            <SectionCta
+              label={careersPage.closing.secondaryCta}
+              to={`mailto:${company.email}`}
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>

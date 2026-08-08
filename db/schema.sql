@@ -55,3 +55,27 @@ CREATE TABLE IF NOT EXISTS testimonials (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id TEXT PRIMARY KEY,
+  slug TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  excerpt TEXT NOT NULL DEFAULT '',
+  published_at DATE NOT NULL,
+  read_minutes INT NOT NULL DEFAULT 5,
+  category TEXT NOT NULL DEFAULT '',
+  cover_image TEXT NOT NULL DEFAULT '',
+  cover_alt TEXT NOT NULL DEFAULT '',
+  seo_title TEXT NOT NULL DEFAULT '',
+  seo_description TEXT NOT NULL DEFAULT '',
+  keywords JSONB NOT NULL DEFAULT '[]'::jsonb,
+  sections JSONB NOT NULL DEFAULT '[]'::jsonb,
+  cta JSONB,
+  published BOOLEAN NOT NULL DEFAULT TRUE,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_blog_posts_published
+  ON blog_posts(published, published_at DESC);

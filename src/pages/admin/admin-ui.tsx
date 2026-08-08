@@ -7,6 +7,12 @@ import {
 } from 'react'
 import { Link } from 'react-router-dom'
 
+const surface =
+  'border border-ink/10 bg-cream shadow-[0_1px_2px_rgba(45,27,14,0.04),0_8px_24px_rgba(45,27,14,0.06)]'
+const surfaceInset = 'border border-ink/10 bg-cream-light'
+const fieldFocus =
+  'focus:border-mahogany focus:ring-2 focus:ring-mahogany/20 focus:ring-offset-0'
+
 export function AdminPageHeader({
   title,
   children,
@@ -21,19 +27,20 @@ export function AdminPageHeader({
   busy?: boolean
 }) {
   return (
-    <header className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-line pb-6">
+    <header className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-ink/10 pb-6">
       <div className="min-w-0 max-w-2xl">
         <div className="flex flex-wrap items-baseline gap-3">
           <h1 className="font-serif text-3xl font-medium tracking-tight text-ink md:text-[2rem]">
             {title}
           </h1>
           {meta && (
-            <span className="font-sans text-xs font-medium tracking-[0.08em] text-ink-muted uppercase">
+            <span className="rounded-md bg-cream-dark/80 px-2 py-0.5 font-sans text-xs font-medium tracking-[0.08em] text-ink-muted uppercase">
               {meta}
             </span>
           )}
           {busy && (
-            <span className="font-sans text-xs font-medium text-mahogany">
+            <span className="inline-flex items-center gap-2 font-sans text-xs font-medium text-mahogany">
+              <AdminSpinner className="size-3.5" />
               Saving…
             </span>
           )}
@@ -49,6 +56,37 @@ export function AdminPageHeader({
   )
 }
 
+export function AdminSpinner({ className = 'size-8' }: { className?: string }) {
+  return (
+    <span
+      className={`inline-block animate-spin rounded-full border-2 border-mahogany/20 border-t-mahogany ${className}`}
+      aria-hidden="true"
+    />
+  )
+}
+
+export function AdminLoading({
+  label = 'Loading…',
+  className = '',
+}: {
+  label?: string
+  className?: string
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center justify-center gap-4 rounded-xl border border-ink/10 bg-cream px-6 py-16 ${className}`}
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <AdminSpinner className="size-9" />
+      <p className="font-sans text-sm font-medium tracking-[0.06em] text-ink-muted">
+        {label}
+      </p>
+    </div>
+  )
+}
+
 export function AdminPanel({
   title,
   children,
@@ -60,7 +98,7 @@ export function AdminPanel({
 }) {
   return (
     <section
-      className={`border border-line bg-cream p-5 md:p-6 ${className}`}
+      className={`rounded-2xl ${surface} p-5 md:p-6 ${className}`}
     >
       {title && (
         <h2 className="font-sans text-[11px] font-semibold tracking-[0.14em] text-mahogany uppercase">
@@ -93,7 +131,7 @@ export function AdminDisclosure({
   }
 
   return (
-    <div className="mb-6 border border-line bg-cream">
+    <div className={`mb-6 overflow-hidden rounded-xl ${surface}`}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -103,11 +141,18 @@ export function AdminDisclosure({
         <span className="font-sans text-[11px] font-semibold tracking-[0.14em] text-mahogany uppercase">
           {title}
         </span>
-        <span className="font-sans text-sm text-ink-muted" aria-hidden="true">
+        <span
+          className="flex size-7 items-center justify-center rounded-md bg-cream-dark/60 font-sans text-sm text-ink-muted"
+          aria-hidden="true"
+        >
           {open ? '−' : '+'}
         </span>
       </button>
-      {open && <div className="border-t border-line px-5 py-5">{children}</div>}
+      {open && (
+        <div className="border-t border-ink/10 bg-cream-light/50 px-5 py-5">
+          {children}
+        </div>
+      )}
     </div>
   )
 }
@@ -132,21 +177,21 @@ export function AdminNestedBlock({
   const panelId = useId()
 
   return (
-    <section className="border border-line bg-cream">
+    <section className={`overflow-hidden rounded-xl ${surface}`}>
       <div className="flex flex-wrap items-start gap-3 px-4 py-3.5 md:px-5">
         <button
           type="button"
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={panelId}
-          className="min-w-0 flex-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-mahogany/40"
+          className="min-w-0 flex-1 rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-mahogany/40"
         >
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="font-serif text-xl font-medium text-ink md:text-[1.35rem]">
               {title}
             </span>
             {meta && (
-              <span className="font-sans text-[11px] font-medium tracking-[0.08em] text-ink-muted uppercase">
+              <span className="rounded-md bg-cream-dark/80 px-2 py-0.5 font-sans text-[11px] font-medium tracking-[0.08em] text-ink-muted uppercase">
                 {meta}
               </span>
             )}
@@ -162,7 +207,7 @@ export function AdminNestedBlock({
           <button
             type="button"
             onClick={onToggle}
-            className="px-2 py-1.5 font-sans text-xs text-ink-muted hover:text-ink"
+            className="rounded-md px-2 py-1.5 font-sans text-xs text-ink-muted transition-colors hover:bg-cream-dark/60 hover:text-ink"
             aria-label={open ? 'Collapse' : 'Expand'}
           >
             {open ? '▴' : '▾'}
@@ -170,7 +215,10 @@ export function AdminNestedBlock({
         </div>
       </div>
       {open && (
-        <div id={panelId} className="border-t border-line px-4 py-5 md:px-5">
+        <div
+          id={panelId}
+          className="border-t border-ink/10 bg-cream-light/40 px-4 py-5 md:px-5"
+        >
           {children}
         </div>
       )}
@@ -199,12 +247,12 @@ export function AdminListItem({
 }) {
   if (children) {
     return (
-      <li className="border border-line bg-cream-light px-4 py-4">{children}</li>
+      <li className={`rounded-xl ${surfaceInset} px-4 py-4`}>{children}</li>
     )
   }
 
   return (
-    <li className="border border-line bg-cream-light px-4 py-4">
+    <li className={`rounded-xl ${surfaceInset} px-4 py-4`}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
           {media}
@@ -235,7 +283,7 @@ export function AdminListItem({
 export function AdminError({ children }: { children: ReactNode }) {
   return (
     <p
-      className="mb-6 border border-crimson/35 bg-cream px-4 py-3 font-sans text-sm font-medium text-crimson"
+      className="mb-6 rounded-xl border border-crimson/35 bg-crimson/5 px-4 py-3 font-sans text-sm font-medium text-crimson"
       role="alert"
     >
       {children}
@@ -245,7 +293,7 @@ export function AdminError({ children }: { children: ReactNode }) {
 
 export function AdminEmpty({ children }: { children: ReactNode }) {
   return (
-    <p className="border border-dashed border-line bg-cream px-5 py-10 text-center font-sans text-sm text-ink-muted">
+    <p className="rounded-xl border border-dashed border-ink/15 bg-cream-dark/40 px-5 py-10 text-center font-sans text-sm text-ink-muted">
       {children}
     </p>
   )
@@ -284,7 +332,7 @@ export function AdminField({
         autoComplete={autoComplete}
         required={required}
         placeholder={placeholder}
-        className={`mt-1.5 w-full border border-line bg-cream-light px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-mahogany focus:ring-1 focus:ring-mahogany/30 ${
+        className={`mt-1.5 w-full rounded-lg border border-ink/10 bg-cream-light px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/35 ${fieldFocus} ${
           mono ? 'font-mono text-[13px]' : 'font-sans'
         }`}
       />
@@ -314,8 +362,41 @@ export function AdminTextArea({
         value={value}
         rows={rows}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1.5 w-full resize-y border border-line bg-cream-light px-3 py-2.5 font-sans text-sm text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-mahogany focus:ring-1 focus:ring-mahogany/30"
+        className={`mt-1.5 w-full resize-y rounded-lg border border-ink/10 bg-cream-light px-3 py-2.5 font-sans text-sm text-ink outline-none transition-colors placeholder:text-ink/35 ${fieldFocus}`}
       />
+    </label>
+  )
+}
+
+export function AdminSelect({
+  label,
+  value,
+  onChange,
+  options,
+  className = '',
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  options: Array<{ value: string; label: string }>
+  className?: string
+}) {
+  return (
+    <label className={`block ${className}`}>
+      <span className="font-sans text-xs font-medium text-ink-muted">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`mt-1.5 w-full rounded-lg border border-ink/10 bg-cream-light px-3 py-2.5 font-sans text-sm text-ink outline-none transition-colors ${fieldFocus}`}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
     </label>
   )
 }
@@ -324,13 +405,13 @@ type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 
 const buttonVariants: Record<ButtonVariant, string> = {
   primary:
-    'bg-mahogany text-cream hover:bg-mahogany-dark disabled:bg-mahogany/40 disabled:text-cream/80',
+    'bg-mahogany text-cream shadow-[0_2px_8px_rgba(103,68,56,0.25)] hover:bg-mahogany-dark hover:shadow-[0_4px_14px_rgba(103,68,56,0.3)] disabled:bg-mahogany/40 disabled:text-cream/80 disabled:shadow-none',
   secondary:
-    'border border-line bg-cream text-ink hover:border-mahogany hover:text-mahogany disabled:border-line disabled:text-ink/35',
+    'border border-ink/10 bg-cream text-ink hover:border-mahogany/50 hover:bg-cream-light hover:text-mahogany disabled:border-ink/10 disabled:text-ink/35',
   danger:
     'border border-crimson/40 bg-cream text-crimson hover:bg-crimson hover:text-cream disabled:border-crimson/20 disabled:text-crimson/40',
   ghost:
-    'border border-transparent bg-transparent text-ink-muted hover:text-ink disabled:text-ink/30',
+    'border border-transparent bg-transparent text-ink-muted hover:bg-cream-dark/50 hover:text-ink disabled:text-ink/30',
 }
 
 export function AdminButton({
@@ -345,7 +426,7 @@ export function AdminButton({
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center gap-2 px-3.5 py-2 font-sans text-xs font-semibold tracking-[0.08em] transition-colors disabled:cursor-not-allowed ${buttonVariants[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 font-sans text-xs font-semibold tracking-[0.08em] transition-all disabled:cursor-not-allowed ${buttonVariants[variant]} ${className}`}
       {...props}
     >
       {children}
@@ -356,7 +437,7 @@ export function AdminButton({
 /** @deprecated Prefer AdminListItem — kept for gradual migration */
 export function AdminRow({ children }: { children: ReactNode }) {
   return (
-    <li className="border border-line bg-cream-light px-4 py-4">{children}</li>
+    <li className={`rounded-xl ${surfaceInset} px-4 py-4`}>{children}</li>
   )
 }
 
@@ -380,8 +461,12 @@ export function AdminStatCard({
   return (
     <Link
       to={to}
-      className="group block border border-line bg-cream p-5 transition-colors hover:border-mahogany/40"
+      className={`group relative block overflow-hidden rounded-2xl ${surface} p-5 transition-all hover:-translate-y-0.5 hover:border-mahogany/35 hover:shadow-[0_8px_28px_rgba(45,27,14,0.1)]`}
     >
+      <span
+        className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-mahogany via-saffron/80 to-transparent opacity-80 transition-opacity group-hover:opacity-100"
+        aria-hidden="true"
+      />
       <p className="font-sans text-[11px] font-semibold tracking-[0.14em] text-mahogany uppercase">
         {label}
       </p>
@@ -389,7 +474,7 @@ export function AdminStatCard({
       <p className="mt-2 font-sans text-sm leading-relaxed text-ink-muted">
         {description}
       </p>
-      <p className="mt-4 font-sans text-xs font-semibold tracking-[0.1em] text-ink group-hover:text-mahogany">
+      <p className="mt-4 font-sans text-xs font-semibold tracking-[0.1em] text-ink transition-colors group-hover:text-mahogany">
         Open →
       </p>
     </Link>
@@ -429,7 +514,7 @@ export function AdminModal({
     <div className="fixed inset-0 z-[70] flex items-end justify-center p-0 sm:items-center sm:p-6">
       <button
         type="button"
-        className="absolute inset-0 bg-[#2d1b0e]/45 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-[#2d1b0e]/50 backdrop-blur-[3px]"
         aria-label="Close dialog"
         onClick={onClose}
       />
@@ -437,16 +522,16 @@ export function AdminModal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative z-10 flex max-h-[92svh] w-full flex-col border border-line bg-cream shadow-[0_20px_50px_rgba(45,27,14,0.18)] sm:max-h-[85svh] ${
+        className={`relative z-10 flex max-h-[92svh] w-full flex-col border border-ink/10 bg-cream shadow-[0_24px_60px_rgba(45,27,14,0.22)] rounded-t-2xl sm:max-h-[85svh] sm:rounded-2xl ${
           wide ? 'sm:max-w-xl' : 'sm:max-w-lg'
         }`}
       >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-line px-5 py-4">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-ink/10 px-5 py-4">
           <h2 className="font-serif text-xl font-medium text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="px-2 py-1 font-sans text-sm text-ink-muted hover:text-ink"
+            className="rounded-md px-2 py-1 font-sans text-sm text-ink-muted transition-colors hover:bg-cream-dark/70 hover:text-ink"
             aria-label="Close"
           >
             ✕
@@ -469,8 +554,10 @@ export function AdminSplit({
 }) {
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)] md:items-start md:gap-5">
-      <aside className="border border-line bg-cream md:sticky md:top-6 md:max-h-[calc(100svh-6rem)] md:overflow-y-auto">
-        <p className="border-b border-line px-4 py-2.5 font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase md:hidden">
+      <aside
+        className={`overflow-hidden rounded-2xl ${surface} md:sticky md:top-6 md:max-h-[calc(100svh-6rem)] md:overflow-y-auto`}
+      >
+        <p className="border-b border-ink/10 bg-cream-dark/30 px-4 py-2.5 font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase md:hidden">
           {masterLabel}
         </p>
         {master}
@@ -496,10 +583,10 @@ export function AdminMasterItem({
       type="button"
       onClick={onClick}
       aria-current={active ? 'true' : undefined}
-      className={`flex w-full items-start gap-2 border-l-2 px-3.5 py-3 text-left transition-colors ${
+      className={`mx-1.5 my-0.5 flex w-[calc(100%-0.75rem)] items-start gap-2 rounded-lg px-3 py-2.5 text-left transition-colors ${
         active
-          ? 'border-mahogany bg-cream-light'
-          : 'border-transparent hover:bg-cream-light/80'
+          ? 'bg-cream-dark text-mahogany shadow-[inset_0_0_0_1px_rgba(103,68,56,0.12)]'
+          : 'text-ink hover:bg-cream-light'
       }`}
     >
       <span className="min-w-0 flex-1">

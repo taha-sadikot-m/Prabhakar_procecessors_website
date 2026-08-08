@@ -165,30 +165,24 @@ function JournalHero({ username }: { username: string | null }) {
             ))}
           </ul>
 
-          <div className="mt-8 flex flex-wrap items-center gap-8">
+          <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-5">
             {instagramHref ? (
               <a
                 href={instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-opacity hover:opacity-75"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase shadow-[0_2px_10px_rgba(103,68,56,0.28)] transition-all hover:bg-mahogany-dark"
               >
                 Follow On Instagram
                 <span aria-hidden="true">→</span>
               </a>
             ) : (
-              <span className="inline-flex items-center gap-2 border-b border-mahogany/25 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany/40 uppercase">
+              <span className="inline-flex items-center justify-center gap-2 rounded-lg border border-mahogany/25 px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany/40 uppercase">
                 Follow On Instagram
                 <span aria-hidden="true">→</span>
               </span>
             )}
-            <a
-              href="#feed"
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              View Feed
-              <span aria-hidden="true">→</span>
-            </a>
+            <SectionCta label="View Feed" to="#feed" variant="outline" />
           </div>
         </FadeIn>
       </div>
@@ -217,7 +211,7 @@ function FeedSkeleton() {
           aria-hidden="true"
         >
           <div
-            className="w-full animate-pulse border border-line/50 bg-cream-dark"
+            className="w-full animate-pulse rounded-xl border border-line/50 bg-cream-dark"
             style={{ aspectRatio: String(ratio) }}
           />
           <div className="mt-3 h-3 w-12 animate-pulse bg-cream-dark" />
@@ -296,7 +290,7 @@ function PostTile({
         onMouseLeave={() => setHovering(false)}
       >
         <div
-          className="relative w-full overflow-hidden border border-mahogany/20 bg-cream-dark transition-shadow duration-500 group-hover:shadow-[0_16px_40px_rgba(45,27,14,0.14)]"
+          className="relative w-full overflow-hidden rounded-xl border border-mahogany/20 bg-cream-dark transition-shadow duration-500 group-hover:shadow-[0_16px_40px_rgba(45,27,14,0.14)]"
           style={{ aspectRatio: String(aspect) }}
         >
           {activeSrc ? (
@@ -433,7 +427,7 @@ function FeedSection({
           {!loading && error && (
             <div
               role="alert"
-              className="border border-mahogany/30 bg-cream-dark px-6 py-10 text-center md:px-10"
+              className="rounded-xl border border-mahogany/30 bg-cream-dark px-6 py-10 text-center md:px-10"
             >
               <p className="font-serif text-2xl font-medium text-ink">
                 Feed unavailable
@@ -444,7 +438,7 @@ function FeedSection({
               <button
                 type="button"
                 onClick={onRetry}
-                className="mt-8 inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-opacity hover:opacity-75"
+                className="mt-8 inline-flex items-center justify-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase shadow-[0_2px_10px_rgba(103,68,56,0.28)] transition-all hover:bg-mahogany-dark"
               >
                 Try Again
                 <span aria-hidden="true">→</span>
@@ -527,26 +521,26 @@ function JournalClosing({ username }: { username: string | null }) {
           <p className="mx-auto mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {journalPage.closing.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             {profileHref ? (
               <a
                 href={profileHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-opacity hover:opacity-75"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase shadow-[0_2px_10px_rgba(103,68,56,0.28)] transition-all hover:bg-mahogany-dark"
               >
                 {journalPage.closing.primaryCta}
                 <span aria-hidden="true">→</span>
               </a>
             ) : (
-              <span className="inline-flex items-center gap-2 border-b border-mahogany/25 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany/40 uppercase">
+              <span className="inline-flex items-center justify-center gap-2 rounded-lg border border-mahogany/25 px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany/40 uppercase">
                 {journalPage.closing.primaryCta}
               </span>
             )}
             <SectionCta
               label={journalPage.closing.secondaryCta}
               to={journalPage.closing.secondaryHref}
-              variant="dark"
+              variant="outline"
             />
           </div>
         </FadeIn>

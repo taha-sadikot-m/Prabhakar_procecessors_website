@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
 import {
+  adminGetBlogPosts,
   adminGetGallery,
   adminGetServices,
   adminGetTestimonials,
 } from '../../lib/cms-api'
-import { AdminError, AdminPageHeader, AdminStatCard } from './admin-ui'
+import {
+  AdminError,
+  AdminLoading,
+  AdminPageHeader,
+  AdminStatCard,
+} from './admin-ui'
 
 export function AdminHomePage() {
   const [counts, setCounts] = useState({
@@ -13,6 +19,8 @@ export function AdminHomePage() {
     sections: 0,
     media: 0,
     quotes: 0,
+    posts: 0,
+    publishedPosts: 0,
   })
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -23,11 +31,13 @@ export function AdminHomePage() {
       adminGetServices(),
       adminGetGallery(),
       adminGetTestimonials(),
+      adminGetBlogPosts(),
     ])
-      .then(([services, gallery, testimonials]) => {
+      .then(([services, gallery, testimonials, blog]) => {
         if (cancelled) return
         const categories = services.categories ?? []
         const sections = gallery.sections ?? []
+        const posts = blog.posts ?? []
         setCounts({
           categories: categories.length,
           services: categories.reduce(
@@ -37,6 +47,8 @@ export function AdminHomePage() {
           sections: sections.length,
           media: sections.reduce((n, s) => n + (s.items?.length ?? 0), 0),
           quotes: testimonials.quotes?.length ?? 0,
+          posts: posts.length,
+          publishedPosts: posts.filter((p) => p.published).length,
         })
       })
       .catch((err) => {
@@ -56,39 +68,41 @@ export function AdminHomePage() {
     <div>
       <AdminPageHeader title="Overview">
         Edit the public site content. Choose a module below to manage
-        categories, media, or partner quotes.
+        categories, media, blog posts, or partner quotes.
       </AdminPageHeader>
 
       {error && <AdminError>{error}</AdminError>}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <AdminStatCard
-          label="Services"
-          value={loading ? '—' : counts.services}
-          description={
-            loading
-              ? 'Loading…'
-              : `${counts.categories} categories · cards on /services`
-          }
-          to="/admin/services"
-        />
-        <AdminStatCard
-          label="Gallery"
-          value={loading ? '—' : counts.media}
-          description={
-            loading
-              ? 'Loading…'
-              : `${counts.sections} sections · Drive media on /gallery`
-          }
-          to="/admin/gallery"
-        />
-        <AdminStatCard
-          label="Testimonials"
-          value={loading ? '—' : counts.quotes}
-          description="Partner quotes shown on /testimonials"
-          to="/admin/testimonials"
-        />
-      </div>
+      {loading ? (
+        <AdminLoading label="Loading overview…" />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <AdminStatCard
+            label="Services"
+            value={counts.services}
+            description={`${counts.categories} categories · cards on /services`}
+            to="/admin/services"
+          />
+          <AdminStatCard
+            label="Gallery"
+            value={counts.media}
+            description={`${counts.sections} sections · Drive media on /gallery`}
+            to="/admin/gallery"
+          />
+          <AdminStatCard
+            label="Blog"
+            value={counts.posts}
+            description={`${counts.publishedPosts} published · SEO posts on /blog`}
+            to="/admin/blog"
+          />
+          <AdminStatCard
+            label="Testimonials"
+            value={counts.quotes}
+            description="Partner quotes shown on /testimonials"
+            to="/admin/testimonials"
+          />
+        </div>
+      )}
     </div>
   )
 }

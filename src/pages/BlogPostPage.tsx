@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import {
   motion,
@@ -11,12 +11,19 @@ import {
   blogPosts,
   getAdjacentPosts,
   getPostBySlug,
+  sortBlogPosts,
   type BlogPost,
   type BlogPostCta,
 } from '../data/blogPosts'
 import { FadeIn } from '../components/motion/FadeIn'
 import { SectionCta } from '../components/SectionCta'
 import { SeoHead, SITE_URL } from '../components/SeoHead'
+import { fetchPublicBlogPosts } from '../lib/cms-api'
+
+function absoluteCover(path: string) {
+  if (path.startsWith('http')) return path
+  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
+}
 
 const MAHOGANY = '#674438'
 const HEADING = '#20222D'
@@ -134,16 +141,18 @@ function MidCtaBand({ cta }: { cta: BlogPostCta }) {
         <p className="mx-auto mt-4 max-w-md font-sans text-sm leading-relaxed text-ink-muted">
           {cta.body}
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
-          <SectionCta label={cta.primaryLabel} to={cta.primaryHref} />
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+          <SectionCta
+            label={cta.primaryLabel}
+            to={cta.primaryHref}
+            variant={cta.primaryTheme ?? 'accent'}
+          />
           {cta.secondaryLabel && cta.secondaryHref && (
-            <Link
+            <SectionCta
+              label={cta.secondaryLabel}
               to={cta.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {cta.secondaryLabel}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant={cta.secondaryTheme ?? 'outline'}
+            />
           )}
         </div>
       </div>
@@ -200,18 +209,16 @@ function ArticleClosing() {
           <p className="mx-auto mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {blogPage.closing.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             <SectionCta
               label={blogPage.closing.primaryCta}
               to={blogPage.closing.primaryHref}
             />
-            <Link
+            <SectionCta
+              label={blogPage.closing.secondaryCta}
               to={blogPage.closing.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {blogPage.closing.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>
@@ -221,14 +228,47 @@ function ArticleClosing() {
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>()
-  const post = slug ? getPostBySlug(slug) : undefined
+  const [posts, setPosts] = useState<BlogPost[]>(() => blogPosts)
+  const [post, setPost] = useState<BlogPost | undefined>(() =>
+    slug ? getPostBySlug(slug) : undefined,
+  )
+  const [ready, setReady] = useState(() => Boolean(slug && getPostBySlug(slug)))
+
+  useEffect(() => {
+    let cancelled = false
+    const fallback = slug ? getPostBySlug(slug) : undefined
+    setReady(Boolean(fallback))
+    setPost(fallback)
+    fetchPublicBlogPosts()
+      .then((data) => {
+        if (cancelled) return
+        if (data.posts?.length) {
+          const sorted = sortBlogPosts(data.posts)
+          setPosts(sorted)
+          setPost(sorted.find((p) => p.slug === slug))
+        }
+      })
+      .catch(() => {
+        /* keep static fallback */
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [slug])
+
+  if (!ready) {
+    return <main className="min-h-[40svh] bg-cream" aria-busy="true" />
+  }
 
   if (!post) {
     return <Navigate to="/blog" replace />
   }
 
-  const { prev, next } = getAdjacentPosts(post.slug)
-  const more = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3)
+  const { prev, next } = getAdjacentPosts(post.slug, posts)
+  const more = posts.filter((p) => p.slug !== post.slug).slice(0, 3)
   const cta = post.cta ?? DEFAULT_CTA
   const midIndex = Math.max(1, Math.floor(post.sections.length / 2))
 
@@ -237,7 +277,7 @@ export function BlogPostPage() {
     '@type': 'Article',
     headline: post.title,
     description: post.seoDescription,
-    image: [`${SITE_URL}${post.coverImage}`],
+    image: [absoluteCover(post.coverImage)],
     datePublished: post.date,
     dateModified: post.updatedAt ?? post.date,
     author: {

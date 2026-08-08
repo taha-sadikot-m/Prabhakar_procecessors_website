@@ -39,6 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             viewUrl: resolved.viewUrl,
             thumbUrl: resolved.thumbUrl,
             fileId: resolved.fileId,
+            videoUrl: resolved.videoUrl,
           }
         }),
     }))

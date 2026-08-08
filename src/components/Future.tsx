@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 import { future } from '../data/content'
 import { SectionCta } from './SectionCta'
@@ -115,20 +114,14 @@ export function Future() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-wrap items-center gap-8 md:mt-16">
-          <SectionCta
-            label={future.cta}
-            to={future.ctaHref}
-            variant="navy"
-          />
+        <div className="mt-14 flex flex-wrap items-center gap-4 sm:gap-5 md:mt-16">
+          <SectionCta label={future.cta} to={future.ctaHref} />
           {future.secondaryCta && future.secondaryHref && (
-            <Link
+            <SectionCta
+              label={future.secondaryCta}
               to={future.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {future.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="outline"
+            />
           )}
         </div>
       </div>

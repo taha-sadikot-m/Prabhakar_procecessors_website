@@ -45,3 +45,9 @@ coverage
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Local toolchain / generated gallery media
+.tmp/
+tools/ffmpeg/
+public/gallery-videos/*.mp4
+public/gallery-videos/*.jpg

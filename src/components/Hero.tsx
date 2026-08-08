@@ -1,7 +1,7 @@
 import { useRef, type MouseEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { hero } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 function DiamondEyebrow({ text }: { text: string }) {
   return (
@@ -145,13 +145,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.28 }}
           className="absolute right-4 bottom-24 z-20 sm:right-5"
         >
-          <Link
-            to={hero.ctaHref}
-            className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-colors hover:border-mahogany-dark hover:text-mahogany-dark"
-          >
-            {hero.cta}
-            <span aria-hidden="true">→</span>
-          </Link>
+          <SectionCta label={hero.cta} to={hero.ctaHref} />
         </motion.div>
       </div>
 
@@ -193,13 +187,7 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.28 }}
             className="mt-8 md:mt-10"
           >
-            <Link
-              to={hero.ctaHref}
-              className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-colors hover:border-mahogany-dark hover:text-mahogany-dark"
-            >
-              {hero.cta}
-              <span aria-hidden="true">→</span>
-            </Link>
+            <SectionCta label={hero.cta} to={hero.ctaHref} />
           </motion.div>
         </div>
       </div>

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
   motion,
   useReducedMotion,
@@ -100,15 +99,13 @@ function TestimonialsHero() {
           <p className="mt-8 font-sans text-[10px] font-medium tracking-[0.18em] text-ink/45 uppercase">
             {testimonialsPage.meta}
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center gap-4 sm:gap-5">
             <SectionCta label="Start A Partnership" to="/contact" />
-            <a
-              href="#stories"
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              Read Stories
-              <span aria-hidden="true">→</span>
-            </a>
+            <SectionCta
+              label="Read Stories"
+              to="#stories"
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>
@@ -344,18 +341,16 @@ function TestimonialsClosing() {
           <p className="mx-auto mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {testimonialsPage.closing.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             <SectionCta
               label={testimonialsPage.closing.primaryCta}
               to={testimonialsPage.closing.primaryHref}
             />
-            <Link
+            <SectionCta
+              label={testimonialsPage.closing.secondaryCta}
               to={testimonialsPage.closing.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {testimonialsPage.closing.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>

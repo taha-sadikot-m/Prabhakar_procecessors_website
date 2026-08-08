@@ -3,7 +3,12 @@
  * Usage: npm run seed:cms  (loads .env via node --env-file)
  * Or:    $env:DATABASE_URL="..."; node scripts/seed-cms.mjs
  */
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { neon } from '@neondatabase/serverless'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const url = process.env.DATABASE_URL
 if (!url) {
@@ -171,6 +176,11 @@ const testimonials = [
 
 function driveFile(id) {
   return `https://drive.google.com/file/d/${id}/view`
+}
+
+/** Prefer locally transcoded H.264 when present (see npm run gallery:transcode). */
+function galleryMediaUrl(item) {
+  return `/gallery-videos/${item.id}.mp4`
 }
 
 /** Customer mill-floor Drive videos — folders (Holi/Workshop) are section-only. */
@@ -425,6 +435,43 @@ async function ensureSchema() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `
+  await sql`
+    CREATE TABLE IF NOT EXISTS contact_messages (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT NOT NULL DEFAULT '',
+      subject TEXT NOT NULL,
+      message TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `
+  await sql`
+    CREATE TABLE IF NOT EXISTS blog_posts (
+      id TEXT PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      excerpt TEXT NOT NULL DEFAULT '',
+      published_at DATE NOT NULL,
+      read_minutes INT NOT NULL DEFAULT 5,
+      category TEXT NOT NULL DEFAULT '',
+      cover_image TEXT NOT NULL DEFAULT '',
+      cover_alt TEXT NOT NULL DEFAULT '',
+      seo_title TEXT NOT NULL DEFAULT '',
+      seo_description TEXT NOT NULL DEFAULT '',
+      keywords JSONB NOT NULL DEFAULT '[]'::jsonb,
+      sections JSONB NOT NULL DEFAULT '[]'::jsonb,
+      cta JSONB,
+      published BOOLEAN NOT NULL DEFAULT TRUE,
+      sort_order INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_blog_posts_published
+      ON blog_posts(published, published_at DESC)
+  `
 }
 
 async function main() {
@@ -486,7 +533,9 @@ async function main() {
     `
     for (let i = 0; i < section.items.length; i++) {
       const item = section.items[i]
-      const driveUrl = driveFile(item.driveId)
+      // Browser-safe H.264 served from /public after `npm run gallery:transcode`.
+      // Original Drive id kept in seed data for re-transcode; CMS stores playable URL.
+      const driveUrl = galleryMediaUrl(item)
       await sql`
         INSERT INTO gallery_items (id, section_id, drive_url, description, sort_order)
         VALUES (${item.id}, ${section.id}, ${driveUrl}, ${item.description}, ${i})
@@ -500,6 +549,60 @@ async function main() {
     }
   }
   console.log(`Gallery seeded (${gallerySections.length} sections)`)
+
+  const blogPosts = JSON.parse(
+    readFileSync(join(__dirname, 'blog-posts-seed.json'), 'utf8'),
+  )
+  for (let i = 0; i < blogPosts.length; i++) {
+    const post = blogPosts[i]
+    const id = `blog_${post.slug}`
+    const keywordsJson = JSON.stringify(post.keywords ?? [])
+    const sectionsJson = JSON.stringify(post.sections ?? [])
+    const ctaJson = post.cta ? JSON.stringify(post.cta) : null
+    await sql`
+      INSERT INTO blog_posts (
+        id, slug, title, excerpt, published_at, read_minutes, category,
+        cover_image, cover_alt, seo_title, seo_description, keywords,
+        sections, cta, published, sort_order
+      )
+      VALUES (
+        ${id},
+        ${post.slug},
+        ${post.title},
+        ${post.excerpt},
+        ${post.date}::date,
+        ${post.readMinutes ?? 5},
+        ${post.category ?? ''},
+        ${post.coverImage ?? ''},
+        ${post.coverAlt ?? ''},
+        ${post.seoTitle ?? ''},
+        ${post.seoDescription ?? ''},
+        ${keywordsJson}::jsonb,
+        ${sectionsJson}::jsonb,
+        ${ctaJson}::jsonb,
+        TRUE,
+        ${i}
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        slug = EXCLUDED.slug,
+        title = EXCLUDED.title,
+        excerpt = EXCLUDED.excerpt,
+        published_at = EXCLUDED.published_at,
+        read_minutes = EXCLUDED.read_minutes,
+        category = EXCLUDED.category,
+        cover_image = EXCLUDED.cover_image,
+        cover_alt = EXCLUDED.cover_alt,
+        seo_title = EXCLUDED.seo_title,
+        seo_description = EXCLUDED.seo_description,
+        keywords = EXCLUDED.keywords,
+        sections = EXCLUDED.sections,
+        cta = EXCLUDED.cta,
+        published = EXCLUDED.published,
+        sort_order = EXCLUDED.sort_order,
+        updated_at = NOW()
+    `
+  }
+  console.log(`Blog posts seeded (${blogPosts.length})`)
 
   console.log('Done')
 }

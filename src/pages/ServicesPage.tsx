@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
   motion,
   useReducedMotion,
@@ -261,7 +260,7 @@ function AlsoAvailable() {
           {servicesPage.alsoAvailable.items.map((item, i) => (
             <li key={item}>
               <FadeIn delay={0.03 * i}>
-                <span className="inline-block border border-mahogany/25 bg-cream-light px-3.5 py-2 font-sans text-[12px] tracking-[0.04em] text-ink/75 transition-colors hover:border-mahogany/50 hover:text-ink md:text-sm">
+                <span className="inline-block rounded-lg border border-mahogany/25 bg-cream-light px-3.5 py-2 font-sans text-[12px] tracking-[0.04em] text-ink/75 transition-colors hover:border-mahogany/50 hover:text-ink md:text-sm">
                   {item}
                 </span>
               </FadeIn>
@@ -328,18 +327,16 @@ function ServicesClosing() {
           <p className="mx-auto mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {servicesPage.closing.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             <SectionCta
               label={servicesPage.closing.primaryCta}
               to={servicesPage.closing.primaryHref}
             />
-            <Link
+            <SectionCta
+              label={servicesPage.closing.secondaryCta}
               to={servicesPage.closing.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {servicesPage.closing.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>

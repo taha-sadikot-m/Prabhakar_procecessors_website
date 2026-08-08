@@ -15,6 +15,8 @@ import { AdminHomePage } from './pages/admin/AdminHomePage'
 import { AdminLayout } from './pages/admin/AdminLayout'
 import { AdminLoginPage } from './pages/admin/AdminLoginPage'
 import { AdminServicesPage } from './pages/admin/AdminServicesPage'
+import { AdminBlogEditorPage } from './pages/admin/AdminBlogEditorPage'
+import { AdminBlogPage } from './pages/admin/AdminBlogPage'
 import { AdminTestimonialsPage } from './pages/admin/AdminTestimonialsPage'
 
 export default function App() {
@@ -27,6 +29,9 @@ export default function App() {
           <Route path="services" element={<AdminServicesPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
           <Route path="testimonials" element={<AdminTestimonialsPage />} />
+          <Route path="blog" element={<AdminBlogPage />} />
+          <Route path="blog/new" element={<AdminBlogEditorPage />} />
+          <Route path="blog/:id/edit" element={<AdminBlogEditorPage />} />
         </Route>
 
         <Route element={<Layout />}>

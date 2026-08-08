@@ -76,7 +76,7 @@ export function Header() {
         <div className="flex items-center justify-end gap-3 justify-self-end">
           <Link
             to="/contact"
-            className="hidden font-sans text-[11px] font-semibold tracking-[0.16em] text-mahogany uppercase transition-opacity hover:opacity-75 lg:inline-block"
+            className="hidden rounded-lg bg-mahogany px-4 py-2 font-sans text-[11px] font-semibold tracking-[0.16em] text-cream uppercase shadow-[0_2px_8px_rgba(103,68,56,0.25)] transition-colors hover:bg-mahogany-dark lg:inline-block"
           >
             Contact
           </Link>
@@ -159,16 +159,10 @@ export function Header() {
                 <Link
                   to="/contact"
                   onClick={() => setOpen(false)}
-                  className="relative inline-block font-sans text-[0.9rem] font-medium tracking-[0.12em] uppercase"
-                  style={{ color: MAHOGANY }}
+                  className="inline-flex items-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.16em] text-cream uppercase shadow-[0_2px_8px_rgba(103,68,56,0.25)] transition-colors hover:bg-mahogany-dark"
                 >
                   Contact
-                  <span aria-hidden="true"> →</span>
-                  <span
-                    className="absolute inset-x-0 -bottom-0.5 h-px"
-                    style={{ backgroundColor: ACCENT }}
-                    aria-hidden="true"
-                  />
+                  <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </div>

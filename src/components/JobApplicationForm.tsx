@@ -5,13 +5,13 @@ import {
   type FormEvent,
   type KeyboardEvent,
 } from 'react'
-import { Link } from 'react-router-dom'
 import { careersPage, company } from '../data/content'
+import { SectionCta } from './SectionCta'
 
 const MAHOGANY = '#674438'
 
 const fieldClass =
-  'w-full border border-line bg-cream px-4 py-3 font-sans text-sm text-ink outline-none transition-colors focus:border-mahogany'
+  'w-full rounded-lg border border-line bg-cream px-4 py-3 font-sans text-sm text-ink outline-none transition-colors focus:border-mahogany'
 
 const labelClass =
   'mb-2 block font-sans text-[11px] font-medium tracking-[0.16em] text-ink uppercase'
@@ -74,7 +74,7 @@ export function JobApplicationForm() {
 
   if (submitted) {
     return (
-      <div className="border border-mahogany/30 bg-cream px-6 py-10 md:px-10 md:py-12">
+      <div className="rounded-xl border border-mahogany/30 bg-cream px-6 py-10 md:px-10 md:py-12">
         <p
           className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase"
           style={{ color: MAHOGANY }}
@@ -96,19 +96,17 @@ export function JobApplicationForm() {
           </a>{' '}
           so our HR team can follow up.
         </p>
-        <Link
-          to="/"
-          className="mt-8 inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-opacity hover:opacity-75"
-        >
-          Back to Home
-          <span aria-hidden="true">→</span>
-        </Link>
+        <SectionCta label="Back to Home" to="/" className="mt-8" />
       </div>
     )
   }
 
   return (
-    <form className="space-y-8" onSubmit={onSubmit} noValidate={false}>
+    <form
+      className="space-y-8 rounded-xl border border-mahogany/20 bg-cream px-5 py-8 md:px-8 md:py-10"
+      onSubmit={onSubmit}
+      noValidate={false}
+    >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announce}
       </div>
@@ -126,7 +124,7 @@ export function JobApplicationForm() {
               <div className="flex flex-col items-center gap-2">
                 <span
                   aria-current={current ? 'step' : undefined}
-                  className={`flex h-8 w-8 items-center justify-center font-sans text-[11px] font-semibold tracking-wider ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg font-sans text-[11px] font-semibold tracking-wider ${
                     current || done
                       ? 'bg-mahogany text-cream'
                       : 'border border-mahogany/25 text-ink/40'
@@ -389,7 +387,7 @@ export function JobApplicationForm() {
             type="button"
             onClick={goNext}
             onKeyDown={onKeyDownContinue}
-            className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-opacity hover:opacity-75"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase shadow-[0_2px_10px_rgba(103,68,56,0.28)] transition-all hover:bg-mahogany-dark"
           >
             Continue
             <span aria-hidden="true">→</span>
@@ -397,7 +395,7 @@ export function JobApplicationForm() {
         ) : (
           <button
             type="submit"
-            className="inline-flex items-center gap-2 border-b border-mahogany pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-mahogany uppercase transition-opacity hover:opacity-75"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase shadow-[0_2px_10px_rgba(103,68,56,0.28)] transition-all hover:bg-mahogany-dark"
           >
             Submit Application
             <span aria-hidden="true">→</span>

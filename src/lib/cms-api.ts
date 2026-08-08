@@ -43,6 +43,7 @@ export type GalleryItemDto = {
   viewUrl: string
   thumbUrl: string
   fileId: string | null
+  videoUrl?: string | null
 }
 
 export type GallerySectionDto = {
@@ -59,6 +60,47 @@ export type TestimonialDto = {
   quote: string
 }
 
+export type BlogSectionDto = {
+  heading: string
+  paragraphs: string[]
+}
+
+export type BlogCtaTheme = 'accent' | 'outline' | 'light'
+
+export type BlogCtaDto = {
+  headline: string
+  body: string
+  primaryLabel: string
+  primaryHref: string
+  primaryTheme?: BlogCtaTheme
+  secondaryLabel?: string
+  secondaryHref?: string
+  secondaryTheme?: BlogCtaTheme
+}
+
+export type BlogPostDto = {
+  slug: string
+  title: string
+  excerpt: string
+  date: string
+  updatedAt?: string
+  readMinutes: number
+  category: string
+  coverImage: string
+  coverAlt: string
+  seoTitle: string
+  seoDescription: string
+  keywords: string[]
+  sections: BlogSectionDto[]
+  cta?: BlogCtaDto
+}
+
+export type AdminBlogPostDto = BlogPostDto & {
+  id: string
+  published: boolean
+  sortOrder: number
+}
+
 export function fetchPublicServices() {
   return request<{ categories: ServiceCategoryDto[] }>('/api/services')
 }
@@ -69,6 +111,16 @@ export function fetchPublicGallery() {
 
 export function fetchPublicTestimonials() {
   return request<{ quotes: TestimonialDto[] }>('/api/testimonials')
+}
+
+export function fetchPublicBlogPosts() {
+  return request<{ posts: BlogPostDto[] }>('/api/blog')
+}
+
+export function fetchPublicBlogPost(slug: string) {
+  return request<{ post: BlogPostDto }>(
+    `/api/blog?slug=${encodeURIComponent(slug)}`,
+  )
 }
 
 export function adminLogin(username: string, password: string) {
@@ -204,6 +256,30 @@ export function adminSaveTestimonial(
 export function adminDeleteTestimonial(id: string) {
   return request<{ ok: boolean }>(
     `/api/admin/testimonials?id=${encodeURIComponent(id)}`,
+    { method: 'DELETE', auth: true },
+  )
+}
+
+export function adminGetBlogPosts() {
+  return request<{ posts: AdminBlogPostDto[] }>('/api/admin/blog', {
+    auth: true,
+  })
+}
+
+export function adminSaveBlogPost(
+  method: 'POST' | 'PUT',
+  body: Record<string, unknown>,
+) {
+  return request<{ id?: string; ok?: boolean }>('/api/admin/blog', {
+    method,
+    auth: true,
+    body: JSON.stringify(body),
+  })
+}
+
+export function adminDeleteBlogPost(id: string) {
+  return request<{ ok: boolean }>(
+    `/api/admin/blog?id=${encodeURIComponent(id)}`,
     { method: 'DELETE', auth: true },
   )
 }

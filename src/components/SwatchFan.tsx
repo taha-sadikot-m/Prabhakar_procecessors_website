@@ -349,7 +349,7 @@ export function SwatchFan({
                 delay:
                   open && !reduceMotion && !entranceDone ? 0.05 * i : 0,
               }}
-              className={`relative h-full w-full cursor-pointer overflow-hidden border bg-cream text-left outline-none ${
+              className={`relative h-full w-full cursor-pointer overflow-hidden rounded-xl border bg-cream text-left outline-none ${
                 selected
                   ? 'pointer-events-none border-mahogany/30'
                   : 'border-mahogany/25 hover:border-mahogany/45'
@@ -424,7 +424,7 @@ export function SwatchFan({
       <motion.div
         ref={panelCardRef}
         animate={controls}
-        className="relative aspect-[4/5] w-full max-w-md overflow-hidden border border-mahogany/25 bg-cream-dark shadow-[0_16px_40px_rgba(45,27,14,0.1)] md:max-w-none lg:aspect-[5/6]"
+        className="relative aspect-[4/5] w-full max-w-[12rem] overflow-hidden rounded-xl border border-mahogany/25 bg-cream-dark shadow-[0_16px_40px_rgba(45,27,14,0.1)] md:max-w-[11rem] lg:max-w-[50%]"
         style={{ transformOrigin: '50% 50%' }}
         aria-hidden="true"
       >
@@ -453,7 +453,7 @@ export function SwatchFan({
         </div>
       </motion.div>
 
-      <div className="relative mt-5 max-w-md md:mt-6" aria-hidden="true">
+      <div className="relative mt-5 max-w-[12rem] md:mt-6 md:max-w-[11rem] lg:max-w-[50%]" aria-hidden="true">
         <p
           className="pointer-events-none absolute -top-8 -left-1 font-serif text-7xl leading-none font-light tracking-tight select-none md:-top-10 md:text-8xl"
           style={{ color: 'rgba(103,68,56,0.16)' }}
@@ -495,7 +495,7 @@ export function SwatchFan({
             onClick={() => stepBy(-1)}
             disabled={activeIndex === 0}
             aria-label="Previous service"
-            className="inline-flex h-9 w-9 items-center justify-center border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
           >
             ←
           </button>
@@ -504,7 +504,7 @@ export function SwatchFan({
             onClick={() => stepBy(1)}
             disabled={activeIndex >= n - 1}
             aria-label="Next service"
-            className="inline-flex h-9 w-9 items-center justify-center border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
           >
             →
           </button>

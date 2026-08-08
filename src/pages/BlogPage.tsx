@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   motion,
@@ -7,10 +7,16 @@ import {
   useTransform,
 } from 'framer-motion'
 import { blogPage, company } from '../data/content'
-import { blogPosts, type BlogPost } from '../data/blogPosts'
+import { blogPosts, sortBlogPosts, type BlogPost } from '../data/blogPosts'
 import { FadeIn } from '../components/motion/FadeIn'
 import { SectionCta } from '../components/SectionCta'
 import { SeoHead, SITE_URL } from '../components/SeoHead'
+import { fetchPublicBlogPosts } from '../lib/cms-api'
+
+function absoluteCover(path: string) {
+  if (path.startsWith('http')) return path
+  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
+}
 
 const MAHOGANY = '#674438'
 const HEADING = '#20222D'
@@ -96,18 +102,16 @@ function BlogHero() {
           <p className="mt-6 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {blogPage.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center gap-4 sm:gap-5">
             <SectionCta
               label={blogPage.hero.primaryCta}
               to={blogPage.hero.primaryHref}
             />
-            <a
-              href={blogPage.hero.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {blogPage.hero.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </a>
+            <SectionCta
+              label={blogPage.hero.secondaryCta}
+              to={blogPage.hero.secondaryHref}
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>
@@ -171,13 +175,11 @@ function FeaturedPost({ post }: { post: BlogPost }) {
             {post.excerpt}
           </p>
           <div className="mt-8">
-            <Link
+            <SectionCta
+              label={blogPage.featuredCta}
               to={`/blog/${post.slug}`}
-              className="inline-flex items-center gap-2 border-b border-cream/50 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase transition-colors hover:border-cream hover:text-cream"
-            >
-              {blogPage.featuredCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="light"
+            />
           </div>
         </FadeIn>
       </div>
@@ -190,7 +192,7 @@ function ArchiveRow({ post }: { post: BlogPost }) {
     <article className="grid gap-6 border-t border-mahogany/15 py-10 md:grid-cols-[minmax(0,220px)_1fr] md:gap-10 md:py-12 lg:grid-cols-[minmax(0,280px)_1fr]">
       <Link
         to={`/blog/${post.slug}`}
-        className="group relative aspect-[4/3] overflow-hidden md:aspect-[5/4]"
+        className="group relative aspect-[4/3] overflow-hidden rounded-xl md:aspect-[5/4]"
       >
         <img
           src={post.coverImage}
@@ -223,13 +225,12 @@ function ArchiveRow({ post }: { post: BlogPost }) {
         <p className="mt-3 max-w-lg font-sans text-sm leading-relaxed text-ink-muted md:text-[15px]">
           {post.excerpt}
         </p>
-        <Link
+        <SectionCta
+          label="Read"
           to={`/blog/${post.slug}`}
-          className="mt-5 inline-flex w-fit items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-        >
-          Read
-          <span aria-hidden="true">→</span>
-        </Link>
+          variant="outline"
+          className="mt-5"
+        />
       </div>
     </article>
   )
@@ -312,18 +313,16 @@ function BlogClosing() {
           <p className="mx-auto mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {blogPage.closing.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             <SectionCta
               label={blogPage.closing.primaryCta}
               to={blogPage.closing.primaryHref}
             />
-            <Link
+            <SectionCta
+              label={blogPage.closing.secondaryCta}
               to={blogPage.closing.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {blogPage.closing.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>
@@ -332,7 +331,24 @@ function BlogClosing() {
 }
 
 export function BlogPage() {
-  const [featured, ...rest] = blogPosts
+  const [posts, setPosts] = useState<BlogPost[]>(() => blogPosts)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchPublicBlogPosts()
+      .then((data) => {
+        if (cancelled) return
+        if (data.posts?.length) setPosts(sortBlogPosts(data.posts))
+      })
+      .catch(() => {
+        /* keep static fallback */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const [featured, ...rest] = posts
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -345,13 +361,13 @@ export function BlogPage() {
       name: company.name,
       url: SITE_URL,
     },
-    blogPost: blogPosts.map((p) => ({
+    blogPost: posts.map((p) => ({
       '@type': 'BlogPosting',
       headline: p.title,
       description: p.excerpt,
       url: `${SITE_URL}/blog/${p.slug}`,
       datePublished: p.date,
-      image: `${SITE_URL}${p.coverImage}`,
+      image: absoluteCover(p.coverImage),
     })),
   }
 

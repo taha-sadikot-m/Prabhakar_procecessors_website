@@ -225,11 +225,28 @@ function resolvePositions(
   return out
 }
 
+function useCanHover() {
+  const [canHover, setCanHover] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const update = () => setCanHover(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
+  return canHover
+}
+
 function PartnerCard({
   partner,
   index,
   expanded,
   onToggle,
+  onHoverStart,
+  onHoverEnd,
+  canHover,
   reduceMotion,
   left,
   top,
@@ -239,6 +256,9 @@ function PartnerCard({
   index: number
   expanded: boolean
   onToggle: () => void
+  onHoverStart: () => void
+  onHoverEnd: () => void
+  canHover: boolean
   reduceMotion: boolean | null
   left: number
   top: number
@@ -286,13 +306,15 @@ function PartnerCard({
           ease: [0.22, 1, 0.36, 1],
         },
       }}
+      onMouseEnter={canHover ? onHoverStart : undefined}
+      onMouseLeave={canHover ? onHoverEnd : undefined}
     >
       <motion.button
         type="button"
         layout
         onClick={onToggle}
         aria-expanded={expanded}
-        className={`rounded-xl border text-left backdrop-blur-md ${
+        className={`rounded-xl border text-left backdrop-blur-md transition-[box-shadow,width] ${
           expanded
             ? 'w-[min(88vw,17.5rem)]'
             : 'w-[10.5rem] md:w-[12.5rem]'
@@ -373,6 +395,7 @@ function PartnerCard({
 export function Partnerships() {
   const reduceMotion = useReducedMotion()
   const isMobile = useIsMobile()
+  const canHover = useCanHover()
   const panelRef = useRef<HTMLDivElement>(null)
   const scatterRef = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -467,6 +490,11 @@ export function Partnerships() {
                 onToggle={() =>
                   setExpanded((id) => (id === partner.id ? null : partner.id))
                 }
+                onHoverStart={() => setExpanded(partner.id)}
+                onHoverEnd={() =>
+                  setExpanded((id) => (id === partner.id ? null : id))
+                }
+                canHover={canHover}
                 reduceMotion={reduceMotion}
                 left={pos.left}
                 top={pos.top}

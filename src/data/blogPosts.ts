@@ -1,10 +1,14 @@
+export type BlogCtaTheme = 'accent' | 'outline' | 'light'
+
 export type BlogPostCta = {
   headline: string
   body: string
   primaryLabel: string
   primaryHref: string
+  primaryTheme?: BlogCtaTheme
   secondaryLabel?: string
   secondaryHref?: string
+  secondaryTheme?: BlogCtaTheme
 }
 
 export type BlogSection = {
@@ -253,16 +257,25 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
   return blogPosts.find((post) => post.slug === slug)
 }
 
-export function getAdjacentPosts(slug: string): {
+export function getAdjacentPosts(
+  slug: string,
+  posts: BlogPost[] = blogPosts,
+): {
   prev: BlogPost | null
   next: BlogPost | null
 } {
-  const index = blogPosts.findIndex((post) => post.slug === slug)
+  const index = posts.findIndex((post) => post.slug === slug)
   if (index === -1) return { prev: null, next: null }
   return {
-    prev: blogPosts[index + 1] ?? null,
-    next: blogPosts[index - 1] ?? null,
+    prev: posts[index + 1] ?? null,
+    next: posts[index - 1] ?? null,
   }
+}
+
+export function sortBlogPosts(posts: BlogPost[]): BlogPost[] {
+  return [...posts].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  )
 }
 
 /** Flat paragraph list for prerender / excerpts when sections are the source of truth */

@@ -7,7 +7,6 @@ import {
   type KeyboardEvent,
   type TouchEvent,
 } from 'react'
-import { Link } from 'react-router-dom'
 import {
   Handshake,
   Leaf,
@@ -206,7 +205,7 @@ function HeritageStory() {
 
         <div
           ref={imageRef}
-          className="relative aspect-[4/5] overflow-hidden border border-mahogany/20 md:aspect-[5/6]"
+          className="relative aspect-[4/5] overflow-hidden rounded-xl border border-mahogany/20 md:aspect-[5/6]"
         >
           <motion.div
             className="absolute inset-[-8%] h-[116%] w-full"
@@ -273,7 +272,7 @@ function Principles() {
         {/* Desktop / tablet asymmetric bento */}
         <div className="mt-16 hidden gap-5 md:grid md:grid-cols-12 md:gap-6">
           <FadeIn className="md:col-span-7 md:row-span-3">
-            <article className="relative flex h-full min-h-[22rem] flex-col justify-end overflow-hidden border border-mahogany/20 bg-cream px-8 py-10 lg:min-h-full lg:px-10 lg:py-12">
+            <article className="relative flex h-full min-h-[22rem] flex-col justify-end overflow-hidden rounded-xl border border-mahogany/20 bg-cream px-8 py-10 lg:min-h-full lg:px-10 lg:py-12">
               <div
                 className="pointer-events-none absolute inset-0 opacity-[0.08]"
                 style={{
@@ -343,7 +342,7 @@ function Principles() {
         <ul className="mt-14 grid list-none gap-6 p-0 md:hidden">
           <li>
             <FadeIn>
-              <article className="relative overflow-hidden border border-mahogany/20 bg-cream px-6 py-8">
+              <article className="relative overflow-hidden rounded-xl border border-mahogany/20 bg-cream px-6 py-8">
                 <div
                   className="pointer-events-none absolute inset-0 opacity-[0.08]"
                   style={{
@@ -522,7 +521,7 @@ function ProcessJourney() {
         >
           <div className="grid gap-8 md:grid-cols-12 md:items-stretch md:gap-10 lg:gap-14">
             {/* Stage image */}
-            <div className="relative aspect-[16/11] overflow-hidden border border-mahogany/20 bg-cream-dark md:col-span-7 md:aspect-auto md:min-h-[26rem]">
+            <div className="relative aspect-[16/11] overflow-hidden rounded-xl border border-mahogany/20 bg-cream-dark md:col-span-7 md:aspect-auto md:min-h-[26rem]">
               {stages.map((s) => (
                 <motion.div
                   key={s.id}
@@ -687,7 +686,7 @@ function Leadership() {
           {aboutPage.leadership.members.map((member, i) => (
             <li key={member.name}>
               <FadeIn delay={0.05 * i}>
-                <div className="overflow-hidden border border-mahogany/20">
+                <div className="overflow-hidden rounded-xl border border-mahogany/20">
                   <img
                     src={member.image}
                     alt={member.name}
@@ -723,7 +722,7 @@ function Leadership() {
               <li key={member.name} className={offsets[i]}>
                 <FadeIn delay={0.08 * i} className="group">
                   <div
-                    className="aspect-[3/4] overflow-hidden border"
+                    className="aspect-[3/4] overflow-hidden rounded-xl border"
                     style={{ borderColor: 'rgba(103, 68, 56, 0.25)' }}
                   >
                     <img
@@ -815,18 +814,16 @@ function AboutClosing() {
           <p className="mx-auto mt-6 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {aboutPage.closing.body}
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             <SectionCta
               label={aboutPage.closing.primaryCta}
               to={aboutPage.closing.primaryHref}
             />
-            <Link
+            <SectionCta
+              label={aboutPage.closing.secondaryCta}
               to={aboutPage.closing.secondaryHref}
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              {aboutPage.closing.secondaryCta}
-              <span aria-hidden="true">→</span>
-            </Link>
+              variant="outline"
+            />
           </div>
         </FadeIn>
       </div>

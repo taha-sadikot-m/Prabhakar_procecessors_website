@@ -12,6 +12,7 @@ import {
   AdminField,
   AdminList,
   AdminListItem,
+  AdminLoading,
   AdminModal,
   AdminPageHeader,
   AdminTextArea,
@@ -36,6 +37,7 @@ export function AdminTestimonialsPage() {
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState<Modal>({ type: 'none' })
   const [form, setForm] = useState(empty)
 
@@ -46,6 +48,8 @@ export function AdminTestimonialsPage() {
       setQuotes(data.quotes)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load')
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -92,7 +96,9 @@ export function AdminTestimonialsPage() {
 
       {error && <AdminError>{error}</AdminError>}
 
-      {quotes.length === 0 ? (
+      {loading ? (
+        <AdminLoading label="Loading testimonials…" />
+      ) : quotes.length === 0 ? (
         <AdminEmpty>No testimonials yet. Add one to begin.</AdminEmpty>
       ) : (
         <AdminList>

@@ -8,6 +8,8 @@ export const company = {
   website: 'https://prabhakarprocessors.com',
   mapsUrl:
     'https://www.google.com/maps/search/?api=1&query=Prabhakar+Processors+Pvt+Ltd+Kadodara+Surat',
+  mapsEmbedUrl:
+    'https://www.google.com/maps?q=Prabhakar+Processors+Pvt+Ltd+Kadodara+Surat&z=15&output=embed',
   address: {
     lines: [
       'Plot No. 13/14, Block No. 296',
@@ -712,6 +714,13 @@ export const servicesPage = {
   },
 }
 
+export const galleryPage = {
+  hero: {
+    desktopImage: '/gallery_section/gallery-hero-desktop.png',
+    mobileImage: '/gallery_section/gallery-hero-mobile.png',
+  },
+}
+
 export const careersPage = {
   eyebrow: 'Careers',
   headline: ['Grow With A Team', 'That Values Craft.'],
@@ -719,7 +728,8 @@ export const careersPage = {
   body: 'At Prabhakar Processors, we are committed to creating a workplace where employees feel valued, supported, and empowered to grow.',
   meta: '19 departments · Surat, Gujarat · Since 2009',
   hero: {
-    texture: '/service_section/bg-jali-lattice.png',
+    desktopImage: '/careers_section/careers-hero-desktop.png',
+    mobileImage: '/careers_section/careers-hero-mobile.png',
   },
   rail: [
     { id: 'benefits', label: 'Benefits' },
@@ -733,6 +743,7 @@ export const careersPage = {
       {
         id: 'security',
         title: 'Security & Pay',
+        image: '/careers_section/benefit-security.png',
         items: [
           'Competitive Salary & Timely Payments',
           'Employee Provident Fund (PF)',
@@ -743,6 +754,7 @@ export const careersPage = {
       {
         id: 'workplace',
         title: 'Workplace & Safety',
+        image: '/careers_section/benefit-workplace.png',
         items: [
           'Safe & Healthy Working Environment',
           'Comfortable Working Environment',
@@ -754,6 +766,7 @@ export const careersPage = {
       {
         id: 'learning',
         title: 'Learning & Growth',
+        image: '/careers_section/benefit-learning.png',
         items: [
           'Professional Training & Skill Development',
           'Advanced SOPs & Training',
@@ -764,6 +777,7 @@ export const careersPage = {
       {
         id: 'life',
         title: 'Life & Community',
+        image: '/careers_section/benefit-life.png',
         items: [
           'Supportive & Team-Oriented Work Culture',
           'Mess & Canteen Facilities',
@@ -991,4 +1005,11 @@ export const contactPage = {
   headline: "Let's Start A Conversation.",
   body: 'Grey fabric in. Exceptional cloth out. Reach us by phone, email, or visit our facility in Kadodara, Surat.',
   ctaMailSubject: 'Contact Prabhakar Processors',
+  formTitle: 'Send An Enquiry',
+  formBody:
+    'Tell us about your fabric, process needs, or partnership interest. We will reply shortly.',
+  formSuccessEyebrow: 'Message received',
+  formSuccessTitle: 'Thank you.',
+  formSuccessBody:
+    'Your enquiry has been sent. Our team will get back to you soon. For urgent needs, call us directly.',
 }

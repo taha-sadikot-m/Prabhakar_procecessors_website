@@ -14,6 +14,7 @@ import {
   AdminField,
   AdminList,
   AdminListItem,
+  AdminLoading,
   AdminMasterItem,
   AdminModal,
   AdminPageHeader,
@@ -66,6 +67,7 @@ export function AdminServicesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [modal, setModal] = useState<Modal>({ type: 'none' })
   const [catForm, setCatForm] = useState(emptyCategory)
@@ -82,6 +84,8 @@ export function AdminServicesPage() {
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load')
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -135,11 +139,14 @@ export function AdminServicesPage() {
 
       {error && <AdminError>{error}</AdminError>}
 
+      {loading ? (
+        <AdminLoading label="Loading services…" />
+      ) : (
       <AdminSplit
         masterLabel="Categories"
         master={
           <div>
-            <div className="hidden border-b border-line px-4 py-3 md:block">
+            <div className="hidden border-b border-ink/10 bg-cream-dark/30 px-4 py-3 md:block">
               <p className="font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
                 Categories
               </p>
@@ -323,6 +330,7 @@ export function AdminServicesPage() {
           )
         }
       />
+      )}
 
       <AdminModal
         open={modal.type === 'addCategory' || modal.type === 'editCategory'}

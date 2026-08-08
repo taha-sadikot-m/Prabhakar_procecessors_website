@@ -1,5 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import {
   AnimatePresence,
   motion,
@@ -14,8 +19,8 @@ import {
   type GalleryItemDto,
   type GallerySectionDto,
 } from '../lib/cms-api'
-import { resolveDriveUrls } from '../lib/drive-client'
-import { servicesPage } from '../data/content'
+import { driveVideoUrl, resolveDriveUrls } from '../lib/drive-client'
+import { galleryPage, servicesPage } from '../data/content'
 
 const MAHOGANY = '#674438'
 const HEADING = '#20222D'
@@ -28,6 +33,16 @@ type GalleryEntry = {
 
 const masonryClass =
   'm-0 columns-1 gap-x-5 [column-fill:_balance] sm:columns-2 sm:gap-x-6 lg:columns-3 lg:gap-x-7'
+
+function isPlayableVideo(entry: GalleryEntry) {
+  const resolved = resolveDriveUrls(entry.item.driveUrl)
+  return Boolean(
+    resolved.videoUrl ||
+      entry.item.videoUrl ||
+      entry.item.fileId ||
+      resolved.fileId,
+  )
+}
 
 function DiamondRule({ className = '' }: { className?: string }) {
   return (
@@ -71,27 +86,37 @@ function GalleryHero({
   return (
     <section
       ref={sectionRef}
-      className="relative flex min-h-[58svh] flex-col overflow-hidden bg-cream pt-24 md:min-h-[64svh]"
+      className="relative flex min-h-[78svh] flex-col overflow-hidden bg-cream pt-24"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
           className="absolute inset-[-6%] will-change-transform"
           style={{ y: bgY }}
         >
-          <img
-            src={servicesPage.backgrounds.jali}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-40"
-            draggable={false}
-          />
+          <picture className="absolute inset-0 block h-full w-full">
+            <source
+              media="(min-width: 768px)"
+              srcSet={galleryPage.hero.desktopImage}
+            />
+            <img
+              src={galleryPage.hero.mobileImage}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-[center_40%]"
+              draggable={false}
+            />
+          </picture>
         </motion.div>
         <div
-          className="absolute inset-0 bg-gradient-to-b from-cream via-cream/85 to-cream"
+          className="absolute inset-0 bg-gradient-to-r from-cream via-cream/90 to-transparent md:via-cream/80 md:to-transparent"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cream to-transparent"
           aria-hidden="true"
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 py-14 md:px-8 lg:px-10 lg:py-20">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 py-16 md:px-8 lg:px-10 lg:py-24">
         <FadeIn className="max-w-xl">
           <p
             className="font-sans text-[11px] font-medium tracking-[0.22em] uppercase"
@@ -172,87 +197,344 @@ function FilterTab({
     <button
       type="button"
       onClick={onClick}
-      className={`relative shrink-0 px-4 py-2 font-sans text-[11px] font-semibold tracking-[0.16em] uppercase transition-colors ${
-        isActive ? 'text-mahogany' : 'text-ink/55 hover:text-ink'
+      className={`relative shrink-0 rounded-lg px-4 py-2 font-sans text-[11px] font-semibold tracking-[0.16em] uppercase transition-colors ${
+        isActive
+          ? 'bg-cream-dark/80 text-mahogany'
+          : 'text-ink/55 hover:bg-cream-dark/40 hover:text-ink'
       }`}
       aria-pressed={isActive}
     >
       {label}
       <span className="ml-1.5 font-medium opacity-60">({count})</span>
-      <span
-        className={`absolute inset-x-4 -bottom-0.5 h-px origin-left bg-mahogany transition-transform duration-300 ${
-          isActive ? 'scale-x-100' : 'scale-x-0'
-        }`}
-        aria-hidden="true"
-      />
     </button>
+  )
+}
+
+type PlayerStatus = 'loading' | 'playing' | 'paused' | 'error'
+
+function InlineDrivePlayer({
+  videoUrl,
+  poster,
+  label,
+  wantPlaying,
+  soundOn,
+  reloadKey = 0,
+  onStatusChange,
+}: {
+  videoUrl: string
+  poster: string
+  label: string
+  wantPlaying: boolean
+  soundOn: boolean
+  reloadKey?: number
+  onStatusChange?: (status: PlayerStatus) => void
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [status, setStatus] = useState<PlayerStatus>('loading')
+  const statusRef = useRef<PlayerStatus>('loading')
+  const soundOnRef = useRef(soundOn)
+  soundOnRef.current = soundOn
+
+  function setPlayerStatus(next: PlayerStatus) {
+    statusRef.current = next
+    setStatus(next)
+    onStatusChange?.(next)
+  }
+
+  function applySound(el: HTMLVideoElement, withSound: boolean) {
+    el.muted = !withSound
+    el.defaultMuted = !withSound
+    el.volume = withSound ? 1 : 0
+  }
+
+  function tryPlay(el: HTMLVideoElement) {
+    applySound(el, soundOnRef.current)
+    void el
+      .play()
+      .then(() => setPlayerStatus('playing'))
+      .catch(() => {
+        window.setTimeout(() => {
+          const node = videoRef.current
+          if (!node || !wantPlaying) return
+          applySound(node, soundOnRef.current)
+          void node
+            .play()
+            .then(() => setPlayerStatus('playing'))
+            .catch(() => setPlayerStatus('error'))
+        }, 250)
+      })
+  }
+
+  useLayoutEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    applySound(el, soundOn)
+    if (wantPlaying) {
+      if (el.readyState >= 2) tryPlay(el)
+      else setPlayerStatus('loading')
+    } else {
+      el.pause()
+      if (statusRef.current !== 'error') setPlayerStatus('paused')
+    }
+  }, [wantPlaying, videoUrl, reloadKey])
+
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    applySound(el, soundOn)
+  }, [soundOn])
+
+  useEffect(() => {
+    setPlayerStatus('loading')
+  }, [videoUrl, reloadKey])
+
+  if (status === 'error') {
+    return (
+      <>
+        {poster ? (
+          <img
+            src={poster}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-cream-dark" />
+        )}
+        <span className="absolute inset-0 flex items-center justify-center bg-[#2d1b0e]/45 px-4 text-center">
+          <span className="rounded-md border border-cream/25 bg-[#2d1b0e]/70 px-3 py-2 font-sans text-[10px] font-semibold tracking-[0.12em] text-cream uppercase backdrop-blur-sm">
+            Tap to retry
+          </span>
+        </span>
+        <span className="sr-only">{label} unavailable</span>
+      </>
+    )
+  }
+
+  return (
+    <>
+      {status === 'loading' && poster && (
+        <img
+          src={poster}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+      <video
+        ref={videoRef}
+        key={`${videoUrl}-${reloadKey}`}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+          status === 'loading' ? 'opacity-0' : 'opacity-100'
+        }`}
+        src={videoUrl}
+        poster={poster || undefined}
+        muted={!soundOn}
+        loop
+        playsInline
+        preload="auto"
+        controls={false}
+        aria-label={label}
+        onLoadStart={() => {
+          if (wantPlaying) setPlayerStatus('loading')
+        }}
+        onCanPlay={() => {
+          const el = videoRef.current
+          if (el && wantPlaying) tryPlay(el)
+        }}
+        onLoadedData={() => {
+          const el = videoRef.current
+          if (el && wantPlaying) tryPlay(el)
+        }}
+        onPlaying={() => setPlayerStatus('playing')}
+        onPause={() => {
+          if (!wantPlaying) setPlayerStatus('paused')
+        }}
+        onError={() => setPlayerStatus('error')}
+      />
+    </>
   )
 }
 
 function GalleryTile({
   entry,
   showSectionChip,
-  onOpen,
+  playing,
+  onTogglePlay,
+  onOpenStill,
 }: {
   entry: GalleryEntry
   showSectionChip: boolean
-  onOpen: () => void
+  playing: boolean
+  onTogglePlay: () => void
+  onOpenStill: () => void
 }) {
   const [ratio, setRatio] = useState<string | null>(null)
+  const [activated, setActivated] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
+  const [playerStatus, setPlayerStatus] = useState<PlayerStatus>('loading')
+  const [soundOn, setSoundOn] = useState(false)
   const urls = resolveDriveUrls(entry.item.driveUrl)
+  const fileId = entry.item.fileId || urls.fileId
+  const videoUrl =
+    urls.videoUrl ||
+    entry.item.videoUrl ||
+    (fileId ? driveVideoUrl(fileId) : null)
+  const isVideo = Boolean(videoUrl)
   const imgSrc = entry.item.thumbUrl || urls.thumbUrl || urls.viewUrl
   const label = entry.item.description?.trim() || entry.sectionTitle
+  const showPlayer = Boolean(isVideo && activated && videoUrl)
+
+  function activate() {
+    if (!isVideo) {
+      onOpenStill()
+      return
+    }
+    if (!activated) {
+      setActivated(true)
+      setPlayerStatus('loading')
+      if (!playing) onTogglePlay()
+      return
+    }
+    if (playerStatus === 'error') {
+      setReloadKey((k) => k + 1)
+      setPlayerStatus('loading')
+      if (!playing) onTogglePlay()
+      return
+    }
+    onTogglePlay()
+  }
+
+  const chipLabel = !showPlayer
+    ? null
+    : playerStatus === 'error'
+      ? 'Tap to retry'
+      : playing
+        ? playerStatus === 'loading'
+          ? 'Loading…'
+          : null
+        : playerStatus === 'paused'
+          ? 'Paused'
+          : null
 
   return (
     <figure className="mb-5 break-inside-avoid sm:mb-6 lg:mb-7">
-      <button
-        type="button"
-        onClick={onOpen}
-        aria-label={`Open ${label}`}
-        className="group relative block w-full overflow-hidden bg-cream-dark text-left outline-none focus-visible:ring-2 focus-visible:ring-mahogany/50 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={activate}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            activate()
+          }
+        }}
+        aria-label={
+          isVideo
+            ? playing
+              ? `Pause ${label}`
+              : `Play ${label}`
+            : `Open ${label}`
+        }
+        aria-pressed={isVideo ? playing : undefined}
+        className="group relative block w-full cursor-pointer overflow-hidden rounded-xl bg-cream-dark text-left shadow-[0_1px_2px_rgba(45,27,14,0.04),0_8px_24px_rgba(45,27,14,0.06)] outline-none focus-visible:ring-2 focus-visible:ring-mahogany/50 focus-visible:ring-offset-2 focus-visible:ring-offset-cream md:rounded-2xl"
         style={{ aspectRatio: ratio ?? '4 / 5' }}
       >
-        <img
-          src={imgSrc}
-          alt={entry.item.description ?? ''}
-          className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
-          loading="lazy"
-          onLoad={(e) => {
-            const el = e.currentTarget
-            if (el.naturalWidth && el.naturalHeight) {
-              setRatio(`${el.naturalWidth} / ${el.naturalHeight}`)
-            }
-          }}
-        />
-        <span
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#2d1b0e]/55 via-[#2d1b0e]/10 to-transparent opacity-80 transition duration-500 group-hover:opacity-100"
-          aria-hidden="true"
-        />
+        {showPlayer ? (
+          <InlineDrivePlayer
+            videoUrl={videoUrl!}
+            poster={imgSrc}
+            label={label}
+            wantPlaying={playing}
+            soundOn={soundOn}
+            reloadKey={reloadKey}
+            onStatusChange={setPlayerStatus}
+          />
+        ) : (
+          <img
+            src={imgSrc}
+            alt={entry.item.description ?? ''}
+            className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
+            loading="lazy"
+            onLoad={(e) => {
+              const el = e.currentTarget
+              if (el.naturalWidth && el.naturalHeight) {
+                setRatio(`${el.naturalWidth} / ${el.naturalHeight}`)
+              }
+            }}
+          />
+        )}
+        {!playing && (
+          <span
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#2d1b0e]/55 via-[#2d1b0e]/10 to-transparent opacity-80 transition duration-500 group-hover:opacity-100"
+            aria-hidden="true"
+          />
+        )}
         {showSectionChip && (
-          <span className="absolute top-3 left-3 z-10 max-w-[70%] truncate border border-cream/25 bg-[#2d1b0e]/55 px-2.5 py-1 font-sans text-[9px] font-semibold tracking-[0.16em] text-cream uppercase backdrop-blur-sm">
+          <span className="pointer-events-none absolute top-3 left-3 z-10 max-w-[70%] truncate rounded-md border border-cream/25 bg-[#2d1b0e]/55 px-2.5 py-1 font-sans text-[9px] font-semibold tracking-[0.16em] text-cream uppercase backdrop-blur-sm">
             {entry.sectionTitle}
           </span>
         )}
-        <span
-          className="absolute top-1/2 left-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/40 bg-mahogany/90 text-cream shadow-[0_8px_24px_rgba(45,27,14,0.28)] transition duration-300 group-hover:scale-105 group-hover:bg-mahogany"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="ml-0.5 h-6 w-6 fill-current"
+        {isVideo && !playing && (
+          <span
+            className="pointer-events-none absolute top-1/2 left-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/40 bg-mahogany/90 text-cream shadow-[0_8px_24px_rgba(45,27,14,0.28)] transition duration-300 group-hover:scale-105 group-hover:bg-mahogany"
             aria-hidden="true"
           >
-            <path d="M8 5.14v13.72L19 12 8 5.14z" />
-          </svg>
-        </span>
-        {entry.item.description && (
-          <span className="absolute inset-x-0 bottom-0 z-10 translate-y-1 px-4 pb-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            <svg
+              viewBox="0 0 24 24"
+              className="ml-0.5 h-6 w-6 fill-current"
+              aria-hidden="true"
+            >
+              <path d="M8 5.14v13.72L19 12 8 5.14z" />
+            </svg>
+          </span>
+        )}
+        {chipLabel && (
+          <span
+            className={`pointer-events-none absolute top-3 z-10 rounded-md border border-cream/25 bg-[#2d1b0e]/55 px-2 py-1 font-sans text-[9px] font-semibold tracking-[0.14em] text-cream uppercase backdrop-blur-sm ${
+              showPlayer ? 'right-14' : 'right-3'
+            }`}
+          >
+            {chipLabel}
+          </span>
+        )}
+        {showPlayer && (
+          <button
+            type="button"
+            className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-cream/30 bg-[#2d1b0e]/65 text-cream shadow-[0_4px_12px_rgba(45,27,14,0.2)] backdrop-blur-sm transition hover:bg-[#2d1b0e]/85 focus-visible:ring-2 focus-visible:ring-cream/50 focus-visible:outline-none"
+            aria-label={soundOn ? 'Mute video' : 'Unmute video'}
+            aria-pressed={soundOn}
+            onClick={(e) => {
+              e.stopPropagation()
+              setSoundOn((on) => !on)
+            }}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            {soundOn ? (
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 fill-current"
+                aria-hidden="true"
+              >
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.3-3.9v7.8A4.5 4.5 0 0 0 16.5 12zM14 3.2v2.1a6.9 6.9 0 0 1 0 13.4v2.1A8.9 8.9 0 0 0 14 3.2z" />
+              </svg>
+            ) : (
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 fill-current"
+                aria-hidden="true"
+              >
+                <path d="M16.5 12a4.5 4.5 0 0 0-2.3-3.9v2.4l2.2 2.2c.06-.23.1-.46.1-.7zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12c0-3.53-2.05-6.56-5-8.04v2.21A6.9 6.9 0 0 1 19 12zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z" />
+              </svg>
+            )}
+          </button>
+        )}
+        {!playing && entry.item.description && (
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 z-10 translate-y-1 px-4 pb-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <span className="line-clamp-2 font-sans text-xs leading-relaxed text-cream/95 md:text-sm">
               {entry.item.description}
             </span>
           </span>
         )}
-      </button>
+      </div>
     </figure>
   )
 }
@@ -261,12 +543,16 @@ function GalleryLookbook({
   entries,
   showSectionChip,
   filterKey,
-  onOpen,
+  playingId,
+  onTogglePlay,
+  onOpenStill,
 }: {
   entries: GalleryEntry[]
   showSectionChip: boolean
   filterKey: string
-  onOpen: (index: number) => void
+  playingId: string | null
+  onTogglePlay: (id: string) => void
+  onOpenStill: (index: number) => void
 }) {
   const reduceMotion = useReducedMotion()
 
@@ -293,7 +579,9 @@ function GalleryLookbook({
             key={entry.item.id}
             entry={entry}
             showSectionChip={showSectionChip}
-            onOpen={() => onOpen(index)}
+            playing={playingId === entry.item.id}
+            onTogglePlay={() => onTogglePlay(entry.item.id)}
+            onOpenStill={() => onOpenStill(index)}
           />
         ))}
       </motion.div>
@@ -336,16 +624,12 @@ function GalleryLightbox({
   }, [entries.length, index, onClose, onNavigate])
 
   const urls = entry ? resolveDriveUrls(entry.item.driveUrl) : null
-  const preview = entry
-    ? entry.item.previewUrl || urls?.previewUrl || ''
-    : ''
   const imgSrc = entry
     ? entry.item.thumbUrl || urls?.thumbUrl || urls?.viewUrl || ''
     : ''
   const label = entry
     ? entry.item.description?.trim() || entry.sectionTitle
     : 'Gallery media'
-  const useEmbed = Boolean(entry && (entry.item.fileId || urls?.fileId))
   const canNavigate = entries.length > 1
 
   useEffect(() => {
@@ -400,7 +684,7 @@ function GalleryLightbox({
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 border border-cream/25 bg-cream/10 px-3 py-1.5 font-sans text-[10px] font-semibold tracking-[0.14em] text-cream uppercase transition hover:bg-cream/20"
+            className="shrink-0 rounded-lg border border-cream/25 bg-cream/10 px-3 py-1.5 font-sans text-[10px] font-semibold tracking-[0.14em] text-cream uppercase transition hover:bg-cream/20"
           >
             Close
           </button>
@@ -414,7 +698,7 @@ function GalleryLightbox({
                 onClick={() =>
                   onNavigate(index <= 0 ? entries.length - 1 : index - 1)
                 }
-                className="absolute top-1/2 left-0 z-20 -translate-y-1/2 border border-cream/20 bg-[#1a120c]/60 px-3 py-3 text-cream transition hover:bg-[#1a120c]/85 md:-left-2"
+                className="absolute top-1/2 left-0 z-20 -translate-y-1/2 rounded-lg border border-cream/20 bg-[#1a120c]/60 px-3 py-3 text-cream transition hover:bg-[#1a120c]/85 md:-left-2"
                 aria-label="Previous"
               >
                 ←
@@ -424,7 +708,7 @@ function GalleryLightbox({
                 onClick={() =>
                   onNavigate(index >= entries.length - 1 ? 0 : index + 1)
                 }
-                className="absolute top-1/2 right-0 z-20 -translate-y-1/2 border border-cream/20 bg-[#1a120c]/60 px-3 py-3 text-cream transition hover:bg-[#1a120c]/85 md:-right-2"
+                className="absolute top-1/2 right-0 z-20 -translate-y-1/2 rounded-lg border border-cream/20 bg-[#1a120c]/60 px-3 py-3 text-cream transition hover:bg-[#1a120c]/85 md:-right-2"
                 aria-label="Next"
               >
                 →
@@ -433,28 +717,17 @@ function GalleryLightbox({
           )}
 
           <div
-            className="relative w-full max-h-[75svh] overflow-hidden bg-[#120c09]"
+            className="relative w-full max-h-[75svh] overflow-hidden rounded-2xl bg-[#120c09] shadow-[0_24px_60px_rgba(26,18,12,0.45)]"
             style={{
               aspectRatio: ratio ?? '4 / 5',
               maxWidth: 'min(100%, calc(75svh * 1.2))',
             }}
           >
-            {useEmbed ? (
-              <iframe
-                key={entry.item.id}
-                title={label}
-                src={preview}
-                className="absolute inset-0 h-full w-full border-0"
-                allow="autoplay; encrypted-media; fullscreen"
-                allowFullScreen
-              />
-            ) : (
-              <img
-                src={imgSrc}
-                alt={entry.item.description ?? ''}
-                className="absolute inset-0 h-full w-full object-contain"
-              />
-            )}
+            <img
+              src={imgSrc}
+              alt={entry.item.description ?? ''}
+              className="absolute inset-0 h-full w-full object-contain"
+            />
           </div>
         </div>
       </div>
@@ -507,15 +780,9 @@ function GalleryClosing() {
             Tell us what you need dyed, printed, or finished. We will match
             process to fabric.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
             <SectionCta label="Start A Project" to="/contact" />
-            <Link
-              to="/services"
-              className="inline-flex items-center gap-2 border-b border-ink/30 pb-1 font-sans text-[11px] font-semibold tracking-[0.18em] text-ink uppercase transition-colors hover:border-mahogany hover:text-mahogany"
-            >
-              View Services
-              <span aria-hidden="true">→</span>
-            </Link>
+            <SectionCta label="View Services" to="/services" variant="outline" />
           </div>
         </FadeIn>
       </div>
@@ -527,6 +794,7 @@ export function GalleryPage() {
   const [sections, setSections] = useState<GallerySectionDto[] | null>(null)
   const [activeId, setActiveId] = useState('all')
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [playingId, setPlayingId] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -557,6 +825,18 @@ export function GalleryPage() {
       ? null
       : (sections?.find((s) => s.id === activeId)?.body ?? null)
 
+  function togglePlay(id: string) {
+    setLightboxIndex(null)
+    setPlayingId((prev) => (prev === id ? null : id))
+  }
+
+  function openStill(index: number) {
+    const entry = visibleEntries[index]
+    if (!entry || isPlayableVideo(entry)) return
+    setPlayingId(null)
+    setLightboxIndex(index)
+  }
+
   return (
     <main className="bg-cream">
       <GalleryHero
@@ -578,6 +858,7 @@ export function GalleryPage() {
             onChange={(id) => {
               setActiveId(id)
               setLightboxIndex(null)
+              setPlayingId(null)
             }}
             allCount={allEntries.length}
           />
@@ -595,7 +876,9 @@ export function GalleryPage() {
                 entries={visibleEntries}
                 showSectionChip={activeId === 'all'}
                 filterKey={activeId}
-                onOpen={setLightboxIndex}
+                playingId={playingId}
+                onTogglePlay={togglePlay}
+                onOpenStill={openStill}
               />
             </div>
           </section>
@@ -605,14 +888,16 @@ export function GalleryPage() {
       <GalleryClosing />
 
       <AnimatePresence>
-        {lightboxIndex !== null && visibleEntries[lightboxIndex] && (
-          <GalleryLightbox
-            entries={visibleEntries}
-            index={lightboxIndex}
-            onClose={() => setLightboxIndex(null)}
-            onNavigate={setLightboxIndex}
-          />
-        )}
+        {lightboxIndex !== null &&
+          visibleEntries[lightboxIndex] &&
+          !isPlayableVideo(visibleEntries[lightboxIndex]) && (
+            <GalleryLightbox
+              entries={visibleEntries}
+              index={lightboxIndex}
+              onClose={() => setLightboxIndex(null)}
+              onNavigate={setLightboxIndex}
+            />
+          )}
       </AnimatePresence>
     </main>
   )
