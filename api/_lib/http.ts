@@ -34,7 +34,16 @@ export function json(
 }
 
 export function readJsonBody<T>(req: VercelRequest): T {
-  return (req.body ?? {}) as T
+  const body = req.body
+  if (body == null || body === '') return {} as T
+  if (typeof body === 'string') {
+    try {
+      return JSON.parse(body) as T
+    } catch {
+      return {} as T
+    }
+  }
+  return body as T
 }
 
 export function newId(prefix: string) {
