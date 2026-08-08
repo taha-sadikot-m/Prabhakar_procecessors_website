@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   adminDeleteGalleryItem,
   adminDeleteGallerySection,
@@ -12,9 +12,13 @@ import {
   AdminEmpty,
   AdminError,
   AdminField,
+  AdminList,
+  AdminListItem,
+  AdminMasterItem,
+  AdminModal,
   AdminPageHeader,
   AdminPanel,
-  AdminRow,
+  AdminSplit,
   AdminTextArea,
 } from './admin-ui'
 import { AdminMediaPreview } from './AdminMediaPreview'
@@ -38,22 +42,31 @@ type Section = {
 const emptySection = { title: '', body: '', sortOrder: 0 }
 const emptyItem = { driveUrl: '', description: '', sortOrder: 0 }
 
+type Modal =
+  | { type: 'none' }
+  | { type: 'addSection' }
+  | { type: 'editSection' }
+  | { type: 'addItem' }
+  | { type: 'editItem'; itemId: string }
+
 export function AdminGalleryPage() {
   const [sections, setSections] = useState<Section[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [newSection, setNewSection] = useState(emptySection)
-  const [editingSection, setEditingSection] = useState<string | null>(null)
-  const [sectionDraft, setSectionDraft] = useState(emptySection)
-  const [newItem, setNewItem] = useState<Record<string, typeof emptyItem>>({})
-  const [editingItem, setEditingItem] = useState<string | null>(null)
-  const [itemDraft, setItemDraft] = useState(emptyItem)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [modal, setModal] = useState<Modal>({ type: 'none' })
+  const [sectionForm, setSectionForm] = useState(emptySection)
+  const [itemForm, setItemForm] = useState(emptyItem)
 
   const load = useCallback(async () => {
     setError(null)
     try {
       const data = await adminGetGallery()
       setSections(data.sections)
+      setSelectedId((prev) => {
+        if (prev && data.sections.some((s) => s.id === prev)) return prev
+        return data.sections[0]?.id ?? null
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load')
     }
@@ -69,6 +82,7 @@ export function AdminGalleryPage() {
     try {
       await fn()
       await load()
+      setModal({ type: 'none' })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
@@ -76,344 +90,338 @@ export function AdminGalleryPage() {
     }
   }
 
+  const selected = useMemo(
+    () => sections.find((s) => s.id === selectedId) ?? null,
+    [sections, selectedId],
+  )
+
+  const mediaCount = sections.reduce((n, s) => n + s.items.length, 0)
+  const closeModal = useCallback(() => setModal({ type: 'none' }), [])
+
   return (
     <div>
-      <AdminPageHeader title="Gallery">
-        Paste Google Drive share links. Media type and aspect are detected on
-        the public gallery at load time.
+      <AdminPageHeader
+        title="Gallery"
+        meta={`${sections.length} sections · ${mediaCount} media`}
+        busy={busy}
+        actions={
+          <AdminButton
+            variant="primary"
+            onClick={() => {
+              setSectionForm(emptySection)
+              setModal({ type: 'addSection' })
+            }}
+          >
+            Add section
+          </AdminButton>
+        }
+      >
+        Pick a section on the left, then manage its Drive media on the right.
       </AdminPageHeader>
 
       {error && <AdminError>{error}</AdminError>}
 
-      <AdminPanel title="Add section" className="mb-10">
+      <AdminSplit
+        masterLabel="Sections"
+        master={
+          <div>
+            <div className="hidden border-b border-line px-4 py-3 md:block">
+              <p className="font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                Sections
+              </p>
+            </div>
+            {sections.length === 0 ? (
+              <p className="px-4 py-6 font-sans text-sm text-ink-muted">
+                No sections yet.
+              </p>
+            ) : (
+              <div className="flex gap-1 overflow-x-auto p-2 md:block md:overflow-visible md:p-0 md:py-1">
+                {sections.map((section) => (
+                  <div
+                    key={section.id}
+                    className="min-w-[9.5rem] shrink-0 md:min-w-0 md:shrink"
+                  >
+                    <AdminMasterItem
+                      title={section.title}
+                      meta={`${section.items.length} media`}
+                      active={selectedId === section.id}
+                      onClick={() => setSelectedId(section.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        }
+        detail={
+          !selected ? (
+            <AdminEmpty>
+              Select a section on the left, or add a new one.
+            </AdminEmpty>
+          ) : (
+            <div className="space-y-5">
+              <AdminPanel>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-sans text-[10px] font-semibold tracking-[0.14em] text-mahogany uppercase">
+                      Section
+                    </p>
+                    <h2 className="mt-2 font-serif text-2xl font-medium text-ink">
+                      {selected.title}
+                    </h2>
+                    {selected.body && (
+                      <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-ink-muted">
+                        {selected.body}
+                      </p>
+                    )}
+                  </div>
+                  <AdminActions>
+                    <AdminButton
+                      variant="secondary"
+                      onClick={() => {
+                        setSectionForm({
+                          title: selected.title,
+                          body: selected.body ?? '',
+                          sortOrder: selected.sortOrder,
+                        })
+                        setModal({ type: 'editSection' })
+                      }}
+                    >
+                      Edit section
+                    </AdminButton>
+                    <AdminButton
+                      variant="danger"
+                      disabled={busy}
+                      onClick={() => {
+                        if (
+                          !confirm(
+                            `Delete section “${selected.title}” and all items?`,
+                          )
+                        )
+                          return
+                        void run(async () => {
+                          await adminDeleteGallerySection(selected.id)
+                          setSelectedId(null)
+                        })
+                      }}
+                    >
+                      Delete
+                    </AdminButton>
+                  </AdminActions>
+                </div>
+              </AdminPanel>
+
+              <div>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="font-sans text-[11px] font-semibold tracking-[0.14em] text-ink uppercase">
+                    Media
+                    <span className="ml-2 font-medium text-ink-muted normal-case tracking-normal">
+                      ({selected.items.length})
+                    </span>
+                  </h3>
+                  <AdminButton
+                    variant="secondary"
+                    onClick={() => {
+                      setItemForm(emptyItem)
+                      setModal({ type: 'addItem' })
+                    }}
+                  >
+                    Add media
+                  </AdminButton>
+                </div>
+
+                {selected.items.length === 0 ? (
+                  <AdminEmpty>
+                    No media in this section yet. Add a Drive file link.
+                  </AdminEmpty>
+                ) : (
+                  <AdminList>
+                    {selected.items.map((item) => (
+                      <AdminListItem key={item.id}>
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
+                            <AdminMediaPreview
+                              kind="drive"
+                              src={item.driveUrl}
+                              alt={item.description ?? 'Gallery media'}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="font-sans text-sm font-medium text-ink">
+                                {item.description || 'Untitled media'}
+                              </p>
+                              <p className="mt-1 break-all font-mono text-xs text-ink-muted">
+                                {item.driveUrl}
+                              </p>
+                            </div>
+                          </div>
+                          <AdminActions>
+                            <AdminButton
+                              variant="secondary"
+                              onClick={() => {
+                                setItemForm({
+                                  driveUrl: item.driveUrl,
+                                  description: item.description ?? '',
+                                  sortOrder: item.sortOrder,
+                                })
+                                setModal({
+                                  type: 'editItem',
+                                  itemId: item.id,
+                                })
+                              }}
+                            >
+                              Edit
+                            </AdminButton>
+                            <AdminButton
+                              variant="danger"
+                              disabled={busy}
+                              onClick={() => {
+                                if (!confirm('Delete this gallery item?'))
+                                  return
+                                void run(() => adminDeleteGalleryItem(item.id))
+                              }}
+                            >
+                              Delete
+                            </AdminButton>
+                          </AdminActions>
+                        </div>
+                      </AdminListItem>
+                    ))}
+                  </AdminList>
+                )}
+              </div>
+            </div>
+          )
+        }
+      />
+
+      <AdminModal
+        open={modal.type === 'addSection' || modal.type === 'editSection'}
+        onClose={closeModal}
+        title={modal.type === 'editSection' ? 'Edit section' : 'Add section'}
+        wide
+      >
         <div className="grid gap-4 md:grid-cols-2">
           <AdminField
             label="Title"
-            value={newSection.title}
-            onChange={(v) => setNewSection((s) => ({ ...s, title: v }))}
+            value={sectionForm.title}
+            onChange={(v) => setSectionForm((s) => ({ ...s, title: v }))}
           />
           <AdminField
             label="Sort order"
             type="number"
-            value={String(newSection.sortOrder)}
+            value={String(sectionForm.sortOrder)}
             onChange={(v) =>
-              setNewSection((s) => ({ ...s, sortOrder: Number(v) || 0 }))
+              setSectionForm((s) => ({ ...s, sortOrder: Number(v) || 0 }))
             }
           />
           <AdminTextArea
             label="Body (optional)"
-            value={newSection.body}
-            onChange={(v) => setNewSection((s) => ({ ...s, body: v }))}
+            value={sectionForm.body}
+            onChange={(v) => setSectionForm((s) => ({ ...s, body: v }))}
             className="md:col-span-2"
           />
         </div>
-        <AdminButton
-          className="mt-5"
-          disabled={busy || !newSection.title.trim()}
-          onClick={() =>
-            run(async () => {
-              await adminSaveGallerySection('POST', {
-                title: newSection.title,
-                body: newSection.body || null,
-                sortOrder: newSection.sortOrder,
-              })
-              setNewSection(emptySection)
-            })
-          }
-        >
-          Add section
-        </AdminButton>
-      </AdminPanel>
-
-      <div className="space-y-8">
-        {sections.length === 0 && (
-          <AdminEmpty>No gallery sections yet. Add one above.</AdminEmpty>
-        )}
-
-        {sections.map((section) => (
-          <AdminPanel key={section.id}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="font-serif text-2xl font-medium text-ink">
-                  {section.title}
-                </p>
-                {section.body && (
-                  <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-ink-muted">
-                    {section.body}
-                  </p>
-                )}
-              </div>
-              <AdminActions>
-                <AdminButton
-                  variant="secondary"
-                  onClick={() => {
-                    setEditingSection(section.id)
-                    setSectionDraft({
-                      title: section.title,
-                      body: section.body ?? '',
-                      sortOrder: section.sortOrder,
-                    })
-                  }}
-                >
-                  Edit
-                </AdminButton>
-                <AdminButton
-                  variant="danger"
-                  disabled={busy}
-                  onClick={() => {
-                    if (
-                      !confirm(
-                        `Delete section “${section.title}” and all items?`,
-                      )
-                    )
-                      return
-                    void run(() => adminDeleteGallerySection(section.id))
-                  }}
-                >
-                  Delete
-                </AdminButton>
-              </AdminActions>
-            </div>
-
-            {editingSection === section.id && (
-              <div className="mt-6 border-t border-mahogany/25 pt-5">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <AdminField
-                    label="Title"
-                    value={sectionDraft.title}
-                    onChange={(v) =>
-                      setSectionDraft((s) => ({ ...s, title: v }))
-                    }
-                  />
-                  <AdminField
-                    label="Sort order"
-                    type="number"
-                    value={String(sectionDraft.sortOrder)}
-                    onChange={(v) =>
-                      setSectionDraft((s) => ({
-                        ...s,
-                        sortOrder: Number(v) || 0,
-                      }))
-                    }
-                  />
-                  <AdminTextArea
-                    label="Body"
-                    value={sectionDraft.body}
-                    onChange={(v) =>
-                      setSectionDraft((s) => ({ ...s, body: v }))
-                    }
-                    className="md:col-span-2"
-                  />
-                </div>
-                <AdminActions>
-                  <AdminButton
-                    className="mt-4"
-                    disabled={busy}
-                    onClick={() =>
-                      run(async () => {
-                        await adminSaveGallerySection('PUT', {
-                          id: section.id,
-                          title: sectionDraft.title,
-                          body: sectionDraft.body || null,
-                          sortOrder: sectionDraft.sortOrder,
-                        })
-                        setEditingSection(null)
-                      })
-                    }
-                  >
-                    Save
-                  </AdminButton>
-                  <AdminButton
-                    className="mt-4"
-                    variant="ghost"
-                    onClick={() => setEditingSection(null)}
-                  >
-                    Cancel
-                  </AdminButton>
-                </AdminActions>
-              </div>
-            )}
-
-            <ul className="mt-6 list-none space-y-3 p-0">
-              {section.items.map((item) => (
-                <AdminRow key={item.id}>
-                  {editingItem === item.id ? (
-                    <div className="grid gap-4">
-                      {itemDraft.driveUrl.trim() && (
-                        <AdminMediaPreview
-                          kind="drive"
-                          src={itemDraft.driveUrl}
-                          alt={itemDraft.description || 'Gallery media'}
-                        />
-                      )}
-                      <AdminField
-                        label="Google Drive URL"
-                        value={itemDraft.driveUrl}
-                        onChange={(v) =>
-                          setItemDraft((s) => ({ ...s, driveUrl: v }))
-                        }
-                        mono
-                      />
-                      <AdminField
-                        label="Description (optional)"
-                        value={itemDraft.description}
-                        onChange={(v) =>
-                          setItemDraft((s) => ({ ...s, description: v }))
-                        }
-                      />
-                      <AdminField
-                        label="Sort order"
-                        type="number"
-                        value={String(itemDraft.sortOrder)}
-                        onChange={(v) =>
-                          setItemDraft((s) => ({
-                            ...s,
-                            sortOrder: Number(v) || 0,
-                          }))
-                        }
-                      />
-                      <AdminActions>
-                        <AdminButton
-                          disabled={busy}
-                          onClick={() =>
-                            run(async () => {
-                              await adminSaveGalleryItem('PUT', {
-                                id: item.id,
-                                sectionId: section.id,
-                                driveUrl: itemDraft.driveUrl,
-                                description: itemDraft.description || null,
-                                sortOrder: itemDraft.sortOrder,
-                              })
-                              setEditingItem(null)
-                            })
-                          }
-                        >
-                          Save item
-                        </AdminButton>
-                        <AdminButton
-                          variant="ghost"
-                          onClick={() => setEditingItem(null)}
-                        >
-                          Cancel
-                        </AdminButton>
-                      </AdminActions>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
-                        <AdminMediaPreview
-                          kind="drive"
-                          src={item.driveUrl}
-                          alt={item.description ?? 'Gallery media'}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="break-all font-mono text-sm text-ink">
-                            {item.driveUrl}
-                          </p>
-                          {item.description && (
-                            <p className="mt-2 font-sans text-sm text-ink-muted">
-                              {item.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <AdminActions>
-                        <AdminButton
-                          variant="secondary"
-                          onClick={() => {
-                            setEditingItem(item.id)
-                            setItemDraft({
-                              driveUrl: item.driveUrl,
-                              description: item.description ?? '',
-                              sortOrder: item.sortOrder,
-                            })
-                          }}
-                        >
-                          Edit
-                        </AdminButton>
-                        <AdminButton
-                          variant="danger"
-                          disabled={busy}
-                          onClick={() => {
-                            if (!confirm('Delete this gallery item?')) return
-                            void run(() => adminDeleteGalleryItem(item.id))
-                          }}
-                        >
-                          Delete
-                        </AdminButton>
-                      </AdminActions>
-                    </div>
-                  )}
-                </AdminRow>
-              ))}
-            </ul>
-
-            <div className="mt-6 border-t border-mahogany/25 pt-5">
-              <h3 className="font-sans text-xs font-semibold tracking-[0.14em] text-ink uppercase">
-                Add Drive media
-              </h3>
-              <div className="mt-4 grid gap-4">
-                {(newItem[section.id]?.driveUrl ?? '').trim() && (
-                  <AdminMediaPreview
-                    kind="drive"
-                    src={newItem[section.id]!.driveUrl}
-                    alt={
-                      newItem[section.id]?.description || 'New gallery media'
-                    }
-                  />
-                )}
-                <AdminField
-                  label="Google Drive URL"
-                  value={newItem[section.id]?.driveUrl ?? ''}
-                  onChange={(v) =>
-                    setNewItem((s) => ({
-                      ...s,
-                      [section.id]: {
-                        ...(s[section.id] ?? emptyItem),
-                        driveUrl: v,
-                      },
-                    }))
-                  }
-                  mono
-                />
-                <AdminField
-                  label="Description (optional)"
-                  value={newItem[section.id]?.description ?? ''}
-                  onChange={(v) =>
-                    setNewItem((s) => ({
-                      ...s,
-                      [section.id]: {
-                        ...(s[section.id] ?? emptyItem),
-                        description: v,
-                      },
-                    }))
-                  }
-                />
-              </div>
-              <AdminButton
-                className="mt-4"
-                disabled={
-                  busy || !(newItem[section.id]?.driveUrl ?? '').trim()
+        <AdminActions>
+          <AdminButton
+            className="mt-5"
+            disabled={busy || !sectionForm.title.trim()}
+            onClick={() =>
+              run(async () => {
+                if (modal.type === 'editSection' && selected) {
+                  await adminSaveGallerySection('PUT', {
+                    id: selected.id,
+                    title: sectionForm.title,
+                    body: sectionForm.body || null,
+                    sortOrder: sectionForm.sortOrder,
+                  })
+                } else {
+                  const res = await adminSaveGallerySection('POST', {
+                    title: sectionForm.title,
+                    body: sectionForm.body || null,
+                    sortOrder: sectionForm.sortOrder,
+                  })
+                  if (res.id) setSelectedId(res.id)
                 }
-                onClick={() =>
-                  run(async () => {
-                    const draft = newItem[section.id] ?? emptyItem
-                    await adminSaveGalleryItem('POST', {
-                      sectionId: section.id,
-                      driveUrl: draft.driveUrl,
-                      description: draft.description || null,
-                      sortOrder: section.items.length,
-                    })
-                    setNewItem((s) => ({ ...s, [section.id]: emptyItem }))
+              })
+            }
+          >
+            {modal.type === 'editSection' ? 'Save changes' : 'Save section'}
+          </AdminButton>
+          <AdminButton className="mt-5" variant="ghost" onClick={closeModal}>
+            Cancel
+          </AdminButton>
+        </AdminActions>
+      </AdminModal>
+
+      <AdminModal
+        open={modal.type === 'addItem' || modal.type === 'editItem'}
+        onClose={closeModal}
+        title={modal.type === 'editItem' ? 'Edit media' : 'Add media'}
+        wide
+      >
+        <div className="grid gap-4">
+          {itemForm.driveUrl.trim() && (
+            <AdminMediaPreview
+              kind="drive"
+              src={itemForm.driveUrl}
+              alt={itemForm.description || 'Gallery media'}
+            />
+          )}
+          <AdminField
+            label="Google Drive URL"
+            value={itemForm.driveUrl}
+            onChange={(v) => setItemForm((s) => ({ ...s, driveUrl: v }))}
+            mono
+          />
+          <AdminField
+            label="Description (optional)"
+            value={itemForm.description}
+            onChange={(v) => setItemForm((s) => ({ ...s, description: v }))}
+          />
+          {modal.type === 'editItem' && (
+            <AdminField
+              label="Sort order"
+              type="number"
+              value={String(itemForm.sortOrder)}
+              onChange={(v) =>
+                setItemForm((s) => ({ ...s, sortOrder: Number(v) || 0 }))
+              }
+            />
+          )}
+        </div>
+        <AdminActions>
+          <AdminButton
+            className="mt-5"
+            disabled={busy || !itemForm.driveUrl.trim() || !selected}
+            onClick={() =>
+              run(async () => {
+                if (!selected) return
+                if (modal.type === 'editItem') {
+                  await adminSaveGalleryItem('PUT', {
+                    id: modal.itemId,
+                    sectionId: selected.id,
+                    driveUrl: itemForm.driveUrl,
+                    description: itemForm.description || null,
+                    sortOrder: itemForm.sortOrder,
+                  })
+                } else {
+                  await adminSaveGalleryItem('POST', {
+                    sectionId: selected.id,
+                    driveUrl: itemForm.driveUrl,
+                    description: itemForm.description || null,
+                    sortOrder: selected.items.length,
                   })
                 }
-              >
-                Add item
-              </AdminButton>
-            </div>
-          </AdminPanel>
-        ))}
-      </div>
+              })
+            }
+          >
+            {modal.type === 'editItem' ? 'Save changes' : 'Save media'}
+          </AdminButton>
+          <AdminButton className="mt-5" variant="ghost" onClick={closeModal}>
+            Cancel
+          </AdminButton>
+        </AdminActions>
+      </AdminModal>
     </div>
   )
 }

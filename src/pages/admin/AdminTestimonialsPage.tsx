@@ -10,9 +10,10 @@ import {
   AdminEmpty,
   AdminError,
   AdminField,
+  AdminList,
+  AdminListItem,
+  AdminModal,
   AdminPageHeader,
-  AdminPanel,
-  AdminRow,
   AdminTextArea,
 } from './admin-ui'
 
@@ -26,13 +27,17 @@ type Quote = {
 
 const empty = { type: '', years: 0, quote: '', sortOrder: 0 }
 
+type Modal =
+  | { type: 'none' }
+  | { type: 'add' }
+  | { type: 'edit'; id: string }
+
 export function AdminTestimonialsPage() {
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [draft, setDraft] = useState(empty)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editDraft, setEditDraft] = useState(empty)
+  const [modal, setModal] = useState<Modal>({ type: 'none' })
+  const [form, setForm] = useState(empty)
 
   const load = useCallback(async () => {
     setError(null)
@@ -54,6 +59,7 @@ export function AdminTestimonialsPage() {
     try {
       await fn()
       await load()
+      setModal({ type: 'none' })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
@@ -61,150 +67,57 @@ export function AdminTestimonialsPage() {
     }
   }
 
+  const closeModal = useCallback(() => setModal({ type: 'none' }), [])
+
   return (
     <div>
-      <AdminPageHeader title="Testimonials">
-        Partner quotes shown on /testimonials. Partner type, years, and quote
-        only.
+      <AdminPageHeader
+        title="Testimonials"
+        meta={`${quotes.length} quotes`}
+        busy={busy}
+        actions={
+          <AdminButton
+            variant="primary"
+            onClick={() => {
+              setForm(empty)
+              setModal({ type: 'add' })
+            }}
+          >
+            Add quote
+          </AdminButton>
+        }
+      >
+        Partner quotes shown on /testimonials — partner type, years, and quote.
       </AdminPageHeader>
 
       {error && <AdminError>{error}</AdminError>}
 
-      <AdminPanel title="Add quote" className="mb-10">
-        <div className="grid gap-4 md:grid-cols-2">
-          <AdminField
-            label="Partner type"
-            value={draft.type}
-            onChange={(v) => setDraft((s) => ({ ...s, type: v }))}
-          />
-          <AdminField
-            label="Years"
-            type="number"
-            value={String(draft.years)}
-            onChange={(v) =>
-              setDraft((s) => ({ ...s, years: Number(v) || 0 }))
-            }
-          />
-          <AdminTextArea
-            label="Quote"
-            value={draft.quote}
-            onChange={(v) => setDraft((s) => ({ ...s, quote: v }))}
-            className="md:col-span-2"
-          />
-          <AdminField
-            label="Sort order"
-            type="number"
-            value={String(draft.sortOrder)}
-            onChange={(v) =>
-              setDraft((s) => ({ ...s, sortOrder: Number(v) || 0 }))
-            }
-          />
-        </div>
-        <AdminButton
-          className="mt-5"
-          disabled={busy || !draft.type.trim() || !draft.quote.trim()}
-          onClick={() =>
-            run(async () => {
-              await adminSaveTestimonial('POST', {
-                ...draft,
-                sortOrder: draft.sortOrder || quotes.length,
-              })
-              setDraft(empty)
-            })
-          }
-        >
-          Add quote
-        </AdminButton>
-      </AdminPanel>
-
-      <ul className="list-none space-y-3 p-0">
-        {quotes.length === 0 && (
-          <AdminEmpty>No testimonials yet. Add one above.</AdminEmpty>
-        )}
-
-        {quotes.map((q) => (
-          <AdminRow key={q.id}>
-            {editingId === q.id ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                <AdminField
-                  label="Partner type"
-                  value={editDraft.type}
-                  onChange={(v) => setEditDraft((s) => ({ ...s, type: v }))}
-                />
-                <AdminField
-                  label="Years"
-                  type="number"
-                  value={String(editDraft.years)}
-                  onChange={(v) =>
-                    setEditDraft((s) => ({
-                      ...s,
-                      years: Number(v) || 0,
-                    }))
-                  }
-                />
-                <AdminTextArea
-                  label="Quote"
-                  value={editDraft.quote}
-                  onChange={(v) =>
-                    setEditDraft((s) => ({ ...s, quote: v }))
-                  }
-                  className="md:col-span-2"
-                />
-                <AdminField
-                  label="Sort order"
-                  type="number"
-                  value={String(editDraft.sortOrder)}
-                  onChange={(v) =>
-                    setEditDraft((s) => ({
-                      ...s,
-                      sortOrder: Number(v) || 0,
-                    }))
-                  }
-                />
-                <AdminActions>
-                  <AdminButton
-                    disabled={busy}
-                    onClick={() =>
-                      run(async () => {
-                        await adminSaveTestimonial('PUT', {
-                          id: q.id,
-                          ...editDraft,
-                        })
-                        setEditingId(null)
-                      })
-                    }
-                  >
-                    Save
-                  </AdminButton>
-                  <AdminButton
-                    variant="ghost"
-                    onClick={() => setEditingId(null)}
-                  >
-                    Cancel
-                  </AdminButton>
-                </AdminActions>
-              </div>
-            ) : (
+      {quotes.length === 0 ? (
+        <AdminEmpty>No testimonials yet. Add one to begin.</AdminEmpty>
+      ) : (
+        <AdminList>
+          {quotes.map((q) => (
+            <AdminListItem key={q.id}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <p className="font-serif text-xl leading-snug text-ink italic md:text-2xl">
-                    “{q.quote}”
-                  </p>
-                  <p className="mt-2 font-sans text-sm font-medium text-ink">
+                  <p className="font-sans text-xs font-semibold tracking-[0.1em] text-mahogany uppercase">
                     {q.type} · {q.years} years
+                  </p>
+                  <p className="mt-2 font-serif text-lg leading-snug text-ink italic md:text-xl">
+                    “{q.quote}”
                   </p>
                 </div>
                 <AdminActions>
                   <AdminButton
                     variant="secondary"
                     onClick={() => {
-                      setEditingId(q.id)
-                      setEditDraft({
+                      setForm({
                         type: q.type,
                         years: q.years,
                         quote: q.quote,
                         sortOrder: q.sortOrder,
                       })
+                      setModal({ type: 'edit', id: q.id })
                     }}
                   >
                     Edit
@@ -221,10 +134,74 @@ export function AdminTestimonialsPage() {
                   </AdminButton>
                 </AdminActions>
               </div>
-            )}
-          </AdminRow>
-        ))}
-      </ul>
+            </AdminListItem>
+          ))}
+        </AdminList>
+      )}
+
+      <AdminModal
+        open={modal.type === 'add' || modal.type === 'edit'}
+        onClose={closeModal}
+        title={modal.type === 'edit' ? 'Edit quote' : 'Add quote'}
+        wide
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <AdminField
+            label="Partner type"
+            value={form.type}
+            onChange={(v) => setForm((s) => ({ ...s, type: v }))}
+            placeholder="Exporter, Brand…"
+          />
+          <AdminField
+            label="Years"
+            type="number"
+            value={String(form.years)}
+            onChange={(v) =>
+              setForm((s) => ({ ...s, years: Number(v) || 0 }))
+            }
+          />
+          <AdminTextArea
+            label="Quote"
+            value={form.quote}
+            onChange={(v) => setForm((s) => ({ ...s, quote: v }))}
+            className="md:col-span-2"
+          />
+          <AdminField
+            label="Sort order"
+            type="number"
+            value={String(form.sortOrder)}
+            onChange={(v) =>
+              setForm((s) => ({ ...s, sortOrder: Number(v) || 0 }))
+            }
+          />
+        </div>
+        <AdminActions>
+          <AdminButton
+            className="mt-5"
+            disabled={busy || !form.type.trim() || !form.quote.trim()}
+            onClick={() =>
+              run(async () => {
+                if (modal.type === 'edit') {
+                  await adminSaveTestimonial('PUT', {
+                    id: modal.id,
+                    ...form,
+                  })
+                } else {
+                  await adminSaveTestimonial('POST', {
+                    ...form,
+                    sortOrder: form.sortOrder || quotes.length,
+                  })
+                }
+              })
+            }
+          >
+            {modal.type === 'edit' ? 'Save changes' : 'Save quote'}
+          </AdminButton>
+          <AdminButton className="mt-5" variant="ghost" onClick={closeModal}>
+            Cancel
+          </AdminButton>
+        </AdminActions>
+      </AdminModal>
     </div>
   )
 }

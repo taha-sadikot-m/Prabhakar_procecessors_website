@@ -11,6 +11,7 @@ import { JournalPage } from './pages/JournalPage'
 import { ServicesPage } from './pages/ServicesPage'
 import { TestimonialsPage } from './pages/TestimonialsPage'
 import { AdminGalleryPage } from './pages/admin/AdminGalleryPage'
+import { AdminHomePage } from './pages/admin/AdminHomePage'
 import { AdminLayout } from './pages/admin/AdminLayout'
 import { AdminLoginPage } from './pages/admin/AdminLoginPage'
 import { AdminServicesPage } from './pages/admin/AdminServicesPage'
@@ -22,7 +23,7 @@ export default function App() {
       <Routes>
         <Route path="admin/login" element={<AdminLoginPage />} />
         <Route path="admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="services" replace />} />
+          <Route index element={<AdminHomePage />} />
           <Route path="services" element={<AdminServicesPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
           <Route path="testimonials" element={<AdminTestimonialsPage />} />

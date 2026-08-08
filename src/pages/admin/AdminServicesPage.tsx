@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   adminDeleteCard,
   adminDeleteCategory,
@@ -12,9 +12,13 @@ import {
   AdminEmpty,
   AdminError,
   AdminField,
+  AdminList,
+  AdminListItem,
+  AdminMasterItem,
+  AdminModal,
   AdminPageHeader,
   AdminPanel,
-  AdminRow,
+  AdminSplit,
   AdminTextArea,
 } from './admin-ui'
 import { AdminMediaPreview } from './AdminMediaPreview'
@@ -51,22 +55,31 @@ const emptyCard = {
   sortOrder: 0,
 }
 
+type Modal =
+  | { type: 'none' }
+  | { type: 'addCategory' }
+  | { type: 'editCategory' }
+  | { type: 'addCard' }
+  | { type: 'editCard'; cardId: string }
+
 export function AdminServicesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [newCat, setNewCat] = useState(emptyCategory)
-  const [editingCat, setEditingCat] = useState<string | null>(null)
-  const [catDraft, setCatDraft] = useState(emptyCategory)
-  const [newCard, setNewCard] = useState<Record<string, typeof emptyCard>>({})
-  const [editingCard, setEditingCard] = useState<string | null>(null)
-  const [cardDraft, setCardDraft] = useState(emptyCard)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [modal, setModal] = useState<Modal>({ type: 'none' })
+  const [catForm, setCatForm] = useState(emptyCategory)
+  const [cardForm, setCardForm] = useState(emptyCard)
 
   const load = useCallback(async () => {
     setError(null)
     try {
       const data = await adminGetServices()
       setCategories(data.categories)
+      setSelectedId((prev) => {
+        if (prev && data.categories.some((c) => c.id === prev)) return prev
+        return data.categories[0]?.id ?? null
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load')
     }
@@ -82,6 +95,7 @@ export function AdminServicesPage() {
     try {
       await fn()
       await load()
+      setModal({ type: 'none' })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
@@ -89,362 +103,359 @@ export function AdminServicesPage() {
     }
   }
 
+  const selected = useMemo(
+    () => categories.find((c) => c.id === selectedId) ?? null,
+    [categories, selectedId],
+  )
+
+  const cardCount = categories.reduce((n, c) => n + c.services.length, 0)
+  const closeModal = useCallback(() => setModal({ type: 'none' }), [])
+
   return (
     <div>
-      <AdminPageHeader title="Services">
-        Manage categories and service cards. Image URL can be a path under
-        /public, an absolute image URL, or a Google Drive share link (file must
-        be shared so it can be viewed).
+      <AdminPageHeader
+        title="Services"
+        meta={`${categories.length} categories · ${cardCount} cards`}
+        busy={busy}
+        actions={
+          <AdminButton
+            variant="primary"
+            onClick={() => {
+              setCatForm(emptyCategory)
+              setModal({ type: 'addCategory' })
+            }}
+          >
+            Add category
+          </AdminButton>
+        }
+      >
+        Pick a category on the left, then manage its details and service cards
+        on the right.
       </AdminPageHeader>
 
       {error && <AdminError>{error}</AdminError>}
 
-      <AdminPanel title="Add category" className="mb-10">
+      <AdminSplit
+        masterLabel="Categories"
+        master={
+          <div>
+            <div className="hidden border-b border-line px-4 py-3 md:block">
+              <p className="font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                Categories
+              </p>
+            </div>
+            {categories.length === 0 ? (
+              <p className="px-4 py-6 font-sans text-sm text-ink-muted">
+                No categories yet.
+              </p>
+            ) : (
+              <div className="flex gap-1 overflow-x-auto p-2 md:block md:overflow-visible md:p-0 md:py-1">
+                {categories.map((cat) => (
+                  <div
+                    key={cat.id}
+                    className="min-w-[9.5rem] shrink-0 md:min-w-0 md:shrink"
+                  >
+                    <AdminMasterItem
+                      title={
+                        <>
+                          {cat.numeral && (
+                            <span className="text-mahogany">{cat.numeral} </span>
+                          )}
+                          {cat.title}
+                        </>
+                      }
+                      meta={`${cat.services.length} cards`}
+                      active={selectedId === cat.id}
+                      onClick={() => setSelectedId(cat.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        }
+        detail={
+          !selected ? (
+            <AdminEmpty>
+              Select a category on the left, or add a new one.
+            </AdminEmpty>
+          ) : (
+            <div className="space-y-5">
+              <AdminPanel>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-sans text-[10px] font-semibold tracking-[0.14em] text-mahogany uppercase">
+                      Category
+                    </p>
+                    <h2 className="mt-2 font-serif text-2xl font-medium text-ink">
+                      {selected.numeral && (
+                        <span className="mr-2 text-mahogany">
+                          {selected.numeral}
+                        </span>
+                      )}
+                      {selected.title}
+                    </h2>
+                    {selected.intro && (
+                      <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-ink-muted">
+                        {selected.intro}
+                      </p>
+                    )}
+                  </div>
+                  <AdminActions>
+                    <AdminButton
+                      variant="secondary"
+                      onClick={() => {
+                        setCatForm({
+                          title: selected.title,
+                          numeral: selected.numeral,
+                          intro: selected.intro,
+                          sortOrder: selected.sortOrder,
+                        })
+                        setModal({ type: 'editCategory' })
+                      }}
+                    >
+                      Edit category
+                    </AdminButton>
+                    <AdminButton
+                      variant="danger"
+                      disabled={busy}
+                      onClick={() => {
+                        if (
+                          !confirm(
+                            `Delete category “${selected.title}” and all its cards?`,
+                          )
+                        )
+                          return
+                        void run(async () => {
+                          await adminDeleteCategory(selected.id)
+                          setSelectedId(null)
+                        })
+                      }}
+                    >
+                      Delete
+                    </AdminButton>
+                  </AdminActions>
+                </div>
+              </AdminPanel>
+
+              <div>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="font-sans text-[11px] font-semibold tracking-[0.14em] text-ink uppercase">
+                    Service cards
+                    <span className="ml-2 font-medium text-ink-muted normal-case tracking-normal">
+                      ({selected.services.length})
+                    </span>
+                  </h3>
+                  <AdminButton
+                    variant="secondary"
+                    onClick={() => {
+                      setCardForm(emptyCard)
+                      setModal({ type: 'addCard' })
+                    }}
+                  >
+                    Add card
+                  </AdminButton>
+                </div>
+
+                {selected.services.length === 0 ? (
+                  <AdminEmpty>
+                    No cards in this category yet. Add one to show on
+                    /services.
+                  </AdminEmpty>
+                ) : (
+                  <AdminList>
+                    {selected.services.map((card) => (
+                      <AdminListItem key={card.id}>
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
+                            {card.imageUrl.trim() && (
+                              <AdminMediaPreview
+                                kind="auto"
+                                src={card.imageUrl}
+                                alt={card.name}
+                              />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <p className="font-sans text-base font-semibold text-ink">
+                                {card.name}
+                              </p>
+                              <p className="mt-1 line-clamp-2 font-sans text-sm leading-relaxed text-ink-muted">
+                                {card.description}
+                              </p>
+                            </div>
+                          </div>
+                          <AdminActions>
+                            <AdminButton
+                              variant="secondary"
+                              onClick={() => {
+                                setCardForm({
+                                  name: card.name,
+                                  description: card.description,
+                                  imageUrl: card.imageUrl,
+                                  sortOrder: card.sortOrder,
+                                })
+                                setModal({
+                                  type: 'editCard',
+                                  cardId: card.id,
+                                })
+                              }}
+                            >
+                              Edit
+                            </AdminButton>
+                            <AdminButton
+                              variant="danger"
+                              disabled={busy}
+                              onClick={() => {
+                                if (!confirm(`Delete “${card.name}”?`)) return
+                                void run(() => adminDeleteCard(card.id))
+                              }}
+                            >
+                              Delete
+                            </AdminButton>
+                          </AdminActions>
+                        </div>
+                      </AdminListItem>
+                    ))}
+                  </AdminList>
+                )}
+              </div>
+            </div>
+          )
+        }
+      />
+
+      <AdminModal
+        open={modal.type === 'addCategory' || modal.type === 'editCategory'}
+        onClose={closeModal}
+        title={modal.type === 'editCategory' ? 'Edit category' : 'Add category'}
+        wide
+      >
         <div className="grid gap-4 md:grid-cols-2">
           <AdminField
             label="Title"
-            value={newCat.title}
-            onChange={(v) => setNewCat((s) => ({ ...s, title: v }))}
+            value={catForm.title}
+            onChange={(v) => setCatForm((s) => ({ ...s, title: v }))}
           />
           <AdminField
             label="Numeral"
-            value={newCat.numeral}
-            onChange={(v) => setNewCat((s) => ({ ...s, numeral: v }))}
+            value={catForm.numeral}
+            onChange={(v) => setCatForm((s) => ({ ...s, numeral: v }))}
+            placeholder="I, II, III…"
           />
           <AdminTextArea
             label="Intro"
-            value={newCat.intro}
-            onChange={(v) => setNewCat((s) => ({ ...s, intro: v }))}
+            value={catForm.intro}
+            onChange={(v) => setCatForm((s) => ({ ...s, intro: v }))}
             className="md:col-span-2"
           />
           <AdminField
             label="Sort order"
             type="number"
-            value={String(newCat.sortOrder)}
+            value={String(catForm.sortOrder)}
             onChange={(v) =>
-              setNewCat((s) => ({ ...s, sortOrder: Number(v) || 0 }))
+              setCatForm((s) => ({ ...s, sortOrder: Number(v) || 0 }))
             }
           />
         </div>
-        <AdminButton
-          className="mt-5"
-          disabled={busy || !newCat.title.trim()}
-          onClick={() =>
-            run(async () => {
-              await adminSaveCategory('POST', newCat)
-              setNewCat(emptyCategory)
-            })
-          }
-        >
-          Add category
-        </AdminButton>
-      </AdminPanel>
+        <AdminActions>
+          <AdminButton
+            className="mt-5"
+            disabled={busy || !catForm.title.trim()}
+            onClick={() =>
+              run(async () => {
+                if (modal.type === 'editCategory' && selected) {
+                  await adminSaveCategory('PUT', {
+                    id: selected.id,
+                    ...catForm,
+                  })
+                } else {
+                  const res = await adminSaveCategory('POST', catForm)
+                  if (res.id) setSelectedId(res.id)
+                }
+              })
+            }
+          >
+            {modal.type === 'editCategory' ? 'Save changes' : 'Save category'}
+          </AdminButton>
+          <AdminButton className="mt-5" variant="ghost" onClick={closeModal}>
+            Cancel
+          </AdminButton>
+        </AdminActions>
+      </AdminModal>
 
-      <div className="space-y-8">
-        {categories.length === 0 && (
-          <AdminEmpty>No service categories yet. Add one above.</AdminEmpty>
-        )}
-
-        {categories.map((cat) => (
-          <AdminPanel key={cat.id}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="font-serif text-2xl font-medium text-ink">
-                  <span className="mr-2 text-mahogany">{cat.numeral}</span>
-                  {cat.title}
-                </p>
-                <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-ink-muted">
-                  {cat.intro}
-                </p>
-              </div>
-              <AdminActions>
-                <AdminButton
-                  variant="secondary"
-                  onClick={() => {
-                    setEditingCat(cat.id)
-                    setCatDraft({
-                      title: cat.title,
-                      numeral: cat.numeral,
-                      intro: cat.intro,
-                      sortOrder: cat.sortOrder,
-                    })
-                  }}
-                >
-                  Edit
-                </AdminButton>
-                <AdminButton
-                  variant="danger"
-                  disabled={busy}
-                  onClick={() => {
-                    if (
-                      !confirm(
-                        `Delete category “${cat.title}” and all its cards?`,
-                      )
-                    )
-                      return
-                    void run(() => adminDeleteCategory(cat.id))
-                  }}
-                >
-                  Delete
-                </AdminButton>
-              </AdminActions>
-            </div>
-
-            {editingCat === cat.id && (
-              <div className="mt-6 border-t border-mahogany/25 pt-5">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <AdminField
-                    label="Title"
-                    value={catDraft.title}
-                    onChange={(v) => setCatDraft((s) => ({ ...s, title: v }))}
-                  />
-                  <AdminField
-                    label="Numeral"
-                    value={catDraft.numeral}
-                    onChange={(v) =>
-                      setCatDraft((s) => ({ ...s, numeral: v }))
-                    }
-                  />
-                  <AdminTextArea
-                    label="Intro"
-                    value={catDraft.intro}
-                    onChange={(v) => setCatDraft((s) => ({ ...s, intro: v }))}
-                    className="md:col-span-2"
-                  />
-                  <AdminField
-                    label="Sort order"
-                    type="number"
-                    value={String(catDraft.sortOrder)}
-                    onChange={(v) =>
-                      setCatDraft((s) => ({
-                        ...s,
-                        sortOrder: Number(v) || 0,
-                      }))
-                    }
-                  />
-                </div>
-                <AdminActions>
-                  <AdminButton
-                    className="mt-4"
-                    disabled={busy}
-                    onClick={() =>
-                      run(async () => {
-                        await adminSaveCategory('PUT', {
-                          id: cat.id,
-                          ...catDraft,
-                        })
-                        setEditingCat(null)
-                      })
-                    }
-                  >
-                    Save
-                  </AdminButton>
-                  <AdminButton
-                    className="mt-4"
-                    variant="ghost"
-                    onClick={() => setEditingCat(null)}
-                  >
-                    Cancel
-                  </AdminButton>
-                </AdminActions>
-              </div>
-            )}
-
-            <ul className="mt-6 list-none space-y-3 p-0">
-              {cat.services.map((card) => (
-                <AdminRow key={card.id}>
-                  {editingCard === card.id ? (
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {cardDraft.imageUrl.trim() && (
-                        <AdminMediaPreview
-                          kind="auto"
-                          src={cardDraft.imageUrl}
-                          alt={cardDraft.name || 'Service card'}
-                          className="md:col-span-2"
-                        />
-                      )}
-                      <AdminField
-                        label="Name"
-                        value={cardDraft.name}
-                        onChange={(v) =>
-                          setCardDraft((s) => ({ ...s, name: v }))
-                        }
-                      />
-                      <AdminField
-                        label="Image URL (path, absolute, or Drive link)"
-                        value={cardDraft.imageUrl}
-                        onChange={(v) =>
-                          setCardDraft((s) => ({ ...s, imageUrl: v }))
-                        }
-                        mono
-                      />
-                      <AdminTextArea
-                        label="Description"
-                        value={cardDraft.description}
-                        onChange={(v) =>
-                          setCardDraft((s) => ({ ...s, description: v }))
-                        }
-                        className="md:col-span-2"
-                      />
-                      <AdminField
-                        label="Sort order"
-                        type="number"
-                        value={String(cardDraft.sortOrder)}
-                        onChange={(v) =>
-                          setCardDraft((s) => ({
-                            ...s,
-                            sortOrder: Number(v) || 0,
-                          }))
-                        }
-                      />
-                      <AdminActions>
-                        <AdminButton
-                          disabled={busy}
-                          onClick={() =>
-                            run(async () => {
-                              await adminSaveCard('PUT', {
-                                id: card.id,
-                                categoryId: cat.id,
-                                ...cardDraft,
-                              })
-                              setEditingCard(null)
-                            })
-                          }
-                        >
-                          Save card
-                        </AdminButton>
-                        <AdminButton
-                          variant="ghost"
-                          onClick={() => setEditingCard(null)}
-                        >
-                          Cancel
-                        </AdminButton>
-                      </AdminActions>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
-                        {card.imageUrl.trim() && (
-                          <AdminMediaPreview
-                            kind="auto"
-                            src={card.imageUrl}
-                            alt={card.name}
-                          />
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="font-sans text-base font-semibold text-ink">
-                            {card.name}
-                          </p>
-                          <p className="mt-1 font-sans text-sm leading-relaxed text-ink-muted">
-                            {card.description}
-                          </p>
-                          <p className="mt-2 break-all font-mono text-xs text-ink">
-                            {card.imageUrl}
-                          </p>
-                        </div>
-                      </div>
-                      <AdminActions>
-                        <AdminButton
-                          variant="secondary"
-                          onClick={() => {
-                            setEditingCard(card.id)
-                            setCardDraft({
-                              name: card.name,
-                              description: card.description,
-                              imageUrl: card.imageUrl,
-                              sortOrder: card.sortOrder,
-                            })
-                          }}
-                        >
-                          Edit
-                        </AdminButton>
-                        <AdminButton
-                          variant="danger"
-                          disabled={busy}
-                          onClick={() => {
-                            if (!confirm(`Delete “${card.name}”?`)) return
-                            void run(() => adminDeleteCard(card.id))
-                          }}
-                        >
-                          Delete
-                        </AdminButton>
-                      </AdminActions>
-                    </div>
-                  )}
-                </AdminRow>
-              ))}
-            </ul>
-
-            <div className="mt-6 border-t border-mahogany/25 pt-5">
-              <h3 className="font-sans text-xs font-semibold tracking-[0.14em] text-ink uppercase">
-                Add card
-              </h3>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                {(newCard[cat.id]?.imageUrl ?? '').trim() && (
-                  <AdminMediaPreview
-                    kind="auto"
-                    src={newCard[cat.id]!.imageUrl}
-                    alt={newCard[cat.id]?.name || 'New service card'}
-                    className="md:col-span-2"
-                  />
-                )}
-                <AdminField
-                  label="Name"
-                  value={newCard[cat.id]?.name ?? ''}
-                  onChange={(v) =>
-                    setNewCard((s) => ({
-                      ...s,
-                      [cat.id]: { ...(s[cat.id] ?? emptyCard), name: v },
-                    }))
-                  }
-                />
-                <AdminField
-                  label="Image URL (path, absolute, or Drive link)"
-                  value={newCard[cat.id]?.imageUrl ?? ''}
-                  onChange={(v) =>
-                    setNewCard((s) => ({
-                      ...s,
-                      [cat.id]: { ...(s[cat.id] ?? emptyCard), imageUrl: v },
-                    }))
-                  }
-                  mono
-                />
-                <AdminTextArea
-                  label="Description"
-                  value={newCard[cat.id]?.description ?? ''}
-                  onChange={(v) =>
-                    setNewCard((s) => ({
-                      ...s,
-                      [cat.id]: {
-                        ...(s[cat.id] ?? emptyCard),
-                        description: v,
-                      },
-                    }))
-                  }
-                  className="md:col-span-2"
-                />
-              </div>
-              <AdminButton
-                className="mt-4"
-                disabled={busy || !(newCard[cat.id]?.name ?? '').trim()}
-                onClick={() =>
-                  run(async () => {
-                    const draft = newCard[cat.id] ?? emptyCard
-                    await adminSaveCard('POST', {
-                      categoryId: cat.id,
-                      ...draft,
-                      sortOrder: cat.services.length,
-                    })
-                    setNewCard((s) => ({ ...s, [cat.id]: emptyCard }))
+      <AdminModal
+        open={modal.type === 'addCard' || modal.type === 'editCard'}
+        onClose={closeModal}
+        title={modal.type === 'editCard' ? 'Edit card' : 'Add card'}
+        wide
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          {cardForm.imageUrl.trim() && (
+            <AdminMediaPreview
+              kind="auto"
+              src={cardForm.imageUrl}
+              alt={cardForm.name || 'Service card'}
+              className="md:col-span-2"
+            />
+          )}
+          <AdminField
+            label="Name"
+            value={cardForm.name}
+            onChange={(v) => setCardForm((s) => ({ ...s, name: v }))}
+          />
+          <AdminField
+            label="Image URL"
+            value={cardForm.imageUrl}
+            onChange={(v) => setCardForm((s) => ({ ...s, imageUrl: v }))}
+            mono
+          />
+          <AdminTextArea
+            label="Description"
+            value={cardForm.description}
+            onChange={(v) => setCardForm((s) => ({ ...s, description: v }))}
+            className="md:col-span-2"
+          />
+          {modal.type === 'editCard' && (
+            <AdminField
+              label="Sort order"
+              type="number"
+              value={String(cardForm.sortOrder)}
+              onChange={(v) =>
+                setCardForm((s) => ({ ...s, sortOrder: Number(v) || 0 }))
+              }
+            />
+          )}
+        </div>
+        <AdminActions>
+          <AdminButton
+            className="mt-5"
+            disabled={busy || !cardForm.name.trim() || !selected}
+            onClick={() =>
+              run(async () => {
+                if (!selected) return
+                if (modal.type === 'editCard') {
+                  await adminSaveCard('PUT', {
+                    id: modal.cardId,
+                    categoryId: selected.id,
+                    ...cardForm,
+                  })
+                } else {
+                  await adminSaveCard('POST', {
+                    categoryId: selected.id,
+                    ...cardForm,
+                    sortOrder: selected.services.length,
                   })
                 }
-              >
-                Add card
-              </AdminButton>
-            </div>
-          </AdminPanel>
-        ))}
-      </div>
+              })
+            }
+          >
+            {modal.type === 'editCard' ? 'Save changes' : 'Save card'}
+          </AdminButton>
+          <AdminButton className="mt-5" variant="ghost" onClick={closeModal}>
+            Cancel
+          </AdminButton>
+        </AdminActions>
+      </AdminModal>
     </div>
   )
 }
