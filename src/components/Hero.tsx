@@ -86,19 +86,13 @@ export function Hero() {
             />
           </picture>
         </motion.div>
-        {/* Bottom fade only — side wash removed; mobile copy uses local scrim */}
+        {/* Bottom fade only */}
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-cream/45 to-transparent md:h-40 md:from-cream/50" />
       </div>
 
       {/* —— Mobile layout: top-left copy, bottom-right CTA —— */}
       <div className="relative z-10 flex flex-1 flex-col md:hidden">
         <div className="relative mr-auto w-[min(22rem,92%)] px-4 pt-2 text-left sm:px-5">
-          {/* Local cream scrim behind copy */}
-          <div
-            className="pointer-events-none absolute -inset-x-2 -inset-y-3 z-0 bg-gradient-to-r from-cream via-cream/95 to-transparent sm:-inset-x-3"
-            aria-hidden="true"
-          />
-
           <div className="relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 16 }}

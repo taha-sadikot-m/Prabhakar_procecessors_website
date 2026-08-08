@@ -18,6 +18,13 @@ import { blogPage, company } from '../src/data/content.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
+
+// Local `.env` is gitignored; Vercel injects env vars via the dashboard.
+const envPath = join(root, '.env')
+if (existsSync(envPath) && typeof process.loadEnvFile === 'function') {
+  process.loadEnvFile(envPath)
+}
+
 const SITE = company.website.replace(/\/$/, '')
 
 function mapDbPost(row: Record<string, unknown>): BlogPost {

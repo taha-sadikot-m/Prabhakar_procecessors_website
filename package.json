@@ -4,15 +4,15 @@
   "version": "1.0.0",
   "type": "module",
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "concurrently -k -n api,web -c magenta,cyan \"npm:dev:api\" \"vite\"",
     "dev:api": "node --env-file=.env --import tsx scripts/dev-api.mjs",
     "dev:vite": "vite",
-    "build": "tsc -b && vite build && node --env-file=.env --import tsx scripts/seo-build.ts",
+    "build": "tsc -b && vite build && node --import tsx scripts/seo-build.ts",
     "preview": "vite preview",
-    "seo": "node --env-file=.env --import tsx scripts/seo-build.ts",
+    "seo": "node --import tsx scripts/seo-build.ts",
     "seed:cms": "node --env-file=.env scripts/seed-cms.mjs",
     "gallery:transcode": "node scripts/transcode-gallery-videos.mjs"
   },
