@@ -90,7 +90,7 @@ export function Hero() {
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-cream/45 to-transparent md:h-40 md:from-cream/50" />
       </div>
 
-      {/* —— Mobile layout: top-left copy, bottom-right CTA —— */}
+      {/* —— Mobile layout: copy + CTA stacked —— */}
       <div className="relative z-10 flex flex-1 flex-col md:hidden">
         <div className="relative mr-auto w-[min(22rem,92%)] px-4 pt-2 text-left sm:px-5">
           <div className="relative z-10">
@@ -114,7 +114,9 @@ export function Hero() {
             >
               {hero.headline[0]}
               <br />
-              {hero.headline[1]}{' '}
+              {hero.headline[1]}
+              <br />
+              {hero.headline[2]}{' '}
               <span className="text-mahogany">{hero.highlight}</span>
             </motion.h1>
 
@@ -130,17 +132,17 @@ export function Hero() {
             >
               {hero.subcopy}
             </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.28 }}
+              className="mt-8"
+            >
+              <SectionCta label={hero.cta} to={hero.ctaHref} />
+            </motion.div>
           </div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.28 }}
-          className="absolute right-4 bottom-24 z-20 sm:right-5"
-        >
-          <SectionCta label={hero.cta} to={hero.ctaHref} />
-        </motion.div>
       </div>
 
       {/* —— Desktop / tablet layout (unchanged structure) —— */}
@@ -162,7 +164,9 @@ export function Hero() {
           >
             {hero.headline[0]}
             <br />
-            {hero.headline[1]}{' '}
+            {hero.headline[1]}
+            <br />
+            {hero.headline[2]}{' '}
             <span className="text-mahogany">{hero.highlight}</span>
           </motion.h1>
 
