@@ -3,6 +3,7 @@
  * Used by `npm run dev` so /api works without the Vercel CLI.
  */
 import express from 'express'
+import health from '../api/health.ts'
 import services from '../api/services.ts'
 import gallery from '../api/gallery.ts'
 import testimonials from '../api/testimonials.ts'
@@ -13,7 +14,14 @@ import adminTestimonials from '../api/admin/testimonials.ts'
 
 const PORT = Number(process.env.DEV_API_PORT) || 8787
 
-function mount(handler) {
+function resolveHandler(mod) {
+  if (typeof mod === 'function') return mod
+  if (mod && typeof mod.default === 'function') return mod.default
+  throw new Error('API handler export is not a function')
+}
+
+function mount(mod) {
+  const handler = resolveHandler(mod)
   return async (req, res) => {
     try {
       await handler(req, res)
@@ -31,6 +39,7 @@ function mount(handler) {
 const app = express()
 app.use(express.json({ limit: '2mb' }))
 
+app.all('/api/health', mount(health))
 app.all('/api/services', mount(services))
 app.all('/api/gallery', mount(gallery))
 app.all('/api/testimonials', mount(testimonials))

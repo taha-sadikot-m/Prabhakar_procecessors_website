@@ -1,10 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-type ExpressLikeResponse = VercelResponse & {
-  status?: (code: number) => ExpressLikeResponse
-  json?: (body: unknown) => void
-}
-
 export function setCors(res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader(
@@ -17,20 +12,11 @@ export function setCors(res: VercelResponse) {
   )
 }
 
-function sendStatus(res: VercelResponse, status: number) {
-  const expressRes = res as ExpressLikeResponse
-  if (typeof expressRes.status === 'function') {
-    expressRes.status(status).end()
-    return
-  }
-  res.statusCode = status
-  res.end()
-}
-
 export function handleOptions(req: VercelRequest, res: VercelResponse) {
   setCors(res)
   if (req.method === 'OPTIONS') {
-    sendStatus(res, 204)
+    res.statusCode = 204
+    res.end()
     return true
   }
   return false
@@ -42,15 +28,6 @@ export function json(
   body: unknown,
 ) {
   setCors(res)
-  const expressRes = res as ExpressLikeResponse
-  if (
-    typeof expressRes.status === 'function' &&
-    typeof expressRes.json === 'function'
-  ) {
-    expressRes.status(status)
-    expressRes.json(body)
-    return
-  }
   res.statusCode = status
   res.setHeader('Content-Type', 'application/json; charset=utf-8')
   res.end(JSON.stringify(body))
