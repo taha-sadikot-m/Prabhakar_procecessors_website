@@ -10,6 +10,8 @@ import { HomePage } from './pages/HomePage'
 import { JournalPage } from './pages/JournalPage'
 import { ServicesPage } from './pages/ServicesPage'
 import { TestimonialsPage } from './pages/TestimonialsPage'
+import { AdminCareersPage } from './pages/admin/AdminCareersPage'
+import { AdminContactPage } from './pages/admin/AdminContactPage'
 import { AdminGalleryPage } from './pages/admin/AdminGalleryPage'
 import { AdminHomePage } from './pages/admin/AdminHomePage'
 import { AdminLayout } from './pages/admin/AdminLayout'
@@ -32,6 +34,8 @@ export default function App() {
           <Route path="blog" element={<AdminBlogPage />} />
           <Route path="blog/new" element={<AdminBlogEditorPage />} />
           <Route path="blog/:id/edit" element={<AdminBlogEditorPage />} />
+          <Route path="careers" element={<AdminCareersPage />} />
+          <Route path="contact" element={<AdminContactPage />} />
         </Route>
 
         <Route element={<Layout />}>

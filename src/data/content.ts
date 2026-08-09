@@ -841,7 +841,7 @@ export const careersPage = {
     steps: [
       { id: 'role', label: 'Role', title: 'Choose Your Role' },
       { id: 'about', label: 'About You', title: 'Tell Us About You' },
-      { id: 'documents', label: 'Documents', title: 'Documents & Notes' },
+      { id: 'documents', label: 'Documents', title: 'Resume Link & Notes' },
     ],
     departments: [
       'HR Department',

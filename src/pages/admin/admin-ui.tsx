@@ -523,7 +523,7 @@ export function AdminModal({
         aria-modal="true"
         aria-label={title}
         className={`relative z-10 flex max-h-[92svh] w-full flex-col border border-ink/10 bg-cream shadow-[0_24px_60px_rgba(45,27,14,0.22)] rounded-t-2xl sm:max-h-[85svh] sm:rounded-2xl ${
-          wide ? 'sm:max-w-xl' : 'sm:max-w-lg'
+          wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'
         }`}
       >
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-ink/10 px-5 py-4">

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import {
   adminGetBlogPosts,
+  adminGetContactMessages,
   adminGetGallery,
+  adminGetJobApplications,
   adminGetServices,
   adminGetTestimonials,
 } from '../../lib/cms-api'
@@ -21,6 +23,8 @@ export function AdminHomePage() {
     quotes: 0,
     posts: 0,
     publishedPosts: 0,
+    applications: 0,
+    messages: 0,
   })
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -32,8 +36,18 @@ export function AdminHomePage() {
       adminGetGallery(),
       adminGetTestimonials(),
       adminGetBlogPosts(),
+      adminGetJobApplications(),
+      adminGetContactMessages(),
     ])
-      .then(([services, gallery, testimonials, blog]) => {
+      .then(
+        ([
+          services,
+          gallery,
+          testimonials,
+          blog,
+          careers,
+          contact,
+        ]) => {
         if (cancelled) return
         const categories = services.categories ?? []
         const sections = gallery.sections ?? []
@@ -49,6 +63,8 @@ export function AdminHomePage() {
           quotes: testimonials.quotes?.length ?? 0,
           posts: posts.length,
           publishedPosts: posts.filter((p) => p.published).length,
+          applications: careers.applications?.length ?? 0,
+          messages: contact.messages?.length ?? 0,
         })
       })
       .catch((err) => {
@@ -100,6 +116,18 @@ export function AdminHomePage() {
             value={counts.quotes}
             description="Partner quotes shown on /testimonials"
             to="/admin/testimonials"
+          />
+          <AdminStatCard
+            label="Careers"
+            value={counts.applications}
+            description="Job applications from /careers"
+            to="/admin/careers"
+          />
+          <AdminStatCard
+            label="Contact"
+            value={counts.messages}
+            description="Messages from the contact form"
+            to="/admin/contact"
           />
         </div>
       )}

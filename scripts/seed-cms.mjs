@@ -452,6 +452,23 @@ async function ensureSchema() {
     )
   `
   await sql`
+    CREATE TABLE IF NOT EXISTS job_applications (
+      id TEXT PRIMARY KEY,
+      department TEXT NOT NULL,
+      city TEXT NOT NULL,
+      full_name TEXT NOT NULL,
+      mobile TEXT NOT NULL,
+      email TEXT NOT NULL,
+      qualification TEXT NOT NULL,
+      experience TEXT NOT NULL,
+      current_company TEXT NOT NULL DEFAULT '',
+      expected_salary TEXT NOT NULL DEFAULT '',
+      resume_url TEXT NOT NULL,
+      remarks TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `
+  await sql`
     CREATE TABLE IF NOT EXISTS blog_posts (
       id TEXT PRIMARY KEY,
       slug TEXT NOT NULL UNIQUE,

@@ -8,6 +8,8 @@ const links = [
   { to: '/admin/gallery', label: 'Gallery', end: false },
   { to: '/admin/testimonials', label: 'Testimonials', end: false },
   { to: '/admin/blog', label: 'Blog', end: false },
+  { to: '/admin/careers', label: 'Careers', end: false },
+  { to: '/admin/contact', label: 'Contact', end: false },
 ]
 
 function navClass({ isActive }: { isActive: boolean }) {

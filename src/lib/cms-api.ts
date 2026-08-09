@@ -287,3 +287,63 @@ export function adminDeleteBlogPost(id: string) {
     { method: 'DELETE', auth: true },
   )
 }
+
+export type JobApplicationDto = {
+  id: string
+  department: string
+  city: string
+  fullName: string
+  mobile: string
+  email: string
+  qualification: string
+  experience: string
+  currentCompany: string
+  expectedSalary: string
+  resumeUrl: string
+  remarks: string
+  createdAt: string
+}
+
+export type ContactMessageDto = {
+  id: string
+  name: string
+  email: string
+  phone: string
+  subject: string
+  message: string
+  createdAt: string
+}
+
+export function submitJobApplication(body: Record<string, unknown>) {
+  return request<{ ok: boolean; id: string }>('/api/careers', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export function adminGetJobApplications() {
+  return request<{ applications: JobApplicationDto[] }>(
+    '/api/admin/careers',
+    { auth: true },
+  )
+}
+
+export function adminDeleteJobApplication(id: string) {
+  return request<{ ok: boolean }>(
+    `/api/admin/careers?id=${encodeURIComponent(id)}`,
+    { method: 'DELETE', auth: true },
+  )
+}
+
+export function adminGetContactMessages() {
+  return request<{ messages: ContactMessageDto[] }>('/api/admin/contact', {
+    auth: true,
+  })
+}
+
+export function adminDeleteContactMessage(id: string) {
+  return request<{ ok: boolean }>(
+    `/api/admin/contact?id=${encodeURIComponent(id)}`,
+    { method: 'DELETE', auth: true },
+  )
+}

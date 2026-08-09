@@ -5,7 +5,8 @@ import {
   type FormEvent,
   type KeyboardEvent,
 } from 'react'
-import { careersPage, company } from '../data/content'
+import { careersPage } from '../data/content'
+import { submitJobApplication } from '../lib/cms-api'
 import { SectionCta } from './SectionCta'
 
 const MAHOGANY = '#674438'
@@ -21,6 +22,8 @@ const STEPS = careersPage.form.steps
 export function JobApplicationForm() {
   const [step, setStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [announce, setAnnounce] = useState('')
   const stepRefs = useRef<(HTMLFieldSetElement | null)[]>([])
   const headingRefs = useRef<(HTMLHeadingElement | null)[]>([])
@@ -51,18 +54,52 @@ export function JobApplicationForm() {
 
   const goNext = () => {
     if (!validateStep(step)) return
+    setError(null)
     setStep((s) => Math.min(STEPS.length - 1, s + 1))
   }
 
   const goBack = () => {
+    setError(null)
     setStep((s) => Math.max(0, s - 1))
   }
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (step < STEPS.length - 1) {
+      goNext()
+      return
+    }
     if (!validateStep(step)) return
-    setSubmitted(true)
-    setAnnounce('Application submitted. Thank you.')
+
+    const form = e.currentTarget
+    const data = new FormData(form)
+    const payload = {
+      department: String(data.get('department') ?? ''),
+      city: String(data.get('city') ?? ''),
+      fullName: String(data.get('fullName') ?? ''),
+      mobile: String(data.get('mobile') ?? ''),
+      email: String(data.get('email') ?? ''),
+      qualification: String(data.get('qualification') ?? ''),
+      experience: String(data.get('experience') ?? ''),
+      currentCompany: String(data.get('currentCompany') ?? ''),
+      expectedSalary: String(data.get('expectedSalary') ?? ''),
+      resumeUrl: String(data.get('resumeUrl') ?? ''),
+      remarks: String(data.get('remarks') ?? ''),
+    }
+
+    setSubmitting(true)
+    setError(null)
+    try {
+      await submitJobApplication(payload)
+      setSubmitted(true)
+      setAnnounce('Application submitted. Thank you.')
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to submit application',
+      )
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const onKeyDownContinue = (e: KeyboardEvent<HTMLButtonElement>) => {
@@ -86,15 +123,8 @@ export function JobApplicationForm() {
         </h3>
         <span className="mt-4 block h-px w-10 bg-mahogany" aria-hidden="true" />
         <p className="mt-5 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
-          Your application has been recorded locally. Please also email your
-          resume to{' '}
-          <a
-            href={`mailto:${company.email}`}
-            className="text-mahogany underline-offset-2 hover:underline"
-          >
-            {company.email}
-          </a>{' '}
-          so our HR team can follow up.
+          Your application has been submitted. Our HR team will review your
+          details and resume link, and follow up if there is a match.
         </p>
         <SectionCta label="Back to Home" to="/" className="mt-8" />
       </div>
@@ -111,7 +141,6 @@ export function JobApplicationForm() {
         {announce}
       </div>
 
-      {/* Progress */}
       <ol
         className="flex list-none items-start gap-0 p-0"
         aria-label="Application steps"
@@ -134,7 +163,11 @@ export function JobApplicationForm() {
                 </span>
                 <span
                   className={`hidden font-sans text-[10px] font-medium tracking-[0.14em] uppercase sm:block ${
-                    current ? 'text-mahogany' : done ? 'text-ink/55' : 'text-ink/40'
+                    current
+                      ? 'text-mahogany'
+                      : done
+                        ? 'text-ink/55'
+                        : 'text-ink/40'
                   }`}
                 >
                   {s.label}
@@ -156,7 +189,15 @@ export function JobApplicationForm() {
         })}
       </ol>
 
-      {/* Step 1 — Role */}
+      {error && (
+        <p
+          role="alert"
+          className="rounded-lg border border-crimson/30 bg-crimson/5 px-4 py-3 font-sans text-sm text-crimson"
+        >
+          {error}
+        </p>
+      )}
+
       <fieldset
         ref={(el) => {
           stepRefs.current[0] = el
@@ -205,7 +246,6 @@ export function JobApplicationForm() {
         </div>
       </fieldset>
 
-      {/* Step 2 — About You */}
       <fieldset
         ref={(el) => {
           stepRefs.current[1] = el
@@ -312,7 +352,6 @@ export function JobApplicationForm() {
         </div>
       </fieldset>
 
-      {/* Step 3 — Documents */}
       <fieldset
         ref={(el) => {
           stepRefs.current[2] = el
@@ -331,31 +370,23 @@ export function JobApplicationForm() {
           {STEPS[2].title}
         </h3>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="resume" className={labelClass}>
-              Upload Resume (PDF/DOC)
-            </label>
-            <input
-              id="resume"
-              name="resume"
-              type="file"
-              accept=".pdf,.doc,.docx"
-              className="w-full font-sans text-sm text-ink-muted file:mr-3 file:border file:border-line file:bg-cream file:px-3 file:py-2 file:font-sans file:text-xs file:uppercase file:tracking-wider"
-            />
-          </div>
-          <div>
-            <label htmlFor="photo" className={labelClass}>
-              Photograph (Optional)
-            </label>
-            <input
-              id="photo"
-              name="photo"
-              type="file"
-              accept="image/*"
-              className="w-full font-sans text-sm text-ink-muted file:mr-3 file:border file:border-line file:bg-cream file:px-3 file:py-2 file:font-sans file:text-xs file:uppercase file:tracking-wider"
-            />
-          </div>
+        <p className="font-sans text-sm leading-relaxed text-ink-muted">
+          Upload your resume to Google Drive (or similar), set the link so
+          anyone with the link can view it, then paste that link below.
+        </p>
+
+        <div>
+          <label htmlFor="resumeUrl" className={labelClass}>
+            Resume Link
+          </label>
+          <input
+            id="resumeUrl"
+            name="resumeUrl"
+            type="url"
+            required
+            placeholder="https://drive.google.com/…"
+            className={fieldClass}
+          />
         </div>
 
         <div>
@@ -376,7 +407,8 @@ export function JobApplicationForm() {
           <button
             type="button"
             onClick={goBack}
-            className="font-sans text-[11px] font-semibold tracking-[0.18em] text-ink/55 uppercase transition-colors hover:text-ink"
+            disabled={submitting}
+            className="font-sans text-[11px] font-semibold tracking-[0.18em] text-ink/55 uppercase transition-colors hover:text-ink disabled:opacity-50"
           >
             ← Back
           </button>
@@ -395,9 +427,10 @@ export function JobApplicationForm() {
         ) : (
           <button
             type="submit"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase shadow-[0_2px_10px_rgba(103,68,56,0.28)] transition-all hover:bg-mahogany-dark"
+            disabled={submitting}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-mahogany px-5 py-3 font-sans text-[11px] font-semibold tracking-[0.18em] text-cream uppercase shadow-[0_2px_10px_rgba(103,68,56,0.28)] transition-all hover:bg-mahogany-dark disabled:opacity-60"
           >
-            Submit Application
+            {submitting ? 'Submitting…' : 'Submit Application'}
             <span aria-hidden="true">→</span>
           </button>
         )}
