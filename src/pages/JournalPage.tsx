@@ -146,7 +146,7 @@ function JournalHero({ username }: { username: string | null }) {
           <p className="mt-8 font-sans text-[10px] font-medium tracking-[0.18em] text-ink/45 uppercase">
             {username
               ? `@${username} · Live from the floor`
-              : 'Find Us · Live from the floor'}
+              : 'Our Socials · Live from the floor'}
           </p>
 
           <ul className="mt-8 flex list-none items-center gap-3 p-0">

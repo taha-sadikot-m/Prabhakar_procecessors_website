@@ -25,7 +25,7 @@ export const navLinks = [
   { label: 'Services', href: '/services' },
   { label: 'Gallery', href: '/gallery' },
   { label: 'Careers', href: '/careers' },
-  { label: 'Find Us', href: '/journal' },
+  { label: 'Our Socials', href: '/journal' },
   { label: 'Testimonials', href: '/testimonials' },
   { label: 'Contact', href: '/contact' },
 ]
@@ -333,7 +333,7 @@ export const future = {
   headline: 'Innovation In Every Thread.',
   cta: 'Meet The Team',
   ctaHref: '/about#leadership',
-  secondaryCta: 'Find Us',
+  secondaryCta: 'Our Socials',
   secondaryHref: '/journal',
   panels: [
     {
@@ -936,7 +936,7 @@ export const testimonialsPage = {
 }
 
 export const journalPage = {
-  eyebrow: 'Find Us',
+  eyebrow: 'Our Socials',
   headline: ['Where We', 'Show Up.'],
   highlight: 'Show Up',
   body: 'Follow Prabhakar across our channels. Below, live photos from the mill floor.',
