@@ -51,7 +51,17 @@ const routes: Record<string, ApiHandler> = {
   'admin/contact': asHandler(adminContact),
 }
 
+/** Prefer original request URL (preserved across Vercel rewrites). */
 function resolvePath(req: VercelRequest): string {
+  const urlPath = (req.url ?? '').split('?')[0] ?? ''
+  const fromUrl = urlPath
+    .replace(/^https?:\/\/[^/]+/i, '')
+    .replace(/^\/api\/?/, '')
+    .replace(/^\/+|\/+$/g, '')
+  if (fromUrl && fromUrl !== 'index') {
+    return fromUrl
+  }
+
   const raw = req.query.path
   if (Array.isArray(raw)) {
     return raw.filter((p) => typeof p === 'string' && p.length > 0).join('/')
@@ -59,8 +69,7 @@ function resolvePath(req: VercelRequest): string {
   if (typeof raw === 'string' && raw.length > 0) {
     return raw.replace(/^\/+|\/+$/g, '')
   }
-  const urlPath = (req.url ?? '').split('?')[0] ?? ''
-  return urlPath.replace(/^\/api\/?/, '').replace(/^\/+|\/+$/g, '')
+  return ''
 }
 
 export default async function handler(
