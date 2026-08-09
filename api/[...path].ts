@@ -21,22 +21,34 @@ type ApiHandler = (
   res: VercelResponse,
 ) => unknown | Promise<unknown>
 
+function asHandler(mod: unknown): ApiHandler {
+  if (typeof mod === 'function') return mod as ApiHandler
+  if (
+    mod &&
+    typeof mod === 'object' &&
+    typeof (mod as { default: unknown }).default === 'function'
+  ) {
+    return (mod as { default: ApiHandler }).default
+  }
+  throw new Error('Invalid API handler export')
+}
+
 const routes: Record<string, ApiHandler> = {
-  health,
-  services,
-  gallery,
-  'drive-media': driveMedia,
-  testimonials,
-  blog,
-  contact,
-  careers,
-  'admin/login': adminLogin,
-  'admin/services': adminServices,
-  'admin/gallery': adminGallery,
-  'admin/testimonials': adminTestimonials,
-  'admin/blog': adminBlog,
-  'admin/careers': adminCareers,
-  'admin/contact': adminContact,
+  health: asHandler(health),
+  services: asHandler(services),
+  gallery: asHandler(gallery),
+  'drive-media': asHandler(driveMedia),
+  testimonials: asHandler(testimonials),
+  blog: asHandler(blog),
+  contact: asHandler(contact),
+  careers: asHandler(careers),
+  'admin/login': asHandler(adminLogin),
+  'admin/services': asHandler(adminServices),
+  'admin/gallery': asHandler(adminGallery),
+  'admin/testimonials': asHandler(adminTestimonials),
+  'admin/blog': asHandler(adminBlog),
+  'admin/careers': asHandler(adminCareers),
+  'admin/contact': asHandler(adminContact),
 }
 
 function resolvePath(req: VercelRequest): string {
