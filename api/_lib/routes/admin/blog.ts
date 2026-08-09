@@ -5,10 +5,10 @@ import {
   type BlogCtaDto,
   type BlogCtaTheme,
   type BlogSectionDto,
-} from '../_lib/blog'
-import { requireAdmin } from '../_lib/auth'
-import { getDb } from '../_lib/db'
-import { handleOptions, json, newId, readJsonBody } from '../_lib/http'
+} from '../../blog'
+import { requireAdmin } from '../../auth'
+import { getDb } from '../../db'
+import { handleOptions, json, newId, readJsonBody } from '../../http'
 
 type BlogBody = {
   id?: string

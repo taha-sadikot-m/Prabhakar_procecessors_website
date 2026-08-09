@@ -1,23 +1,23 @@
 /**
- * Local Express bridge that mounts the same Vercel api/*.ts handlers.
+ * Local Express bridge that mounts the same Vercel api handlers.
  * Used by `npm run dev` so /api works without the Vercel CLI.
  */
 import express from 'express'
-import health from '../api/health.ts'
-import services from '../api/services.ts'
-import gallery from '../api/gallery.ts'
-import driveMedia from '../api/drive-media.ts'
-import testimonials from '../api/testimonials.ts'
-import blog from '../api/blog.ts'
-import contact from '../api/contact.ts'
-import careers from '../api/careers.ts'
-import adminLogin from '../api/admin/login.ts'
-import adminServices from '../api/admin/services.ts'
-import adminGallery from '../api/admin/gallery.ts'
-import adminTestimonials from '../api/admin/testimonials.ts'
-import adminBlog from '../api/admin/blog.ts'
-import adminCareers from '../api/admin/careers.ts'
-import adminContact from '../api/admin/contact.ts'
+import health from '../api/_lib/routes/health.ts'
+import services from '../api/_lib/routes/services.ts'
+import gallery from '../api/_lib/routes/gallery.ts'
+import driveMedia from '../api/_lib/routes/drive-media.ts'
+import testimonials from '../api/_lib/routes/testimonials.ts'
+import blog from '../api/_lib/routes/blog.ts'
+import contact from '../api/_lib/routes/contact.ts'
+import careers from '../api/_lib/routes/careers.ts'
+import adminLogin from '../api/_lib/routes/admin/login.ts'
+import adminServices from '../api/_lib/routes/admin/services.ts'
+import adminGallery from '../api/_lib/routes/admin/gallery.ts'
+import adminTestimonials from '../api/_lib/routes/admin/testimonials.ts'
+import adminBlog from '../api/_lib/routes/admin/blog.ts'
+import adminCareers from '../api/_lib/routes/admin/careers.ts'
+import adminContact from '../api/_lib/routes/admin/contact.ts'
 
 const PORT = Number(process.env.DEV_API_PORT) || 8787
 

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getDb } from './_lib/db'
-import { resolveDriveUrls } from './_lib/drive'
-import { handleOptions, json } from './_lib/http'
+import { getDb } from '../db'
+import { resolveDriveUrls } from '../drive'
+import { handleOptions, json } from '../http'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return

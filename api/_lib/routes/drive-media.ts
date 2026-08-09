@@ -3,8 +3,8 @@ import { Readable } from 'node:stream'
 import {
   fetchDriveMediaStream,
   isValidDriveFileId,
-} from './_lib/drive'
-import { handleOptions, json, setCors } from './_lib/http'
+} from '../drive'
+import { handleOptions, json, setCors } from '../http'
 
 function queryId(req: VercelRequest): string | null {
   const raw = req.query.id

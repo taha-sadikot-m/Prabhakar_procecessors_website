@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { requireAdmin } from '../_lib/auth'
-import { getDb } from '../_lib/db'
-import { handleOptions, json, readJsonBody } from '../_lib/http'
+import { requireAdmin } from '../../auth'
+import { getDb } from '../../db'
+import { handleOptions, json, readJsonBody } from '../../http'
 
 async function ensureTable() {
   const sql = getDb()

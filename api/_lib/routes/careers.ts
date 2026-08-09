@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getDb } from './_lib/db'
-import { handleOptions, json, newId, readJsonBody } from './_lib/http'
+import { getDb } from '../db'
+import { handleOptions, json, newId, readJsonBody } from '../http'
 
 type CareersBody = {
   department?: string

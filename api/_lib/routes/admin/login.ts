@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { checkStaticCredentials, signAdminToken } from '../_lib/auth'
-import { handleOptions, json, readJsonBody } from '../_lib/http'
+import { checkStaticCredentials, signAdminToken } from '../../auth'
+import { handleOptions, json, readJsonBody } from '../../http'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return

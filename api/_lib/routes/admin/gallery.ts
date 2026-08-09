@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { requireAdmin } from '../_lib/auth'
-import { getDb } from '../_lib/db'
-import { handleOptions, json, newId, readJsonBody } from '../_lib/http'
+import { requireAdmin } from '../../auth'
+import { getDb } from '../../db'
+import { handleOptions, json, newId, readJsonBody } from '../../http'
 
 function parseMediaType(value: unknown): 'image' | 'video' | null {
   if (value === 'image' || value === 'video') return value
