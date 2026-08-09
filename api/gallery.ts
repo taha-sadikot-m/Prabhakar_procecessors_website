@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ORDER BY sort_order ASC, title ASC
     `
     const items = await sql`
-      SELECT id, section_id, drive_url, description, sort_order
+      SELECT id, section_id, drive_url, description, media_type, sort_order
       FROM gallery_items
       ORDER BY sort_order ASC
     `
@@ -31,15 +31,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .map((item) => {
           const driveUrl = item.drive_url as string
           const resolved = resolveDriveUrls(driveUrl)
+          const mediaType =
+            item.media_type === 'image' ? 'image' : 'video'
           return {
             id: item.id as string,
             driveUrl,
             description: (item.description as string | null) ?? null,
+            mediaType,
             previewUrl: resolved.previewUrl,
             viewUrl: resolved.viewUrl,
             thumbUrl: resolved.thumbUrl,
             fileId: resolved.fileId,
-            videoUrl: resolved.videoUrl,
+            videoUrl: mediaType === 'video' ? resolved.videoUrl : null,
           }
         }),
     }))

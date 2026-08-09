@@ -88,7 +88,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-[#674438]/20">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-5 py-4 font-sans text-xs text-ink-muted sm:flex-row sm:gap-3 md:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-5 py-4 font-sans text-xs text-ink-muted sm:flex-row sm:flex-wrap sm:gap-3 md:px-8 lg:px-10">
           <p>
             © {new Date().getFullYear()} {company.legalName}. All rights
             reserved.
@@ -99,6 +99,22 @@ export function Footer() {
             aria-hidden="true"
           />
           <p>Surat, Gujarat, India</p>
+          <span
+            className="hidden h-1 w-1 rotate-45 sm:inline-block"
+            style={{ backgroundColor: ACCENT }}
+            aria-hidden="true"
+          />
+          <p>
+            Designed &amp; Developed By{' '}
+            <a
+              href="https://www.magolabs.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-ink-muted transition-colors hover:text-mahogany"
+            >
+              Mago Labs
+            </a>
+          </p>
         </div>
       </div>
     </footer>

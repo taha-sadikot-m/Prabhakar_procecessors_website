@@ -35,10 +35,13 @@ export type ServiceCategoryDto = {
   services: ServiceCardDto[]
 }
 
+export type GalleryMediaType = 'image' | 'video'
+
 export type GalleryItemDto = {
   id: string
   driveUrl: string
   description: string | null
+  mediaType: GalleryMediaType
   previewUrl: string
   viewUrl: string
   thumbUrl: string
@@ -196,6 +199,7 @@ export function adminGetGallery() {
         sectionId: string
         driveUrl: string
         description: string | null
+        mediaType: GalleryMediaType
         sortOrder: number
       }>
     }>

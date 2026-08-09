@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS gallery_items (
   section_id TEXT NOT NULL REFERENCES gallery_sections(id) ON DELETE CASCADE,
   drive_url TEXT NOT NULL,
   description TEXT,
+  media_type TEXT NOT NULL DEFAULT 'video',
   sort_order INT NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

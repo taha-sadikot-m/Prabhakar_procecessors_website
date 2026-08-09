@@ -35,13 +35,7 @@ const masonryClass =
   'm-0 columns-1 gap-x-5 [column-fill:_balance] sm:columns-2 sm:gap-x-6 lg:columns-3 lg:gap-x-7'
 
 function isPlayableVideo(entry: GalleryEntry) {
-  const resolved = resolveDriveUrls(entry.item.driveUrl)
-  return Boolean(
-    resolved.videoUrl ||
-      entry.item.videoUrl ||
-      entry.item.fileId ||
-      resolved.fileId,
-  )
+  return entry.item.mediaType === 'video'
 }
 
 function DiamondRule({ className = '' }: { className?: string }) {
@@ -374,11 +368,12 @@ function GalleryTile({
   const [soundOn, setSoundOn] = useState(false)
   const urls = resolveDriveUrls(entry.item.driveUrl)
   const fileId = entry.item.fileId || urls.fileId
-  const videoUrl =
-    urls.videoUrl ||
-    entry.item.videoUrl ||
-    (fileId ? driveVideoUrl(fileId) : null)
-  const isVideo = Boolean(videoUrl)
+  const isVideo = entry.item.mediaType === 'video'
+  const videoUrl = isVideo
+    ? entry.item.videoUrl ||
+      urls.videoUrl ||
+      (fileId ? driveVideoUrl(fileId) : null)
+    : null
   const imgSrc = entry.item.thumbUrl || urls.thumbUrl || urls.viewUrl
   const label = entry.item.description?.trim() || entry.sectionTitle
   const showPlayer = Boolean(isVideo && activated && videoUrl)

@@ -419,10 +419,15 @@ async function ensureSchema() {
       section_id TEXT NOT NULL REFERENCES gallery_sections(id) ON DELETE CASCADE,
       drive_url TEXT NOT NULL,
       description TEXT,
+      media_type TEXT NOT NULL DEFAULT 'video',
       sort_order INT NOT NULL DEFAULT 0,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
+  `
+  await sql`
+    ALTER TABLE gallery_items
+    ADD COLUMN IF NOT EXISTS media_type TEXT NOT NULL DEFAULT 'video'
   `
   await sql`
     CREATE TABLE IF NOT EXISTS testimonials (
@@ -536,13 +541,15 @@ async function main() {
       // Browser-safe H.264 served from /public after `npm run gallery:transcode`.
       // Original Drive id kept in seed data for re-transcode; CMS stores playable URL.
       const driveUrl = galleryMediaUrl(item)
+      const mediaType = item.mediaType === 'image' ? 'image' : 'video'
       await sql`
-        INSERT INTO gallery_items (id, section_id, drive_url, description, sort_order)
-        VALUES (${item.id}, ${section.id}, ${driveUrl}, ${item.description}, ${i})
+        INSERT INTO gallery_items (id, section_id, drive_url, description, media_type, sort_order)
+        VALUES (${item.id}, ${section.id}, ${driveUrl}, ${item.description}, ${mediaType}, ${i})
         ON CONFLICT (id) DO UPDATE SET
           section_id = EXCLUDED.section_id,
           drive_url = EXCLUDED.drive_url,
           description = EXCLUDED.description,
+          media_type = EXCLUDED.media_type,
           sort_order = EXCLUDED.sort_order,
           updated_at = NOW()
       `

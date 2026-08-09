@@ -3,6 +3,11 @@ import { requireAdmin } from '../_lib/auth'
 import { getDb } from '../_lib/db'
 import { handleOptions, json, newId, readJsonBody } from '../_lib/http'
 
+function parseMediaType(value: unknown): 'image' | 'video' | null {
+  if (value === 'image' || value === 'video') return value
+  return null
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return
   if (!(await requireAdmin(req))) {
@@ -20,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ORDER BY sort_order ASC, title ASC
       `
       const items = await sql`
-        SELECT id, section_id, drive_url, description, sort_order
+        SELECT id, section_id, drive_url, description, media_type, sort_order
         FROM gallery_items
         ORDER BY sort_order ASC
       `
@@ -37,6 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               sectionId: i.section_id,
               driveUrl: i.drive_url,
               description: i.description,
+              mediaType: i.media_type === 'image' ? 'image' : 'video',
               sortOrder: i.sort_order,
             })),
         })),
@@ -101,19 +107,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         sectionId?: string
         driveUrl?: string
         description?: string
+        mediaType?: string
         sortOrder?: number
       }>(req)
       if (!body.sectionId) return json(res, 400, { error: 'sectionId required' })
       const driveUrl = (body.driveUrl ?? '').trim()
       if (!driveUrl) return json(res, 400, { error: 'driveUrl required' })
+      const mediaType = parseMediaType(body.mediaType)
+      if (!mediaType) {
+        return json(res, 400, { error: 'mediaType required (image or video)' })
+      }
       const id = (body.id ?? newId('gitem')).trim()
       await sql`
-        INSERT INTO gallery_items (id, section_id, drive_url, description, sort_order)
+        INSERT INTO gallery_items (id, section_id, drive_url, description, media_type, sort_order)
         VALUES (
           ${id},
           ${body.sectionId},
           ${driveUrl},
           ${body.description?.trim() || null},
+          ${mediaType},
           ${body.sortOrder ?? 0}
         )
       `
@@ -126,15 +138,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         sectionId?: string
         driveUrl?: string
         description?: string
+        mediaType?: string
         sortOrder?: number
       }>(req)
       if (!body.id) return json(res, 400, { error: 'id required' })
+      const mediaType = parseMediaType(body.mediaType)
+      if (!mediaType) {
+        return json(res, 400, { error: 'mediaType required (image or video)' })
+      }
       await sql`
         UPDATE gallery_items
         SET
           section_id = ${body.sectionId ?? ''},
           drive_url = ${(body.driveUrl ?? '').trim()},
           description = ${body.description?.trim() || null},
+          media_type = ${mediaType},
           sort_order = ${body.sortOrder ?? 0},
           updated_at = NOW()
         WHERE id = ${body.id}

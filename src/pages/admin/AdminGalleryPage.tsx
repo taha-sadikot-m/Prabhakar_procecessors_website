@@ -5,6 +5,7 @@ import {
   adminGetGallery,
   adminSaveGalleryItem,
   adminSaveGallerySection,
+  type GalleryMediaType,
 } from '../../lib/cms-api'
 import {
   AdminActions,
@@ -19,6 +20,7 @@ import {
   AdminModal,
   AdminPageHeader,
   AdminPanel,
+  AdminSelect,
   AdminSplit,
   AdminTextArea,
 } from './admin-ui'
@@ -29,6 +31,7 @@ type Item = {
   sectionId: string
   driveUrl: string
   description: string | null
+  mediaType: GalleryMediaType
   sortOrder: number
 }
 
@@ -40,8 +43,22 @@ type Section = {
   items: Item[]
 }
 
+const MEDIA_TYPE_OPTIONS = [
+  { value: 'video', label: 'Video' },
+  { value: 'image', label: 'Image' },
+] as const
+
+function asMediaType(value: string): GalleryMediaType {
+  return value === 'image' ? 'image' : 'video'
+}
+
 const emptySection = { title: '', body: '', sortOrder: 0 }
-const emptyItem = { driveUrl: '', description: '', sortOrder: 0 }
+const emptyItem = {
+  driveUrl: '',
+  description: '',
+  mediaType: 'video' as GalleryMediaType,
+  sortOrder: 0,
+}
 
 type Modal =
   | { type: 'none' }
@@ -253,9 +270,16 @@ export function AdminGalleryPage() {
                               alt={item.description ?? 'Gallery media'}
                             />
                             <div className="min-w-0 flex-1">
-                              <p className="font-sans text-sm font-medium text-ink">
-                                {item.description || 'Untitled media'}
-                              </p>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="font-sans text-sm font-medium text-ink">
+                                  {item.description || 'Untitled media'}
+                                </p>
+                                <span className="rounded-md border border-ink/10 bg-cream-dark/40 px-1.5 py-0.5 font-sans text-[10px] font-semibold tracking-[0.08em] text-ink-muted uppercase">
+                                  {item.mediaType === 'image'
+                                    ? 'Image'
+                                    : 'Video'}
+                                </span>
+                              </div>
                               <p className="mt-1 break-all font-mono text-xs text-ink-muted">
                                 {item.driveUrl}
                               </p>
@@ -268,6 +292,7 @@ export function AdminGalleryPage() {
                                 setItemForm({
                                   driveUrl: item.driveUrl,
                                   description: item.description ?? '',
+                                  mediaType: asMediaType(item.mediaType),
                                   sortOrder: item.sortOrder,
                                 })
                                 setModal({
@@ -381,6 +406,14 @@ export function AdminGalleryPage() {
             onChange={(v) => setItemForm((s) => ({ ...s, driveUrl: v }))}
             mono
           />
+          <AdminSelect
+            label="Media type"
+            value={itemForm.mediaType}
+            onChange={(v) =>
+              setItemForm((s) => ({ ...s, mediaType: asMediaType(v) }))
+            }
+            options={[...MEDIA_TYPE_OPTIONS]}
+          />
           <AdminField
             label="Description (optional)"
             value={itemForm.description}
@@ -400,16 +433,23 @@ export function AdminGalleryPage() {
         <AdminActions>
           <AdminButton
             className="mt-5"
-            disabled={busy || !itemForm.driveUrl.trim() || !selected}
+            disabled={
+              busy ||
+              !itemForm.driveUrl.trim() ||
+              !itemForm.mediaType ||
+              !selected
+            }
             onClick={() =>
               run(async () => {
                 if (!selected) return
+                const mediaType = asMediaType(itemForm.mediaType)
                 if (modal.type === 'editItem') {
                   await adminSaveGalleryItem('PUT', {
                     id: modal.itemId,
                     sectionId: selected.id,
                     driveUrl: itemForm.driveUrl,
                     description: itemForm.description || null,
+                    mediaType,
                     sortOrder: itemForm.sortOrder,
                   })
                 } else {
@@ -417,6 +457,7 @@ export function AdminGalleryPage() {
                     sectionId: selected.id,
                     driveUrl: itemForm.driveUrl,
                     description: itemForm.description || null,
+                    mediaType,
                     sortOrder: selected.items.length,
                   })
                 }
