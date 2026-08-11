@@ -128,23 +128,21 @@ function InlineDrivePlayer({
   poster,
   label,
   wantPlaying,
-  soundOn,
   reloadKey = 0,
   onStatusChange,
+  onReadySize,
 }: {
   videoUrl: string
   poster: string
   label: string
   wantPlaying: boolean
-  soundOn: boolean
   reloadKey?: number
   onStatusChange?: (status: PlayerStatus) => void
+  onReadySize?: (width: number, height: number) => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [status, setStatus] = useState<PlayerStatus>('loading')
   const statusRef = useRef<PlayerStatus>('loading')
-  const soundOnRef = useRef(soundOn)
-  soundOnRef.current = soundOn
 
   function setPlayerStatus(next: PlayerStatus) {
     statusRef.current = next
@@ -152,14 +150,14 @@ function InlineDrivePlayer({
     onStatusChange?.(next)
   }
 
-  function applySound(el: HTMLVideoElement, withSound: boolean) {
-    el.muted = !withSound
-    el.defaultMuted = !withSound
-    el.volume = withSound ? 1 : 0
+  function applyMuted(el: HTMLVideoElement) {
+    el.muted = true
+    el.defaultMuted = true
+    el.volume = 0
   }
 
   function tryPlay(el: HTMLVideoElement) {
-    applySound(el, soundOnRef.current)
+    applyMuted(el)
     void el
       .play()
       .then(() => setPlayerStatus('playing'))
@@ -167,7 +165,7 @@ function InlineDrivePlayer({
         window.setTimeout(() => {
           const node = videoRef.current
           if (!node || !wantPlaying) return
-          applySound(node, soundOnRef.current)
+          applyMuted(node)
           void node
             .play()
             .then(() => setPlayerStatus('playing'))
@@ -179,7 +177,7 @@ function InlineDrivePlayer({
   useLayoutEffect(() => {
     const el = videoRef.current
     if (!el) return
-    applySound(el, soundOn)
+    applyMuted(el)
     if (wantPlaying) {
       if (el.readyState >= 2) tryPlay(el)
       else setPlayerStatus('loading')
@@ -188,12 +186,6 @@ function InlineDrivePlayer({
       if (statusRef.current !== 'error') setPlayerStatus('paused')
     }
   }, [wantPlaying, videoUrl, reloadKey])
-
-  useEffect(() => {
-    const el = videoRef.current
-    if (!el) return
-    applySound(el, soundOn)
-  }, [soundOn])
 
   useEffect(() => {
     setPlayerStatus('loading')
@@ -238,12 +230,19 @@ function InlineDrivePlayer({
         }`}
         src={videoUrl}
         poster={poster || undefined}
-        muted={!soundOn}
+        muted
+        autoPlay
         loop
         playsInline
         preload="auto"
         controls={false}
         aria-label={label}
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget
+          if (el.videoWidth && el.videoHeight) {
+            onReadySize?.(el.videoWidth, el.videoHeight)
+          }
+        }}
         onLoadStart={() => {
           if (wantPlaying) setPlayerStatus('loading')
         }}
@@ -267,20 +266,16 @@ function InlineDrivePlayer({
 
 function GalleryTile({
   entry,
-  playing,
-  onTogglePlay,
   onOpenStill,
 }: {
   entry: GalleryEntry
-  playing: boolean
-  onTogglePlay: () => void
   onOpenStill: () => void
 }) {
+  const tileRef = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
   const [ratio, setRatio] = useState<string | null>(null)
-  const [activated, setActivated] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
   const [playerStatus, setPlayerStatus] = useState<PlayerStatus>('loading')
-  const [soundOn, setSoundOn] = useState(false)
   const [coverReady, setCoverReady] = useState(false)
   const urls = resolveDriveUrls(entry.item.driveUrl)
   const fileId = entry.item.fileId || urls.fileId
@@ -294,67 +289,53 @@ function GalleryTile({
     ? urls.thumbUrl || entry.item.thumbUrl || urls.viewUrl
     : urls.viewUrl || entry.item.viewUrl || urls.thumbUrl
   const label = entry.item.description?.trim() || 'Gallery media'
-  const showPlayer = Boolean(isVideo && activated && videoUrl)
-  const showCoverLoading = !showPlayer && !coverReady
+  const showPlayer = Boolean(isVideo && videoUrl)
+  const showCoverLoading = showPlayer
+    ? inView && playerStatus === 'loading'
+    : !coverReady
 
   useEffect(() => {
     setCoverReady(false)
-  }, [imgSrc, videoUrl, isVideo])
+  }, [imgSrc, isVideo])
 
-  function activate() {
-    if (!isVideo) {
-      onOpenStill()
-      return
-    }
-    if (!activated) {
-      setActivated(true)
-      setPlayerStatus('loading')
-      if (!playing) onTogglePlay()
-      return
-    }
-    if (playerStatus === 'error') {
-      setReloadKey((k) => k + 1)
-      setPlayerStatus('loading')
-      if (!playing) onTogglePlay()
-      return
-    }
-    onTogglePlay()
+  useEffect(() => {
+    const node = tileRef.current
+    if (!node || !showPlayer) return
+    const io = new IntersectionObserver(
+      ([ioEntry]) => setInView(Boolean(ioEntry?.isIntersecting)),
+      { threshold: 0.2, rootMargin: '80px 0px' },
+    )
+    io.observe(node)
+    return () => io.disconnect()
+  }, [showPlayer])
+
+  function retryVideo() {
+    if (playerStatus !== 'error') return
+    setReloadKey((k) => k + 1)
+    setPlayerStatus('loading')
   }
-
-  const chipLabel = !showPlayer
-    ? null
-    : playerStatus === 'error'
-      ? 'Tap to retry'
-      : playing
-        ? playerStatus === 'loading'
-          ? 'Loading…'
-          : null
-        : playerStatus === 'paused'
-          ? 'Paused'
-          : null
 
   return (
     <figure className="mb-5 break-inside-avoid sm:mb-6 lg:mb-7">
       <div
-        role="button"
-        tabIndex={0}
-        onClick={activate}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            activate()
-          }
+        ref={tileRef}
+        role={isVideo ? (playerStatus === 'error' ? 'button' : undefined) : 'button'}
+        tabIndex={isVideo && playerStatus !== 'error' ? undefined : 0}
+        onClick={() => {
+          if (isVideo) retryVideo()
+          else onOpenStill()
         }}
-        aria-label={
-          isVideo
-            ? playing
-              ? `Pause ${label}`
-              : `Play ${label}`
-            : `Open ${label}`
-        }
-        aria-pressed={isVideo ? playing : undefined}
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return
+          e.preventDefault()
+          if (isVideo) retryVideo()
+          else onOpenStill()
+        }}
+        aria-label={isVideo ? label : `Open ${label}`}
         aria-busy={showCoverLoading}
-        className="group relative block w-full cursor-pointer overflow-hidden rounded-xl bg-cream-dark text-left shadow-[0_1px_2px_rgba(45,27,14,0.04),0_8px_24px_rgba(45,27,14,0.06)] outline-none focus-visible:ring-2 focus-visible:ring-mahogany/50 focus-visible:ring-offset-2 focus-visible:ring-offset-cream md:rounded-2xl"
+        className={`group relative block w-full overflow-hidden rounded-xl bg-cream-dark text-left shadow-[0_1px_2px_rgba(45,27,14,0.04),0_8px_24px_rgba(45,27,14,0.06)] outline-none focus-visible:ring-2 focus-visible:ring-mahogany/50 focus-visible:ring-offset-2 focus-visible:ring-offset-cream md:rounded-2xl ${
+          isVideo && playerStatus !== 'error' ? '' : 'cursor-pointer'
+        }`}
         style={{ aspectRatio: ratio ?? '4 / 5' }}
       >
         {showPlayer ? (
@@ -362,31 +343,10 @@ function GalleryTile({
             videoUrl={videoUrl!}
             poster={imgSrc}
             label={label}
-            wantPlaying={playing}
-            soundOn={soundOn}
+            wantPlaying={inView}
             reloadKey={reloadKey}
             onStatusChange={setPlayerStatus}
-          />
-        ) : isVideo && videoUrl ? (
-          <video
-            src={videoUrl}
-            muted
-            playsInline
-            preload="metadata"
-            className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
-            onLoadedMetadata={(e) => {
-              const el = e.currentTarget
-              if (el.videoWidth && el.videoHeight) {
-                setRatio(`${el.videoWidth} / ${el.videoHeight}`)
-              }
-              if (el.currentTime < 0.05) el.currentTime = 0.1
-              else setCoverReady(true)
-            }}
-            onSeeked={() => setCoverReady(true)}
-            onLoadedData={(e) => {
-              if (e.currentTarget.currentTime >= 0.05) setCoverReady(true)
-            }}
-            onError={() => setCoverReady(true)}
+            onReadySize={(w, h) => setRatio(`${w} / ${h}`)}
           />
         ) : (
           <img
@@ -419,69 +379,13 @@ function GalleryTile({
             </span>
           </span>
         )}
-        {!playing && !showCoverLoading && (
+        {!showPlayer && !showCoverLoading && (
           <span
             className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#2d1b0e]/55 via-[#2d1b0e]/10 to-transparent opacity-80 transition duration-500 group-hover:opacity-100"
             aria-hidden="true"
           />
         )}
-        {isVideo && !playing && (
-          <span
-            className={`pointer-events-none absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/40 bg-mahogany/90 text-cream shadow-[0_8px_24px_rgba(45,27,14,0.28)] transition duration-300 group-hover:scale-105 group-hover:bg-mahogany ${
-              showCoverLoading ? 'opacity-50' : ''
-            }`}
-            aria-hidden="true"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="ml-0.5 h-6 w-6 fill-current"
-              aria-hidden="true"
-            >
-              <path d="M8 5.14v13.72L19 12 8 5.14z" />
-            </svg>
-          </span>
-        )}
-        {chipLabel && (
-          <span
-            className={`pointer-events-none absolute top-3 z-10 rounded-md border border-cream/25 bg-[#2d1b0e]/55 px-2 py-1 font-sans text-[9px] font-semibold tracking-[0.14em] text-cream uppercase backdrop-blur-sm ${
-              showPlayer ? 'right-14' : 'right-3'
-            }`}
-          >
-            {chipLabel}
-          </span>
-        )}
-        {showPlayer && (
-          <button
-            type="button"
-            className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-cream/30 bg-[#2d1b0e]/65 text-cream shadow-[0_4px_12px_rgba(45,27,14,0.2)] backdrop-blur-sm transition hover:bg-[#2d1b0e]/85 focus-visible:ring-2 focus-visible:ring-cream/50 focus-visible:outline-none"
-            aria-label={soundOn ? 'Mute video' : 'Unmute video'}
-            aria-pressed={soundOn}
-            onClick={(e) => {
-              e.stopPropagation()
-              setSoundOn((on) => !on)
-            }}
-            onKeyDown={(e) => e.stopPropagation()}
-          >
-            {soundOn ? (
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4 fill-current"
-                aria-hidden="true"
-              >
-                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.3-3.9v7.8A4.5 4.5 0 0 0 16.5 12zM14 3.2v2.1a6.9 6.9 0 0 1 0 13.4v2.1A8.9 8.9 0 0 0 14 3.2z" />
-              </svg>
-            ) : (
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4 fill-current"
-                aria-hidden="true"
-              >
-                <path d="M16.5 12a4.5 4.5 0 0 0-2.3-3.9v2.4l2.2 2.2c.06-.23.1-.46.1-.7zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12c0-3.53-2.05-6.56-5-8.04v2.21A6.9 6.9 0 0 1 19 12zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z" />
-              </svg>
-            )}
-          </button>
-        )}
-        {!playing && entry.item.description && (
+        {entry.item.description && (
           <span className="pointer-events-none absolute inset-x-0 bottom-0 z-10 translate-y-1 px-4 pb-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <span className="line-clamp-2 font-sans text-xs leading-relaxed text-cream/95 md:text-sm">
               {entry.item.description}
@@ -495,13 +399,9 @@ function GalleryTile({
 
 function GalleryLookbook({
   entries,
-  playingId,
-  onTogglePlay,
   onOpenStill,
 }: {
   entries: GalleryEntry[]
-  playingId: string | null
-  onTogglePlay: (id: string) => void
   onOpenStill: (index: number) => void
 }) {
   const reduceMotion = useReducedMotion()
@@ -525,8 +425,6 @@ function GalleryLookbook({
         <GalleryTile
           key={entry.item.id}
           entry={entry}
-          playing={playingId === entry.item.id}
-          onTogglePlay={() => onTogglePlay(entry.item.id)}
           onOpenStill={() => onOpenStill(index)}
         />
       ))}
@@ -743,7 +641,6 @@ function GalleryClosing() {
 export function GalleryPage() {
   const [items, setItems] = useState<GalleryItemDto[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  const [playingId, setPlayingId] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -764,15 +661,9 @@ export function GalleryPage() {
     [items],
   )
 
-  function togglePlay(id: string) {
-    setLightboxIndex(null)
-    setPlayingId((prev) => (prev === id ? null : id))
-  }
-
   function openStill(index: number) {
     const entry = entries[index]
     if (!entry || isPlayableVideo(entry)) return
-    setPlayingId(null)
     setLightboxIndex(index)
   }
 
@@ -789,12 +680,7 @@ export function GalleryPage() {
       ) : (
         <section className="border-t border-line/40 bg-cream">
           <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16 lg:px-10">
-            <GalleryLookbook
-              entries={entries}
-              playingId={playingId}
-              onTogglePlay={togglePlay}
-              onOpenStill={openStill}
-            />
+            <GalleryLookbook entries={entries} onOpenStill={openStill} />
           </div>
         </section>
       )}
