@@ -2,7 +2,7 @@ export const company = {
   name: 'Prabhakar Processors',
   legalName: 'Prabhakar Processors Pvt Ltd',
   since: 2009,
-  tagline: 'Superb Quality. Remarkable Pricing.',
+  tagline: 'Fabric of India. Processed to Perfection.',
   phone: '+91 9909970505',
   email: 'prabhakardyeing@gmail.com',
   website: 'https://prabhakarprocessors.com',

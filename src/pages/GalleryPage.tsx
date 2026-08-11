@@ -14,11 +14,7 @@ import {
 } from 'framer-motion'
 import { FadeIn } from '../components/motion/FadeIn'
 import { SectionCta } from '../components/SectionCta'
-import {
-  fetchPublicGallery,
-  type GalleryItemDto,
-  type GallerySectionDto,
-} from '../lib/cms-api'
+import { fetchPublicGallery, type GalleryItemDto } from '../lib/cms-api'
 import { driveVideoUrl, resolveDriveUrls } from '../lib/drive-client'
 import { galleryPage, servicesPage } from '../data/content'
 
@@ -27,8 +23,6 @@ const HEADING = '#20222D'
 
 type GalleryEntry = {
   item: GalleryItemDto
-  sectionId: string
-  sectionTitle: string
 }
 
 const masonryClass =
@@ -48,22 +42,10 @@ function DiamondRule({ className = '' }: { className?: string }) {
   )
 }
 
-function flattenGallery(sections: GallerySectionDto[]): GalleryEntry[] {
-  return sections.flatMap((section) =>
-    section.items.map((item) => ({
-      item,
-      sectionId: section.id,
-      sectionTitle: section.title,
-    })),
-  )
-}
-
 function GalleryHero({
   frameCount,
-  sectionCount,
 }: {
   frameCount: number | null
-  sectionCount: number | null
 }) {
   const reduceMotion = useReducedMotion()
   const sectionRef = useRef<HTMLElement>(null)
@@ -125,82 +107,17 @@ function GalleryHero({
           </h1>
           <DiamondRule className="mt-6" />
           <p className="mt-6 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
-            A living lookbook from the mill floor — filter by process, or take in
-            the full run.
+            A living lookbook from the mill floor — colour, print, and finish
+            in frame.
           </p>
-          {frameCount !== null && sectionCount !== null && frameCount > 0 && (
+          {frameCount !== null && frameCount > 0 && (
             <p className="mt-5 font-sans text-[11px] font-medium tracking-[0.18em] text-mahogany/80 uppercase">
-              {frameCount} frames across {sectionCount} floors
+              {frameCount} frames
             </p>
           )}
         </FadeIn>
       </div>
     </section>
-  )
-}
-
-function GalleryFilterRail({
-  sections,
-  activeId,
-  onChange,
-  allCount,
-}: {
-  sections: GallerySectionDto[]
-  activeId: string
-  onChange: (id: string) => void
-  allCount: number
-}) {
-  return (
-    <nav
-      aria-label="Gallery sections"
-      className="sticky top-[68px] z-40 border-b border-mahogany/20 bg-cream/95 backdrop-blur-md sm:top-[72px]"
-    >
-      <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-5 py-3 [-ms-overflow-style:none] [scrollbar-width:none] md:px-8 lg:px-10 [&::-webkit-scrollbar]:hidden">
-        <FilterTab
-          label="All"
-          count={allCount}
-          isActive={activeId === 'all'}
-          onClick={() => onChange('all')}
-        />
-        {sections.map((section) => (
-          <FilterTab
-            key={section.id}
-            label={section.title}
-            count={section.items.length}
-            isActive={activeId === section.id}
-            onClick={() => onChange(section.id)}
-          />
-        ))}
-      </div>
-    </nav>
-  )
-}
-
-function FilterTab({
-  label,
-  count,
-  isActive,
-  onClick,
-}: {
-  label: string
-  count: number
-  isActive: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`relative shrink-0 rounded-lg px-4 py-2 font-sans text-[11px] font-semibold tracking-[0.16em] uppercase transition-colors ${
-        isActive
-          ? 'bg-cream-dark/80 text-mahogany'
-          : 'text-ink/55 hover:bg-cream-dark/40 hover:text-ink'
-      }`}
-      aria-pressed={isActive}
-    >
-      {label}
-      <span className="ml-1.5 font-medium opacity-60">({count})</span>
-    </button>
   )
 }
 
@@ -350,13 +267,11 @@ function InlineDrivePlayer({
 
 function GalleryTile({
   entry,
-  showSectionChip,
   playing,
   onTogglePlay,
   onOpenStill,
 }: {
   entry: GalleryEntry
-  showSectionChip: boolean
   playing: boolean
   onTogglePlay: () => void
   onOpenStill: () => void
@@ -366,6 +281,7 @@ function GalleryTile({
   const [reloadKey, setReloadKey] = useState(0)
   const [playerStatus, setPlayerStatus] = useState<PlayerStatus>('loading')
   const [soundOn, setSoundOn] = useState(false)
+  const [coverReady, setCoverReady] = useState(false)
   const urls = resolveDriveUrls(entry.item.driveUrl)
   const fileId = entry.item.fileId || urls.fileId
   const isVideo = entry.item.mediaType === 'video'
@@ -374,9 +290,16 @@ function GalleryTile({
       urls.videoUrl ||
       (fileId ? driveVideoUrl(fileId) : null)
     : null
-  const imgSrc = entry.item.thumbUrl || urls.thumbUrl || urls.viewUrl
-  const label = entry.item.description?.trim() || entry.sectionTitle
+  const imgSrc = isVideo
+    ? urls.thumbUrl || entry.item.thumbUrl || urls.viewUrl
+    : urls.viewUrl || entry.item.viewUrl || urls.thumbUrl
+  const label = entry.item.description?.trim() || 'Gallery media'
   const showPlayer = Boolean(isVideo && activated && videoUrl)
+  const showCoverLoading = !showPlayer && !coverReady
+
+  useEffect(() => {
+    setCoverReady(false)
+  }, [imgSrc, videoUrl, isVideo])
 
   function activate() {
     if (!isVideo) {
@@ -430,6 +353,7 @@ function GalleryTile({
             : `Open ${label}`
         }
         aria-pressed={isVideo ? playing : undefined}
+        aria-busy={showCoverLoading}
         className="group relative block w-full cursor-pointer overflow-hidden rounded-xl bg-cream-dark text-left shadow-[0_1px_2px_rgba(45,27,14,0.04),0_8px_24px_rgba(45,27,14,0.06)] outline-none focus-visible:ring-2 focus-visible:ring-mahogany/50 focus-visible:ring-offset-2 focus-visible:ring-offset-cream md:rounded-2xl"
         style={{ aspectRatio: ratio ?? '4 / 5' }}
       >
@@ -443,10 +367,32 @@ function GalleryTile({
             reloadKey={reloadKey}
             onStatusChange={setPlayerStatus}
           />
+        ) : isVideo && videoUrl ? (
+          <video
+            src={videoUrl}
+            muted
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
+            onLoadedMetadata={(e) => {
+              const el = e.currentTarget
+              if (el.videoWidth && el.videoHeight) {
+                setRatio(`${el.videoWidth} / ${el.videoHeight}`)
+              }
+              if (el.currentTime < 0.05) el.currentTime = 0.1
+              else setCoverReady(true)
+            }}
+            onSeeked={() => setCoverReady(true)}
+            onLoadedData={(e) => {
+              if (e.currentTarget.currentTime >= 0.05) setCoverReady(true)
+            }}
+            onError={() => setCoverReady(true)}
+          />
         ) : (
           <img
             src={imgSrc}
             alt={entry.item.description ?? ''}
+            referrerPolicy="no-referrer"
             className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
             loading="lazy"
             onLoad={(e) => {
@@ -454,23 +400,36 @@ function GalleryTile({
               if (el.naturalWidth && el.naturalHeight) {
                 setRatio(`${el.naturalWidth} / ${el.naturalHeight}`)
               }
+              setCoverReady(true)
             }}
+            onError={() => setCoverReady(true)}
           />
         )}
-        {!playing && (
+        {showCoverLoading && (
+          <span
+            className="pointer-events-none absolute inset-0 z-[5] bg-cream-dark"
+            aria-hidden="true"
+          >
+            <span className="absolute inset-0 animate-pulse bg-cream-dark" />
+            <span className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-2">
+              <span className="inline-block size-4 animate-spin rounded-full border-2 border-mahogany/20 border-t-mahogany" />
+              <span className="font-sans text-[9px] font-semibold tracking-[0.14em] text-mahogany uppercase">
+                {isVideo ? 'Loading video' : 'Loading photo'}
+              </span>
+            </span>
+          </span>
+        )}
+        {!playing && !showCoverLoading && (
           <span
             className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#2d1b0e]/55 via-[#2d1b0e]/10 to-transparent opacity-80 transition duration-500 group-hover:opacity-100"
             aria-hidden="true"
           />
         )}
-        {showSectionChip && (
-          <span className="pointer-events-none absolute top-3 left-3 z-10 max-w-[70%] truncate rounded-md border border-cream/25 bg-[#2d1b0e]/55 px-2.5 py-1 font-sans text-[9px] font-semibold tracking-[0.16em] text-cream uppercase backdrop-blur-sm">
-            {entry.sectionTitle}
-          </span>
-        )}
         {isVideo && !playing && (
           <span
-            className="pointer-events-none absolute top-1/2 left-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/40 bg-mahogany/90 text-cream shadow-[0_8px_24px_rgba(45,27,14,0.28)] transition duration-300 group-hover:scale-105 group-hover:bg-mahogany"
+            className={`pointer-events-none absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/40 bg-mahogany/90 text-cream shadow-[0_8px_24px_rgba(45,27,14,0.28)] transition duration-300 group-hover:scale-105 group-hover:bg-mahogany ${
+              showCoverLoading ? 'opacity-50' : ''
+            }`}
             aria-hidden="true"
           >
             <svg
@@ -536,15 +495,11 @@ function GalleryTile({
 
 function GalleryLookbook({
   entries,
-  showSectionChip,
-  filterKey,
   playingId,
   onTogglePlay,
   onOpenStill,
 }: {
   entries: GalleryEntry[]
-  showSectionChip: boolean
-  filterKey: string
   playingId: string | null
   onTogglePlay: (id: string) => void
   onOpenStill: (index: number) => void
@@ -554,33 +509,28 @@ function GalleryLookbook({
   if (entries.length === 0) {
     return (
       <p className="py-16 text-center font-sans text-sm text-ink/40">
-        Media for this section will appear here.
+        Media will appear here.
       </p>
     )
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={filterKey}
-        className={masonryClass}
-        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
-        transition={{ duration: reduceMotion ? 0 : 0.28, ease: 'easeOut' }}
-      >
-        {entries.map((entry, index) => (
-          <GalleryTile
-            key={entry.item.id}
-            entry={entry}
-            showSectionChip={showSectionChip}
-            playing={playingId === entry.item.id}
-            onTogglePlay={() => onTogglePlay(entry.item.id)}
-            onOpenStill={() => onOpenStill(index)}
-          />
-        ))}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      className={masonryClass}
+      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.28, ease: 'easeOut' }}
+    >
+      {entries.map((entry, index) => (
+        <GalleryTile
+          key={entry.item.id}
+          entry={entry}
+          playing={playingId === entry.item.id}
+          onTogglePlay={() => onTogglePlay(entry.item.id)}
+          onOpenStill={() => onOpenStill(index)}
+        />
+      ))}
+    </motion.div>
   )
 }
 
@@ -620,10 +570,14 @@ function GalleryLightbox({
 
   const urls = entry ? resolveDriveUrls(entry.item.driveUrl) : null
   const imgSrc = entry
-    ? entry.item.thumbUrl || urls?.thumbUrl || urls?.viewUrl || ''
+    ? urls?.viewUrl ||
+      entry.item.viewUrl ||
+      urls?.thumbUrl ||
+      entry.item.thumbUrl ||
+      ''
     : ''
   const label = entry
-    ? entry.item.description?.trim() || entry.sectionTitle
+    ? entry.item.description?.trim() || 'Gallery media'
     : 'Gallery media'
   const canNavigate = entries.length > 1
 
@@ -663,7 +617,7 @@ function GalleryLightbox({
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-cream/55 uppercase">
-              {entry.sectionTitle}
+              Gallery
               {canNavigate && (
                 <span className="ml-2 text-cream/35">
                   {index + 1} / {entries.length}
@@ -721,6 +675,7 @@ function GalleryLightbox({
             <img
               src={imgSrc}
               alt={entry.item.description ?? ''}
+              referrerPolicy="no-referrer"
               className="absolute inset-0 h-full w-full object-contain"
             />
           </div>
@@ -738,8 +693,8 @@ function GalleryEmpty() {
           Gallery coming into view
         </p>
         <p className="mx-auto mt-4 max-w-md font-sans text-sm text-ink-muted">
-          Sections and Drive media are managed from the admin panel. Check back
-          soon, or get in touch for a mill tour.
+          Drive media is managed from the admin panel. Check back soon, or get
+          in touch for a mill tour.
         </p>
         <div className="mt-10 flex justify-center">
           <SectionCta label="Contact Us" to="/contact" />
@@ -786,8 +741,7 @@ function GalleryClosing() {
 }
 
 export function GalleryPage() {
-  const [sections, setSections] = useState<GallerySectionDto[] | null>(null)
-  const [activeId, setActiveId] = useState('all')
+  const [items, setItems] = useState<GalleryItemDto[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [playingId, setPlayingId] = useState<string | null>(null)
 
@@ -795,30 +749,20 @@ export function GalleryPage() {
     let cancelled = false
     fetchPublicGallery()
       .then((data) => {
-        if (!cancelled) setSections(data.sections ?? [])
+        if (!cancelled) setItems(data.items ?? [])
       })
       .catch(() => {
-        if (!cancelled) setSections([])
+        if (!cancelled) setItems([])
       })
     return () => {
       cancelled = true
     }
   }, [])
 
-  const allEntries = useMemo(
-    () => (sections ? flattenGallery(sections) : []),
-    [sections],
+  const entries = useMemo(
+    () => (items ? items.map((item) => ({ item })) : []),
+    [items],
   )
-
-  const visibleEntries = useMemo(() => {
-    if (activeId === 'all') return allEntries
-    return allEntries.filter((entry) => entry.sectionId === activeId)
-  }, [activeId, allEntries])
-
-  const activeSectionBody =
-    activeId === 'all'
-      ? null
-      : (sections?.find((s) => s.id === activeId)?.body ?? null)
 
   function togglePlay(id: string) {
     setLightboxIndex(null)
@@ -826,7 +770,7 @@ export function GalleryPage() {
   }
 
   function openStill(index: number) {
-    const entry = visibleEntries[index]
+    const entry = entries[index]
     if (!entry || isPlayableVideo(entry)) return
     setPlayingId(null)
     setLightboxIndex(index)
@@ -834,60 +778,35 @@ export function GalleryPage() {
 
   return (
     <main className="bg-cream">
-      <GalleryHero
-        frameCount={sections ? allEntries.length : null}
-        sectionCount={sections ? sections.length : null}
-      />
+      <GalleryHero frameCount={items ? entries.length : null} />
 
-      {sections === null ? (
+      {items === null ? (
         <div className="px-5 py-20 text-center font-sans text-sm text-ink/40">
           Loading gallery…
         </div>
-      ) : sections.length === 0 ? (
+      ) : items.length === 0 ? (
         <GalleryEmpty />
       ) : (
-        <>
-          <GalleryFilterRail
-            sections={sections}
-            activeId={activeId}
-            onChange={(id) => {
-              setActiveId(id)
-              setLightboxIndex(null)
-              setPlayingId(null)
-            }}
-            allCount={allEntries.length}
-          />
-
-          <section className="border-t border-line/40 bg-cream">
-            <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16 lg:px-10">
-              {activeSectionBody && (
-                <FadeIn className="mb-10 max-w-xl">
-                  <p className="font-sans text-sm leading-relaxed text-ink-muted md:text-base">
-                    {activeSectionBody}
-                  </p>
-                </FadeIn>
-              )}
-              <GalleryLookbook
-                entries={visibleEntries}
-                showSectionChip={activeId === 'all'}
-                filterKey={activeId}
-                playingId={playingId}
-                onTogglePlay={togglePlay}
-                onOpenStill={openStill}
-              />
-            </div>
-          </section>
-        </>
+        <section className="border-t border-line/40 bg-cream">
+          <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16 lg:px-10">
+            <GalleryLookbook
+              entries={entries}
+              playingId={playingId}
+              onTogglePlay={togglePlay}
+              onOpenStill={openStill}
+            />
+          </div>
+        </section>
       )}
 
       <GalleryClosing />
 
       <AnimatePresence>
         {lightboxIndex !== null &&
-          visibleEntries[lightboxIndex] &&
-          !isPlayableVideo(visibleEntries[lightboxIndex]) && (
+          entries[lightboxIndex] &&
+          !isPlayableVideo(entries[lightboxIndex]) && (
             <GalleryLightbox
-              entries={visibleEntries}
+              entries={entries}
               index={lightboxIndex}
               onClose={() => setLightboxIndex(null)}
               onNavigate={setLightboxIndex}

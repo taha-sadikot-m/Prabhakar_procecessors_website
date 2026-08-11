@@ -2,6 +2,7 @@
  * Local Express bridge that mounts the same Vercel api handlers.
  * Used by `npm run dev` so /api works without the Vercel CLI.
  */
+import http from 'node:http'
 import express from 'express'
 import health from '../api/_lib/routes/health.ts'
 import services from '../api/_lib/routes/services.ts'
@@ -66,6 +67,30 @@ app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'API route not found' })
 })
 
-app.listen(PORT, () => {
+const server = http.createServer(app)
+
+server.on('error', (err) => {
+  const code = err && typeof err === 'object' && 'code' in err ? err.code : ''
+  if (code === 'EADDRINUSE') {
+    console.error(
+      `[dev-api] failed to bind :${PORT}: listen EADDRINUSE: address already in use ::: ${PORT}`,
+    )
+    console.error(
+      '[dev-api] Free the port or set DEV_API_PORT to a free port, then retry.',
+    )
+    process.exit(1)
+  }
+  console.error('[dev-api]', err)
+  process.exit(1)
+})
+
+server.listen(PORT, () => {
   console.log(`[dev-api] listening on http://localhost:${PORT}`)
 })
+
+function shutdown() {
+  server.close(() => process.exit(0))
+}
+
+process.on('SIGINT', shutdown)
+process.on('SIGTERM', shutdown)

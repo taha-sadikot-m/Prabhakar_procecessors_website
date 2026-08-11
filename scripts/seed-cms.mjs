@@ -404,19 +404,8 @@ async function ensureSchema() {
     )
   `
   await sql`
-    CREATE TABLE IF NOT EXISTS gallery_sections (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      body TEXT,
-      sort_order INT NOT NULL DEFAULT 0,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `
-  await sql`
     CREATE TABLE IF NOT EXISTS gallery_items (
       id TEXT PRIMARY KEY,
-      section_id TEXT NOT NULL REFERENCES gallery_sections(id) ON DELETE CASCADE,
       drive_url TEXT NOT NULL,
       description TEXT,
       media_type TEXT NOT NULL DEFAULT 'video',
@@ -428,6 +417,51 @@ async function ensureSchema() {
   await sql`
     ALTER TABLE gallery_items
     ADD COLUMN IF NOT EXISTS media_type TEXT NOT NULL DEFAULT 'video'
+  `
+  const sectionCol = await sql`
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'gallery_items'
+      AND column_name = 'section_id'
+    LIMIT 1
+  `
+  if (sectionCol.length > 0) {
+    await sql`
+      ALTER TABLE gallery_items
+      DROP CONSTRAINT IF EXISTS gallery_items_section_id_fkey
+    `
+    const sectionsTable = await sql`
+      SELECT 1
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+        AND table_name = 'gallery_sections'
+      LIMIT 1
+    `
+    if (sectionsTable.length > 0) {
+      await sql`
+        WITH ranked AS (
+          SELECT
+            gi.id,
+            ROW_NUMBER() OVER (
+              ORDER BY COALESCE(gs.sort_order, 0) ASC, gi.sort_order ASC, gi.id
+            ) - 1 AS new_order
+          FROM gallery_items gi
+          LEFT JOIN gallery_sections gs ON gs.id = gi.section_id
+        )
+        UPDATE gallery_items gi
+        SET sort_order = ranked.new_order
+        FROM ranked
+        WHERE gi.id = ranked.id
+      `
+    }
+    await sql`ALTER TABLE gallery_items DROP COLUMN IF EXISTS section_id`
+  }
+  await sql`DROP TABLE IF EXISTS gallery_sections`
+  await sql`DROP INDEX IF EXISTS idx_gallery_items_section`
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_gallery_items_sort
+    ON gallery_items (sort_order)
   `
   await sql`
     CREATE TABLE IF NOT EXISTS testimonials (
@@ -543,28 +577,17 @@ async function main() {
   }
   console.log('Testimonials seeded')
 
+  let galleryIndex = 0
   for (const section of gallerySections) {
-    await sql`
-      INSERT INTO gallery_sections (id, title, body, sort_order)
-      VALUES (${section.id}, ${section.title}, ${section.body}, ${section.sort})
-      ON CONFLICT (id) DO UPDATE SET
-        title = EXCLUDED.title,
-        body = EXCLUDED.body,
-        sort_order = EXCLUDED.sort_order,
-        updated_at = NOW()
-    `
-    for (let i = 0; i < section.items.length; i++) {
-      const item = section.items[i]
-      // Browser-safe H.264 served from /public after `npm run gallery:transcode`.
-      // Original Drive id kept in seed data for re-transcode; CMS stores playable URL.
+    for (const item of section.items) {
       const driveUrl = galleryMediaUrl(item)
       const mediaType = item.mediaType === 'image' ? 'image' : 'video'
+      const sortOrder = galleryIndex
+      galleryIndex += 1
       await sql`
-        INSERT INTO gallery_items (id, section_id, drive_url, description, media_type, sort_order)
-        VALUES (${item.id}, ${section.id}, ${driveUrl}, ${item.description}, ${mediaType}, ${i})
+        INSERT INTO gallery_items (id, drive_url, description, media_type, sort_order)
+        VALUES (${item.id}, ${driveUrl}, ${item.description}, ${mediaType}, ${sortOrder})
         ON CONFLICT (id) DO UPDATE SET
-          section_id = EXCLUDED.section_id,
-          drive_url = EXCLUDED.drive_url,
           description = EXCLUDED.description,
           media_type = EXCLUDED.media_type,
           sort_order = EXCLUDED.sort_order,
@@ -572,7 +595,7 @@ async function main() {
       `
     }
   }
-  console.log(`Gallery seeded (${gallerySections.length} sections)`)
+  console.log(`Gallery seeded (${galleryIndex} items)`)
 
   const blogPosts = JSON.parse(
     readFileSync(join(__dirname, 'blog-posts-seed.json'), 'utf8'),

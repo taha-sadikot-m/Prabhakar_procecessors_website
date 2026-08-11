@@ -65,8 +65,8 @@ export function resolveDriveUrls(driveUrl: string) {
   return {
     fileId: id,
     previewUrl: drivePreviewUrl(id),
-    viewUrl: driveViewUrl(id),
-    thumbUrl: driveThumbnailUrl(id),
+    viewUrl: driveVideoUrl(id),
+    thumbUrl: `${driveVideoUrl(id)}&thumb=1`,
     videoUrl: driveVideoUrl(id),
   }
 }

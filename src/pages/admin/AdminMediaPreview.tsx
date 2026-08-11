@@ -58,9 +58,12 @@ function ImagePreview({ src, alt }: { src: string; alt: string }) {
 }
 
 function DrivePreview({ src, alt }: { src: string; alt: string }) {
-  const [mode, setMode] = useState<'image' | 'embed' | 'unavailable'>('image')
+  const [mode, setMode] = useState<'image' | 'video' | 'embed' | 'unavailable'>(
+    'image',
+  )
   const urls = resolveDriveUrls(src)
   const imgSrc = urls.thumbUrl || urls.viewUrl
+  const videoSrc = urls.videoUrl || urls.viewUrl
   const preview = urls.previewUrl
 
   useEffect(() => {
@@ -84,13 +87,31 @@ function DrivePreview({ src, alt }: { src: string; alt: string }) {
     )
   }
 
+  if (mode === 'video' && videoSrc) {
+    return (
+      <video
+        src={videoSrc}
+        muted
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 h-full w-full object-cover"
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget
+          if (el.currentTime < 0.05) el.currentTime = 0.1
+        }}
+        onError={() => setMode(urls.fileId ? 'embed' : 'unavailable')}
+      />
+    )
+  }
+
   return (
     <img
       src={imgSrc}
       alt={alt}
       loading="lazy"
+      referrerPolicy="no-referrer"
       className="absolute inset-0 h-full w-full object-cover"
-      onError={() => setMode(urls.fileId ? 'embed' : 'unavailable')}
+      onError={() => setMode(videoSrc ? 'video' : urls.fileId ? 'embed' : 'unavailable')}
     />
   )
 }

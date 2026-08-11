@@ -49,11 +49,12 @@ export type GalleryItemDto = {
   videoUrl?: string | null
 }
 
-export type GallerySectionDto = {
+export type AdminGalleryItemDto = {
   id: string
-  title: string
-  body: string | null
-  items: GalleryItemDto[]
+  driveUrl: string
+  description: string | null
+  mediaType: GalleryMediaType
+  sortOrder: number
 }
 
 export type TestimonialDto = {
@@ -109,7 +110,7 @@ export function fetchPublicServices() {
 }
 
 export function fetchPublicGallery() {
-  return request<{ sections: GallerySectionDto[] }>('/api/gallery')
+  return request<{ items: GalleryItemDto[] }>('/api/gallery')
 }
 
 export function fetchPublicTestimonials() {
@@ -188,39 +189,9 @@ export function adminDeleteCard(id: string) {
 }
 
 export function adminGetGallery() {
-  return request<{
-    sections: Array<{
-      id: string
-      title: string
-      body: string | null
-      sortOrder: number
-      items: Array<{
-        id: string
-        sectionId: string
-        driveUrl: string
-        description: string | null
-        mediaType: GalleryMediaType
-        sortOrder: number
-      }>
-    }>
-  }>('/api/admin/gallery', { auth: true })
-}
-
-export function adminSaveGallerySection(
-  method: 'POST' | 'PUT',
-  body: Record<string, unknown>,
-) {
-  return request<{ id?: string; ok?: boolean }>(
-    `/api/admin/gallery?action=section`,
-    { method, auth: true, body: JSON.stringify(body) },
-  )
-}
-
-export function adminDeleteGallerySection(id: string) {
-  return request<{ ok: boolean }>(
-    `/api/admin/gallery?action=section&id=${encodeURIComponent(id)}`,
-    { method: 'DELETE', auth: true },
-  )
+  return request<{ items: AdminGalleryItemDto[] }>('/api/admin/gallery', {
+    auth: true,
+  })
 }
 
 export function adminSaveGalleryItem(

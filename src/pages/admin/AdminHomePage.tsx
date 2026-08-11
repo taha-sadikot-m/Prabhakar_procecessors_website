@@ -18,7 +18,6 @@ export function AdminHomePage() {
   const [counts, setCounts] = useState({
     categories: 0,
     services: 0,
-    sections: 0,
     media: 0,
     quotes: 0,
     posts: 0,
@@ -50,7 +49,6 @@ export function AdminHomePage() {
         ]) => {
         if (cancelled) return
         const categories = services.categories ?? []
-        const sections = gallery.sections ?? []
         const posts = blog.posts ?? []
         setCounts({
           categories: categories.length,
@@ -58,8 +56,7 @@ export function AdminHomePage() {
             (n, c) => n + (c.services?.length ?? 0),
             0,
           ),
-          sections: sections.length,
-          media: sections.reduce((n, s) => n + (s.items?.length ?? 0), 0),
+          media: gallery.items?.length ?? 0,
           quotes: testimonials.quotes?.length ?? 0,
           posts: posts.length,
           publishedPosts: posts.filter((p) => p.published).length,
@@ -102,7 +99,7 @@ export function AdminHomePage() {
           <AdminStatCard
             label="Gallery"
             value={counts.media}
-            description={`${counts.sections} sections · Drive media on /gallery`}
+            description="Drive media on /gallery"
             to="/admin/gallery"
           />
           <AdminStatCard

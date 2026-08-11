@@ -75,8 +75,8 @@ export function resolveDriveUrls(driveUrl: string) {
   return {
     fileId: id,
     previewUrl: drivePreviewUrl(id),
-    viewUrl: driveViewUrl(id),
-    thumbUrl: driveThumbnailUrl(id),
+    viewUrl: driveVideoUrl(id),
+    thumbUrl: `${driveVideoUrl(id)}&thumb=1`,
     videoUrl: driveVideoUrl(id),
   }
 }
@@ -172,4 +172,38 @@ export async function fetchDriveMediaStream(
   }
 
   return res
+}
+
+const THUMB_UA =
+  'Mozilla/5.0 (compatible; PrabhakarProcessorsGallery/1.0)'
+
+async function fetchImageUrl(url: string): Promise<Response | null> {
+  const res = await fetch(url, {
+    headers: { 'User-Agent': THUMB_UA },
+    redirect: 'follow',
+  })
+  const contentType = res.headers.get('content-type') || ''
+  if (!res.ok || contentType.includes('text/html')) return null
+  if (!contentType.startsWith('image/') && !contentType.includes('octet-stream')) {
+    return null
+  }
+  return res
+}
+
+/** Server-side Drive still/cover image (browser thumbnail URLs are often blocked). */
+export async function fetchDriveThumbnailStream(fileId: string): Promise<Response> {
+  const id = encodeURIComponent(fileId)
+  const candidates = [
+    `https://drive.google.com/thumbnail?id=${id}&sz=w400`,
+    `https://drive.google.com/thumbnail?id=${id}&sz=w1280`,
+    `https://drive.google.com/thumbnail?id=${id}&sz=w1600`,
+    `https://lh3.googleusercontent.com/d/${id}=w400`,
+    `https://lh3.googleusercontent.com/d/${id}=w1600`,
+  ]
+  for (const url of candidates) {
+    const image = await fetchImageUrl(url)
+    if (image) return image
+  }
+
+  throw new Error('Drive thumbnail unavailable (file may not be public)')
 }

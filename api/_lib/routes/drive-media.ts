@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { Readable } from 'node:stream'
 import {
   fetchDriveMediaStream,
+  fetchDriveThumbnailStream,
   isValidDriveFileId,
 } from '../drive'
 import { handleOptions, json, setCors } from '../http'
@@ -11,6 +12,12 @@ function queryId(req: VercelRequest): string | null {
   const id = Array.isArray(raw) ? raw[0] : raw
   if (!id || typeof id !== 'string') return null
   return id
+}
+
+function queryFlag(req: VercelRequest, key: string): boolean {
+  const raw = req.query[key]
+  const value = Array.isArray(raw) ? raw[0] : raw
+  return value === '1' || value === 'true'
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -25,14 +32,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const wantThumb = queryFlag(req, 'thumb')
     const rangeHeader =
       typeof req.headers.range === 'string' ? req.headers.range : undefined
-    const upstream = await fetchDriveMediaStream(fileId, rangeHeader)
+    const upstream = wantThumb
+      ? await fetchDriveThumbnailStream(fileId)
+      : await fetchDriveMediaStream(fileId, rangeHeader)
 
     setCors(res)
     res.statusCode = upstream.status === 206 ? 206 : 200
 
-    const contentType = upstream.headers.get('content-type') || 'video/mp4'
+    const contentType =
+      upstream.headers.get('content-type') ||
+      (wantThumb ? 'image/jpeg' : 'video/mp4')
     res.setHeader('Content-Type', contentType)
     // Never forward Drive's Content-Disposition: attachment — browsers may refuse playback.
     res.setHeader('Content-Disposition', 'inline')
