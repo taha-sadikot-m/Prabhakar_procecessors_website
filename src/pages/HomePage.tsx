@@ -3,7 +3,6 @@ import { Ecosystem } from '../components/Ecosystem'
 import { Future } from '../components/Future'
 import { Hero } from '../components/Hero'
 import { Journey } from '../components/Journey'
-import { Partnerships } from '../components/Partnerships'
 import { People } from '../components/People'
 import { Quality } from '../components/Quality'
 import { Serve } from '../components/Serve'
@@ -18,7 +17,6 @@ export function HomePage() {
       <Quality />
       <Ecosystem />
       <Serve />
-      <Partnerships />
       <Future />
       <People />
       <Closing />
