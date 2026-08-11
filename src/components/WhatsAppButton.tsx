@@ -3,7 +3,7 @@ import { company } from '../data/content'
 
 const WA_GREEN = '#25D366'
 
-const digits = company.phone.replace(/\D/g, '')
+const digits = company.whatsapp.replace(/\D/g, '')
 const href = `https://wa.me/${digits}?text=${encodeURIComponent(
   "Hello, I'd like to inquire about textile processing with Prabhakar Processors.",
 )}`

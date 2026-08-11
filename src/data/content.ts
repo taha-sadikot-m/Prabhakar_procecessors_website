@@ -3,7 +3,8 @@ export const company = {
   legalName: 'Prabhakar Processors Pvt Ltd',
   since: 2009,
   tagline: 'Fabric of India. Processed to Perfection.',
-  phone: '+91 9909970505',
+  phone: '+91 9909970508',
+  whatsapp: '+91 9978570519',
   email: 'prabhakardyeing@gmail.com',
   website: 'https://prabhakarprocessors.com',
   mapsUrl:
@@ -381,8 +382,8 @@ export const closing = {
   mobileImage: '/10th_section/mobile.png',
   contacts: [
     {
-      label: '+91 99099 70505',
-      href: 'tel:+919909970505',
+      label: '+91 99099 70508',
+      href: 'tel:+919909970508',
     },
     {
       label: 'prabhakardyeing@gmail.com',
