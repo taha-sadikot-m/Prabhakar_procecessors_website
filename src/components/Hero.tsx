@@ -3,44 +3,6 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { hero } from '../data/content'
 import { SectionCta } from './SectionCta'
 
-function DiamondEyebrow({ text }: { text: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="h-px w-8 bg-mahogany/30 sm:w-12" aria-hidden="true" />
-      <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" aria-hidden="true" />
-      <p className="font-sans text-[10px] font-medium tracking-[0.22em] text-ink-muted uppercase sm:text-[11px]">
-        {text}
-      </p>
-      <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" aria-hidden="true" />
-      <span className="h-px w-8 bg-mahogany/30 sm:w-12" aria-hidden="true" />
-    </div>
-  )
-}
-
-function MobileEyebrow({ text }: { text: string }) {
-  const parts = text.split('. ').filter(Boolean)
-  const lines =
-    parts.length >= 2
-      ? [parts[0].endsWith('.') ? parts[0] : `${parts[0]}.`, parts.slice(1).join('. ')]
-      : [text]
-
-  return (
-    <div className="flex items-start gap-2.5">
-      <div className="mt-[0.45em] flex shrink-0 items-center gap-2" aria-hidden="true">
-        <span className="h-px w-6 bg-mahogany/30" />
-        <span className="h-1.5 w-1.5 rotate-45 bg-mahogany" />
-      </div>
-      <p className="text-left font-sans text-[9px] font-medium leading-snug tracking-[0.16em] text-ink-muted uppercase">
-        {lines.map((line) => (
-          <span key={line} className="block">
-            {line}
-          </span>
-        ))}
-      </p>
-    </div>
-  )
-}
-
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
   const mx = useMotionValue(0)
@@ -94,14 +56,6 @@ export function Hero() {
       <div className="relative z-10 flex flex-1 flex-col md:hidden">
         <div className="relative mr-auto w-[min(22rem,92%)] px-4 pt-2 text-left sm:px-5">
           <div className="relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55 }}
-            >
-              <MobileEyebrow text={hero.eyebrow} />
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
@@ -148,14 +102,6 @@ export function Hero() {
       {/* —— Desktop / tablet layout (unchanged structure) —— */}
       <div className="relative z-10 mr-auto hidden w-full flex-1 flex-col justify-center px-4 pb-16 pl-4 sm:pl-6 md:flex md:px-6 md:pl-8 lg:pl-10 xl:pl-12">
         <div className="max-w-lg lg:max-w-xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55 }}
-          >
-            <DiamondEyebrow text={hero.eyebrow} />
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}

@@ -32,7 +32,7 @@ export const navLinks = [
 ]
 
 export const hero = {
-  eyebrow: 'Fabric of India. Processed to Perfection.',
+  eyebrow: '',
   headline: ['The Mill that', 'dyes, prints and', 'delivers'],
   highlight: 'quality.',
   subcopy:
