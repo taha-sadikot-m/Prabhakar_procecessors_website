@@ -555,8 +555,8 @@ export const servicesPage = {
   eyebrow: 'Our Services',
   headline: ['The', 'Swatch Book.'],
   highlight: 'Swatch',
-  body: 'A comprehensive portfolio of dyeing, printing, and finishing, each service crafted with the same precision we bring to every metre.',
-  meta: '3 disciplines · 12 core services · 12 on request',
+  body: 'A comprehensive portfolio of dyeing and printing, each service crafted with the same precision we bring to every metre.',
+  meta: '2 disciplines · 15 services',
   hero: {
     desktopImage: '/services_section/services-hero-desktop.png',
     mobileImage: '/services_section/services-hero-mobile.png',
@@ -574,25 +574,39 @@ export const servicesPage = {
         'Colour engineered for consistency, depth, and lasting brilliance across every batch.',
       services: [
         {
-          id: 'piece-dyeing',
-          name: 'Piece Dyeing',
+          id: 'dyed-finish',
+          name: 'Dyed Finish',
           description:
-            'Individual fabric lengths dyed to achieve perfectly uniform colour throughout.',
+            'Even, lasting colour with a clean finished hand across the full width.',
           image: '/service_section/swatch-01-piece-dyeing.png',
         },
         {
-          id: 'solid-dyeing',
-          name: 'Solid Dyeing',
+          id: 'dyed-padding',
+          name: 'Dyed Padding / Shaded Dyeing',
           description:
-            'Batch dyeing for consistent, high-volume colour application across entire fabric runs.',
+            'Pad dyeing for controlled shade depth, including gradient and shaded effects.',
           image: '/service_section/swatch-02-solid-dyeing.png',
         },
         {
-          id: 'cationic-dyeing',
-          name: 'Cationic Dyeing',
+          id: 'prism',
+          name: 'Prism',
           description:
-            'Specialised dyeing for synthetic and cationic dyeable fibres, brilliant shades with excellent wash fastness.',
+            'Multi-tone prism dyeing that builds dimensional colour across the cloth.',
           image: '/service_section/swatch-03-cationic-dyeing.png',
+        },
+        {
+          id: 'batik-dyeing',
+          name: 'Batik Dyeing',
+          description:
+            'Resist-dye batik for distinctive pattern and colour boundaries.',
+          image: '/service_section/swatch-04-screen-printing.png',
+        },
+        {
+          id: 'cross-dyeing',
+          name: 'Cross Dyeing',
+          description:
+            'Dual-fibre cross dyeing for two-tone effects in a single bath.',
+          image: '/service_section/swatch-02-solid-dyeing.png',
         },
       ],
     },
@@ -601,28 +615,42 @@ export const servicesPage = {
       title: 'Printing',
       numeral: '02',
       intro:
-        'From traditional screens to digital precision, patterns rendered with clarity and scale.',
+        'From discharge and rotary to foil, jari, and hand work, patterns rendered with clarity and scale.',
       services: [
         {
-          id: 'screen-printing',
-          name: 'Screen Printing',
+          id: 'padding-discharge-print',
+          name: 'Padding Discharge Print',
           description:
-            'Traditional screen-based printing offering vibrant, durable designs through woven mesh screens.',
-          image: '/service_section/swatch-04-screen-printing.png',
-        },
-        {
-          id: 'discharge-printing',
-          name: 'Discharge Printing',
-          description:
-            'Chemical discharge technique for soft-hand, intricate pattern effects with a natural feel.',
+            'Discharge on a dyed ground for a soft-hand, detailed print.',
           image: '/service_section/swatch-05-discharge-printing.png',
         },
         {
-          id: 'digital-printing',
-          name: 'Digital Printing',
+          id: 'moorga-print',
+          name: 'Moorga Print',
           description:
-            'High-resolution inkjet printing with photographic quality, unlimited colour, and rapid sample development.',
+            'Moorga print for distinctive texture and pattern character.',
+          image: '/service_section/swatch-04-screen-printing.png',
+        },
+        {
+          id: 'over-print',
+          name: 'Over Print',
+          description:
+            'Overprinting on dyed or printed grounds for layered colour and motif.',
           image: '/service_section/swatch-06-digital-printing.png',
+        },
+        {
+          id: 'jari-print',
+          name: 'Jari Print',
+          description:
+            'Metallic jari accents that add occasion-wear richness to fabric.',
+          image: '/service_section/swatch-12-foil-jari-print.png',
+        },
+        {
+          id: 'foil-print',
+          name: 'Foil Print',
+          description:
+            'Foil print for lustre and high-impact metallic highlights.',
+          image: '/service_section/swatch-12-foil-jari-print.png',
         },
         {
           id: 'rotary-allover',
@@ -632,47 +660,31 @@ export const servicesPage = {
           image: '/service_section/swatch-11-rotary-allover.png',
         },
         {
-          id: 'foil-jari',
-          name: 'Foil / Jari Print',
+          id: 'hand-print',
+          name: 'Hand Print',
           description:
-            'Metallic foil and jari accents that add lustre and occasion-wear richness to fabric.',
-          image: '/service_section/swatch-12-foil-jari-print.png',
-        },
-      ],
-    },
-    {
-      id: 'finishing',
-      title: 'Finishing',
-      numeral: '03',
-      intro:
-        'The final treatments that define hand-feel, performance, and how fabric behaves in use.',
-      services: [
-        {
-          id: 'shearing',
-          name: 'Shearing',
-          description:
-            'Precision surface cutting to produce a clean, smooth fabric finish.',
+            'Hand printing for artisan-scale motifs and short runs.',
           image: '/service_section/swatch-07-shearing.png',
         },
         {
-          id: 'sueding',
-          name: 'Sueding',
+          id: 'flatbed-print',
+          name: 'Flatbed Print',
           description:
-            'Mechanical abrasion finishing that imparts a soft, suede-like texture.',
+            'Flatbed printing for precise registration and larger repeat control.',
           image: '/service_section/swatch-08-sueding.png',
         },
         {
-          id: 'water-repellency',
-          name: 'Water Repellency',
+          id: 'pigment-print',
+          name: 'Pigment Print',
           description:
-            'Hydrophobic treatment for moisture-resistant performance in sportswear and outdoor textiles.',
+            'Pigment printing for vibrant colour with a stable, wash-ready hold.',
           image: '/service_section/swatch-09-water-repellency.png',
         },
         {
-          id: 'soil-release',
-          name: 'Soil & Stain Release',
+          id: 'spray-print',
+          name: 'Spray Print',
           description:
-            'Chemical finish enabling easy removal of stains and soil from fabric.',
+            'Spray print for soft-edge colour and atmospheric effects.',
           image: '/service_section/swatch-10-soil-release.png',
         },
       ],
@@ -681,26 +693,13 @@ export const servicesPage = {
   specs: [
     { value: 350, suffix: 'K', label: 'Metres Dyeing / Day' },
     { value: 250, suffix: 'K', label: 'Metres Printing / Day' },
-    { value: 12, suffix: '', label: 'Core Services' },
+    { value: 15, suffix: '', label: 'Core Services' },
     { value: 17, suffix: '+', label: 'Years of Experience' },
   ],
   alsoAvailable: {
     title: 'Also Available',
     body: 'Additional finishes and print techniques offered on request.',
-    items: [
-      'Dyed Finish',
-      'Dyed Padding',
-      'Batik Dyeing',
-      'Cross Dyeing',
-      'Padding Discharge Print',
-      'Prism',
-      'Moorga Print',
-      'Over Print',
-      'Hand Print',
-      'Flatbed Print',
-      'Pigment Print',
-      'Spray Print',
-    ],
+    items: [] as string[],
   },
   closing: {
     headline: ['Ready To Specify', 'Your Next Run?'],

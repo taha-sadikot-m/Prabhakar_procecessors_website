@@ -376,7 +376,7 @@ export function ServicesPage() {
         />
       ))}
       <CapabilityStrip />
-      <AlsoAvailable />
+      {servicesPage.alsoAvailable.items.length > 0 && <AlsoAvailable />}
       <ServicesClosing />
     </main>
   )
