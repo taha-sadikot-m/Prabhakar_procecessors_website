@@ -2,7 +2,7 @@ export const company = {
   name: 'Prabhakar Processors',
   legalName: 'Prabhakar Processors Pvt Ltd',
   since: 2009,
-  tagline: 'Fabric of India. Processed to Perfection.',
+  tagline: 'The Mill that\ndyes, prints and\ndelivers quality.',
   phone: '+91 9909970508',
   whatsapp: '+91 9978570519',
   email: 'prabhakardyeing@gmail.com',
@@ -940,7 +940,7 @@ export const journalPage = {
   headline: ['Where We', 'Show Up.'],
   highlight: 'Show Up',
   body: 'Follow Prabhakar across our channels. Below, live photos from the mill floor.',
-  feedUrl: 'https://feeds.behold.so/BZ8R4J0rUwlTLGYGvmn4',
+  feedUrl: 'https://feeds.behold.so/cdI8h476WuGZiRZTQPIo',
   socials: [
     {
       id: 'instagram',

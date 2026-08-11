@@ -31,7 +31,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-3 md:gap-10 md:px-8 md:py-12 lg:px-10">
         <div>
           <Logo />
-          <p className="mt-4 max-w-xs font-sans text-sm leading-relaxed text-ink-muted">
+          <p className="mt-4 max-w-xs font-sans text-sm leading-relaxed whitespace-pre-line text-ink-muted">
             {company.tagline}
           </p>
           <p className="mt-2 font-sans text-[11px] tracking-[0.06em] text-ink/45">

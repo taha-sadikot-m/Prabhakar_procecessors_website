@@ -119,6 +119,21 @@ export function postPosterUrl(post: BeholdPost): string | null {
   return null
 }
 
+/** Playable video URL for reels; null for photos. */
+export function postVideoUrl(post: BeholdPost): string | null {
+  if (
+    post.mediaUrl &&
+    (post.mediaType === 'VIDEO' || isVideoUrl(post.mediaUrl))
+  ) {
+    return post.mediaUrl
+  }
+  for (const child of post.children ?? []) {
+    const url = postVideoUrl(child)
+    if (url) return url
+  }
+  return null
+}
+
 /** @deprecated Prefer postPosterUrl for display; kept for callers that need any media URL. */
 export function postImageUrl(post: BeholdPost): string | null {
   return postPosterUrl(post)
@@ -149,8 +164,8 @@ export function carouselSlideCount(post: BeholdPost): number {
   return post.children?.length ?? 0
 }
 
-/** Up to `limit` poster URLs from carousel children (image slides only). */
-export function carouselPosterUrls(post: BeholdPost, limit = 3): string[] {
+/** Poster URLs from carousel children (image slides only). */
+export function carouselPosterUrls(post: BeholdPost, limit = Infinity): string[] {
   if (postKind(post) !== 'carousel') return []
   const urls: string[] = []
   for (const child of post.children ?? []) {

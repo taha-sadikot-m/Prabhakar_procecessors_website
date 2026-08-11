@@ -7,10 +7,16 @@ import { People } from '../components/People'
 import { Quality } from '../components/Quality'
 import { Serve } from '../components/Serve'
 import { Transformation } from '../components/Transformation'
+import { SeoHead } from '../components/SeoHead'
 
 export function HomePage() {
   return (
     <main>
+      <SeoHead
+        title="Prabhakar Processors"
+        description="The Mill that dyes, prints and delivers quality."
+        path="/"
+      />
       <Hero />
       <Journey />
       <Transformation />

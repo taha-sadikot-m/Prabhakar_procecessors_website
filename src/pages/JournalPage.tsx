@@ -18,6 +18,7 @@ import {
   postAspectRatio,
   postKind,
   postPosterUrl,
+  postVideoUrl,
   type BeholdFeed,
   type BeholdPost,
 } from '../lib/behold'
@@ -238,25 +239,52 @@ function PostTile({
   const posters = useMemo(
     () =>
       kind === 'carousel'
-        ? carouselPosterUrls(post, 3)
+        ? carouselPosterUrls(post)
         : ([postPosterUrl(post)].filter(Boolean) as string[]),
     [kind, post],
   )
   const cover = posters[0] ?? null
+  const videoUrl = kind === 'video' ? postVideoUrl(post) : null
+  const playReel = Boolean(videoUrl && !reduceMotion)
+  const mediaRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [inView, setInView] = useState(false)
 
-  const [hovering, setHovering] = useState(false)
   const [slide, setSlide] = useState(0)
+  const observeMedia =
+    playReel || (kind === 'carousel' && posters.length > 1)
 
   useEffect(() => {
-    if (reduceMotion || kind !== 'carousel' || posters.length < 2 || !hovering) {
+    if (!observeMedia) return
+    const node = mediaRef.current
+    if (!node) return
+    const io = new IntersectionObserver(
+      ([ioEntry]) => setInView(Boolean(ioEntry?.isIntersecting)),
+      { threshold: 0.25, rootMargin: '40px 0px' },
+    )
+    io.observe(node)
+    return () => io.disconnect()
+  }, [observeMedia])
+
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el || !playReel) return
+    el.muted = true
+    if (inView) void el.play().catch(() => {})
+    else el.pause()
+  }, [inView, playReel, videoUrl])
+
+  useEffect(() => {
+    if (reduceMotion) {
       setSlide(0)
       return
     }
+    if (kind !== 'carousel' || posters.length < 2 || !inView) return
     const id = window.setInterval(() => {
       setSlide((s) => (s + 1) % posters.length)
-    }, 1200)
+    }, 2500)
     return () => window.clearInterval(id)
-  }, [hovering, kind, posters, reduceMotion])
+  }, [inView, kind, posters, reduceMotion])
 
   const activeSrc = posters[slide] ?? cover
   const caption = post.prunedCaption || post.caption || ''
@@ -286,14 +314,26 @@ function PostTile({
                 transition: spring,
               }
         }
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
       >
         <div
+          ref={mediaRef}
           className="relative w-full overflow-hidden rounded-xl border border-mahogany/20 bg-cream-dark transition-shadow duration-500 group-hover:shadow-[0_16px_40px_rgba(45,27,14,0.14)]"
           style={{ aspectRatio: String(aspect) }}
         >
-          {activeSrc ? (
+          {playReel && videoUrl ? (
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              poster={cover ?? undefined}
+              muted
+              loop
+              playsInline
+              autoPlay
+              preload="metadata"
+              className="absolute inset-0 h-full w-full object-cover"
+              aria-label={altText}
+            />
+          ) : activeSrc ? (
             posters.length > 1 ? (
               posters.map((src, i) => (
                 <img
@@ -326,7 +366,7 @@ function PostTile({
             aria-hidden="true"
           />
 
-          {kind === 'video' && (
+          {kind === 'video' && !playReel && (
             <span
               className="absolute top-0 right-0 z-10 flex h-7 w-7 items-center justify-center text-cream"
               style={{ backgroundColor: MAHOGANY }}
