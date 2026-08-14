@@ -57,6 +57,24 @@ export type AdminGalleryItemDto = {
   sortOrder: number
 }
 
+export type CultureImageDto = {
+  id: string
+  driveUrl: string
+  caption: string
+  sortOrder: number
+  previewUrl: string
+  viewUrl: string
+  thumbUrl: string
+  fileId: string | null
+}
+
+export type AdminCultureImageDto = {
+  id: string
+  driveUrl: string
+  caption: string
+  sortOrder: number
+}
+
 export type TestimonialDto = {
   id: string
   type: string
@@ -111,6 +129,10 @@ export function fetchPublicServices() {
 
 export function fetchPublicGallery() {
   return request<{ items: GalleryItemDto[] }>('/api/gallery')
+}
+
+export function fetchPublicCulture() {
+  return request<{ items: CultureImageDto[] }>('/api/culture')
 }
 
 export function fetchPublicTestimonials() {
@@ -207,6 +229,29 @@ export function adminSaveGalleryItem(
 export function adminDeleteGalleryItem(id: string) {
   return request<{ ok: boolean }>(
     `/api/admin/gallery?action=item&id=${encodeURIComponent(id)}`,
+    { method: 'DELETE', auth: true },
+  )
+}
+
+export function adminGetCulture() {
+  return request<{ items: AdminCultureImageDto[] }>('/api/admin/culture', {
+    auth: true,
+  })
+}
+
+export function adminSaveCultureItem(
+  method: 'POST' | 'PUT',
+  body: Record<string, unknown>,
+) {
+  return request<{ id?: string; ok?: boolean }>(
+    `/api/admin/culture?action=item`,
+    { method, auth: true, body: JSON.stringify(body) },
+  )
+}
+
+export function adminDeleteCultureItem(id: string) {
+  return request<{ ok: boolean }>(
+    `/api/admin/culture?action=item&id=${encodeURIComponent(id)}`,
     { method: 'DELETE', auth: true },
   )
 }

@@ -12,7 +12,9 @@ import {
   type LucideProps,
 } from 'lucide-react'
 import {
+  AnimatePresence,
   motion,
+  useInView,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -22,9 +24,24 @@ import { CountUp } from '../components/motion/CountUp'
 import { FadeIn } from '../components/motion/FadeIn'
 import { JobApplicationForm } from '../components/JobApplicationForm'
 import { SectionCta } from '../components/SectionCta'
+import {
+  fetchPublicCulture,
+  type CultureImageDto,
+} from '../lib/cms-api'
+import { resolveDisplayImageUrl } from '../lib/media-url'
 
 const MAHOGANY = '#674438'
 const HEADING = '#20222D'
+
+/** Clamp aspect ratio so extreme panoramas/tall shots don't break the layout. */
+const CULTURE_ASPECT_MIN = 3 / 4
+const CULTURE_ASPECT_MAX = 4 / 3
+const CULTURE_ASPECT_FALLBACK = 4 / 5
+
+function clampCultureAspect(ratio: number) {
+  if (!Number.isFinite(ratio) || ratio <= 0) return CULTURE_ASPECT_FALLBACK
+  return Math.min(CULTURE_ASPECT_MAX, Math.max(CULTURE_ASPECT_MIN, ratio))
+}
 
 const BENEFIT_ICONS: Record<
   (typeof careersPage.benefits.groups)[number]['id'],
@@ -347,8 +364,148 @@ function BenefitPillars() {
   )
 }
 
+function CulturePhotoStack({ images }: { images: string[] }) {
+  const reduceMotion = useReducedMotion()
+  const stackRef = useRef<HTMLDivElement>(null)
+  const inView = useInView(stackRef, { amount: 0.35 })
+  const [active, setActive] = useState(0)
+  const [aspectBySrc, setAspectBySrc] = useState<Record<string, number>>({})
+  const n = images.length
+
+  useEffect(() => {
+    setActive(0)
+  }, [images])
+
+  useEffect(() => {
+    if (reduceMotion || n < 2 || !inView) return
+    const id = window.setInterval(() => {
+      setActive((i) => (i + 1) % n)
+    }, 3500)
+    return () => window.clearInterval(id)
+  }, [inView, n, reduceMotion])
+
+  useEffect(() => {
+    let cancelled = false
+    for (const src of images) {
+      if (!src) continue
+      const img = new Image()
+      img.onload = () => {
+        if (cancelled || !img.naturalWidth || !img.naturalHeight) return
+        const ratio = clampCultureAspect(img.naturalWidth / img.naturalHeight)
+        setAspectBySrc((prev) =>
+          prev[src] === ratio ? prev : { ...prev, [src]: ratio },
+        )
+      }
+      img.src = src
+    }
+    return () => {
+      cancelled = true
+    }
+  }, [images])
+
+  if (n === 0) return null
+
+  const frontSrc = images[active] ?? ''
+  const aspectRatio = aspectBySrc[frontSrc] ?? CULTURE_ASPECT_FALLBACK
+
+  const visible = reduceMotion
+    ? [0]
+    : [0, 1, 2].map((offset) => (active + offset) % n)
+
+  return (
+    <motion.div
+      ref={stackRef}
+      className="relative mx-auto w-full max-w-sm"
+      style={{ aspectRatio }}
+      animate={{ aspectRatio }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      aria-hidden={false}
+    >
+      <AnimatePresence initial={false}>
+        {visible.map((imageIndex, depth) => {
+          const src = images[imageIndex]
+          if (!src) return null
+          const isFront = depth === 0
+          const rotate = reduceMotion ? 0 : depth === 0 ? -2 : depth === 1 ? 5 : -7
+          const y = reduceMotion ? 0 : depth * 14
+          const x = reduceMotion ? 0 : depth === 0 ? 0 : depth === 1 ? 18 : -14
+          const scale = 1 - depth * 0.05
+          return (
+            <motion.div
+              key={`${src}-${imageIndex}-${depth === 0 ? active : `back-${depth}`}`}
+              className="absolute inset-0 overflow-hidden rounded-2xl border border-mahogany/20 bg-cream shadow-[0_16px_40px_rgba(45,27,14,0.14)]"
+              style={{ zIndex: 10 - depth, transformOrigin: 'center bottom' }}
+              initial={
+                reduceMotion || !isFront
+                  ? false
+                  : { opacity: 0, y: 28, rotate: -8, scale: 0.96 }
+              }
+              animate={{
+                opacity: 1,
+                y,
+                x,
+                rotate,
+                scale,
+              }}
+              exit={
+                reduceMotion
+                  ? undefined
+                  : { opacity: 0, y: -36, rotate: 10, scale: 0.94 }
+              }
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <img
+                src={src}
+                alt=""
+                className="h-full w-full object-contain"
+                draggable={false}
+                loading={isFront ? 'eager' : 'lazy'}
+                onLoad={(e) => {
+                  const el = e.currentTarget
+                  if (!el.naturalWidth || !el.naturalHeight) return
+                  const ratio = clampCultureAspect(
+                    el.naturalWidth / el.naturalHeight,
+                  )
+                  setAspectBySrc((prev) =>
+                    prev[src] === ratio ? prev : { ...prev, [src]: ratio },
+                  )
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#2d1b0e]/25 via-transparent to-transparent"
+                aria-hidden="true"
+              />
+            </motion.div>
+          )
+        })}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
 function CultureLedger() {
   const reduceMotion = useReducedMotion()
+  const [images, setImages] = useState<string[]>([])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchPublicCulture()
+      .then((data) => {
+        if (cancelled) return
+        const urls = (data.items ?? [])
+          .map((item: CultureImageDto) =>
+            resolveDisplayImageUrl(item.viewUrl || item.driveUrl),
+          )
+          .filter(Boolean)
+        setImages(urls)
+      })
+      .catch(() => {
+        if (!cancelled) setImages([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <section
@@ -356,56 +513,54 @@ function CultureLedger() {
       className="scroll-mt-[140px] border-t border-line/60 bg-cream-dark sm:scroll-mt-[148px]"
     >
       <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-10 lg:py-24">
-        <FadeIn>
-          <p
-            className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase"
-            style={{ color: MAHOGANY }}
-          >
-            Life At Prabhakar
-          </p>
-          <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
-            {careersPage.culture.title}
-          </h2>
-          <p className="mt-3 max-w-xl font-sans text-sm leading-relaxed text-ink-muted md:text-base">
-            {careersPage.culture.body}
-          </p>
-        </FadeIn>
+        <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
+          <div>
+            <FadeIn>
+              <p
+                className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase"
+                style={{ color: MAHOGANY }}
+              >
+                Life At Prabhakar
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
+                {careersPage.culture.title}
+              </h2>
+              <p className="mt-3 max-w-xl font-sans text-sm leading-relaxed text-ink-muted md:text-base">
+                {careersPage.culture.body}
+              </p>
+            </FadeIn>
 
-        <ul className="mt-14 grid list-none gap-x-10 gap-y-0 p-0 md:grid-cols-2">
-          {careersPage.culture.moments.map((moment, i) => (
-            <li key={moment.title}>
-              <FadeIn delay={reduceMotion ? 0 : 0.04 * i}>
-                <article className="relative py-7 md:py-8">
-                  <motion.span
-                    className="mb-5 block h-px origin-left bg-mahogany/40"
-                    initial={reduceMotion ? { scaleX: 1 } : { scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{
-                      duration: reduceMotion ? 0 : 0.7,
-                      delay: reduceMotion ? 0 : 0.05 * i,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    aria-hidden="true"
-                  />
-                  <span
-                    className="pointer-events-none absolute top-7 right-0 font-serif text-5xl font-light leading-none tracking-tight select-none md:top-8 md:text-6xl"
-                    style={{ color: 'rgba(103,68,56,0.14)' }}
-                    aria-hidden="true"
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <h3 className="relative pr-16 font-serif text-xl font-medium tracking-tight text-ink md:text-2xl">
-                    {moment.title}
-                  </h3>
-                  <p className="relative mt-2 max-w-sm font-sans text-sm leading-relaxed text-ink-muted">
-                    {moment.description}
-                  </p>
-                </article>
-              </FadeIn>
-            </li>
-          ))}
-        </ul>
+            <ul className="mt-10 list-none space-y-0 p-0">
+              {careersPage.culture.moments.map((moment, i) => (
+                <li key={moment.title}>
+                  <FadeIn delay={reduceMotion ? 0 : 0.03 * i}>
+                    <article className="relative border-t border-mahogany/15 py-6 md:py-7">
+                      <span
+                        className="pointer-events-none absolute top-6 right-0 font-serif text-4xl font-light leading-none tracking-tight select-none md:top-7 md:text-5xl"
+                        style={{ color: 'rgba(103,68,56,0.14)' }}
+                        aria-hidden="true"
+                      >
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <h3 className="relative pr-14 font-serif text-xl font-medium tracking-tight text-ink md:text-2xl">
+                        {moment.title}
+                      </h3>
+                      <p className="relative mt-2 max-w-md font-sans text-sm leading-relaxed text-ink-muted">
+                        {moment.description}
+                      </p>
+                    </article>
+                  </FadeIn>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {images.length > 0 && (
+            <FadeIn delay={0.08} className="lg:sticky lg:top-28">
+              <CulturePhotoStack images={images} />
+            </FadeIn>
+          )}
+        </div>
       </div>
     </section>
   )

@@ -880,7 +880,6 @@ export const testimonialsPage = {
   headline: ['Trusted', 'Partnerships.'],
   highlight: 'Partnerships',
   body: 'Manufacturers, exporters, and brands who value consistency choose Prabhakar Processors for the long term. Relationships measured in years, not orders.',
-  meta: '6 partner types · Surat, Gujarat · Since 2009',
   hero: {
     desktopImage: '/partners_section/partners-hero-desktop.png',
     mobileImage: '/partners_section/partners-hero-mobile.png',

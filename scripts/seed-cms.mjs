@@ -475,6 +475,20 @@ async function ensureSchema() {
     ON gallery_items (sort_order)
   `
   await sql`
+    CREATE TABLE IF NOT EXISTS culture_images (
+      id TEXT PRIMARY KEY,
+      drive_url TEXT NOT NULL,
+      caption TEXT NOT NULL DEFAULT '',
+      sort_order INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_culture_images_sort
+    ON culture_images (sort_order)
+  `
+  await sql`
     CREATE TABLE IF NOT EXISTS testimonials (
       id TEXT PRIMARY KEY,
       partner_type TEXT NOT NULL,
@@ -617,6 +631,45 @@ async function main() {
     }
   }
   console.log(`Gallery seeded (${galleryIndex} items)`)
+
+  const cultureSeed = [
+    {
+      id: 'cult-benefit-1',
+      driveUrl: '/careers_section/benefit-security.png',
+      caption: 'Security & stability',
+      sortOrder: 0,
+    },
+    {
+      id: 'cult-benefit-2',
+      driveUrl: '/careers_section/benefit-workplace.png',
+      caption: 'Workplace',
+      sortOrder: 1,
+    },
+    {
+      id: 'cult-benefit-3',
+      driveUrl: '/careers_section/benefit-learning.png',
+      caption: 'Learning',
+      sortOrder: 2,
+    },
+    {
+      id: 'cult-benefit-4',
+      driveUrl: '/careers_section/benefit-life.png',
+      caption: 'Life at the mill',
+      sortOrder: 3,
+    },
+  ]
+  for (const item of cultureSeed) {
+    await sql`
+      INSERT INTO culture_images (id, drive_url, caption, sort_order)
+      VALUES (${item.id}, ${item.driveUrl}, ${item.caption}, ${item.sortOrder})
+      ON CONFLICT (id) DO UPDATE SET
+        drive_url = EXCLUDED.drive_url,
+        caption = EXCLUDED.caption,
+        sort_order = EXCLUDED.sort_order,
+        updated_at = NOW()
+    `
+  }
+  console.log(`Culture images seeded (${cultureSeed.length} items)`)
 
   const blogPosts = JSON.parse(
     readFileSync(join(__dirname, 'blog-posts-seed.json'), 'utf8'),

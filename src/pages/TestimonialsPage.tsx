@@ -43,6 +43,7 @@ function TestimonialsHero() {
   const [first, second] = testimonialsPage.headline
   const highlight = testimonialsPage.highlight
   const secondParts = second.split(highlight)
+  const yearsSince = new Date().getFullYear() - company.since
 
   return (
     <section
@@ -96,8 +97,13 @@ function TestimonialsHero() {
           <p className="mt-6 max-w-md font-sans text-sm leading-relaxed text-ink-muted md:text-base">
             {testimonialsPage.body}
           </p>
-          <p className="mt-8 font-sans text-[10px] font-medium tracking-[0.18em] text-ink/45 uppercase">
-            {testimonialsPage.meta}
+          <p className="mt-8 flex flex-wrap items-baseline gap-2.5">
+            <span className="font-serif text-3xl font-medium tracking-tight text-mahogany md:text-4xl">
+              <CountUp value={yearsSince} suffix="+" />
+            </span>
+            <span className="font-sans text-[10px] font-medium tracking-[0.16em] text-ink/45 uppercase md:text-[11px]">
+              Years Of Trust
+            </span>
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4 sm:gap-5">
             <SectionCta label="Start A Partnership" to="/contact" />
@@ -122,44 +128,6 @@ function TestimonialsHero() {
           aria-hidden="true"
         />
       </a>
-    </section>
-  )
-}
-
-function ProofRibbon({ quotes }: { quotes: TestimonialDto[] }) {
-  const combinedYears = quotes.reduce((sum, q) => sum + q.years, 0)
-  const longest = quotes.length
-    ? Math.max(...quotes.map((q) => q.years))
-    : 0
-  const yearsSince = new Date().getFullYear() - company.since
-
-  const stats = [
-    { value: quotes.length, suffix: '', label: 'Partner Types' },
-    { value: combinedYears, suffix: '+', label: 'Combined Years' },
-    { value: longest, suffix: ' yr', label: 'Longest Tenure' },
-    { value: yearsSince, suffix: '+', label: 'Years Of Trust' },
-  ]
-
-  return (
-    <section className="border-y border-line/70 bg-cream-dark">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-10 px-5 py-14 md:grid-cols-4 md:gap-0 md:px-8 md:py-16 lg:px-10">
-        {stats.map((stat, i) => (
-          <FadeIn
-            key={stat.label}
-            delay={0.05 * i}
-            className={`text-center md:text-left ${
-              i > 0 ? 'md:border-l md:border-mahogany/20 md:pl-8 lg:pl-10' : ''
-            }`}
-          >
-            <p className="font-serif text-4xl font-medium tracking-tight text-mahogany md:text-5xl">
-              <CountUp value={stat.value} suffix={stat.suffix} />
-            </p>
-            <p className="mt-2 font-sans text-[10px] font-medium tracking-[0.16em] text-ink-muted uppercase md:text-[11px]">
-              {stat.label}
-            </p>
-          </FadeIn>
-        ))}
-      </div>
     </section>
   )
 }
@@ -386,7 +354,6 @@ export function TestimonialsPage() {
   return (
     <main className="bg-cream">
       <TestimonialsHero />
-      <ProofRibbon quotes={quotes} />
       {featured && <StoriesSection featured={featured} rest={rest} />}
       <TestimonialsClosing />
     </main>

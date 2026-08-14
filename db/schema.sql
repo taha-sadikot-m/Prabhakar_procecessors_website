@@ -37,6 +37,18 @@ CREATE TABLE IF NOT EXISTS gallery_items (
 CREATE INDEX IF NOT EXISTS idx_gallery_items_sort
   ON gallery_items(sort_order);
 
+CREATE TABLE IF NOT EXISTS culture_images (
+  id TEXT PRIMARY KEY,
+  drive_url TEXT NOT NULL,
+  caption TEXT NOT NULL DEFAULT '',
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_culture_images_sort
+  ON culture_images(sort_order);
+
 CREATE TABLE IF NOT EXISTS testimonials (
   id TEXT PRIMARY KEY,
   partner_type TEXT NOT NULL,

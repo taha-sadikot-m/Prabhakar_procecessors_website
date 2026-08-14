@@ -8,12 +8,14 @@ import testimonials from './_lib/routes/testimonials'
 import blog from './_lib/routes/blog'
 import contact from './_lib/routes/contact'
 import careers from './_lib/routes/careers'
+import culture from './_lib/routes/culture'
 import adminLogin from './_lib/routes/admin/login'
 import adminServices from './_lib/routes/admin/services'
 import adminGallery from './_lib/routes/admin/gallery'
 import adminTestimonials from './_lib/routes/admin/testimonials'
 import adminBlog from './_lib/routes/admin/blog'
 import adminCareers from './_lib/routes/admin/careers'
+import adminCulture from './_lib/routes/admin/culture'
 import adminContact from './_lib/routes/admin/contact'
 
 type ApiHandler = (
@@ -42,12 +44,14 @@ const routes: Record<string, ApiHandler> = {
   blog: asHandler(blog),
   contact: asHandler(contact),
   careers: asHandler(careers),
+  culture: asHandler(culture),
   'admin/login': asHandler(adminLogin),
   'admin/services': asHandler(adminServices),
   'admin/gallery': asHandler(adminGallery),
   'admin/testimonials': asHandler(adminTestimonials),
   'admin/blog': asHandler(adminBlog),
   'admin/careers': asHandler(adminCareers),
+  'admin/culture': asHandler(adminCulture),
   'admin/contact': asHandler(adminContact),
 }
 
