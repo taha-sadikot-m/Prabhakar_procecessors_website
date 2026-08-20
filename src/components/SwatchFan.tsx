@@ -87,8 +87,18 @@ export function SwatchFan({
   const inView = useInView(fanRef, { once: true, margin: '-80px' })
   const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({})
   const panelCardRef = useRef<HTMLDivElement>(null)
+  const mobileScrollRef = useRef<HTMLDivElement>(null)
+  const mobileStripInView = useInView(mobileScrollRef, {
+    amount: 0.45,
+    once: true,
+  })
   const pendingFlight = useRef<FlightSource | null>(null)
   const touchStartX = useRef<number | null>(null)
+  const scrollingFromSelect = useRef(false)
+  const mobileScrollRaf = useRef(0)
+  const hintPlayed = useRef(false)
+  const hintCancelled = useRef(false)
+  const hintTimers = useRef<number[]>([])
   const controls = useAnimationControls()
 
   useEffect(() => {
@@ -171,8 +181,12 @@ export function SwatchFan({
       const index = services.findIndex((s) => s.id === id)
       if (index < 0) return
 
+      hintCancelled.current = true
+      for (const timerId of hintTimers.current) window.clearTimeout(timerId)
+      hintTimers.current = []
+
       const el = cardRefs.current[id]
-      if (el && !reduceMotion && fromUser) {
+      if (el && !reduceMotion && fromUser && isDesktop) {
         pendingFlight.current = {
           rect: el.getBoundingClientRect(),
           angle: baseAngles[index] ?? 0,
@@ -183,7 +197,7 @@ export function SwatchFan({
       }
       setActiveId(id)
     },
-    [activeId, baseAngles, reduceMotion, services],
+    [activeId, baseAngles, isDesktop, reduceMotion, services],
   )
 
   const stepBy = useCallback(
@@ -196,7 +210,122 @@ export function SwatchFan({
     [activeIndex, n, select, services],
   )
 
+  const scrollMobileToIndex = useCallback(
+    (index: number, smooth: boolean) => {
+      const root = mobileScrollRef.current
+      if (!root) return
+      const slide = root.children[index] as HTMLElement | undefined
+      if (!slide) return
+      scrollingFromSelect.current = true
+      slide.scrollIntoView({
+        inline: 'center',
+        block: 'nearest',
+        behavior: smooth && !reduceMotion ? 'smooth' : 'auto',
+      })
+      window.setTimeout(() => {
+        scrollingFromSelect.current = false
+      }, reduceMotion ? 50 : 450)
+    },
+    [reduceMotion],
+  )
+
+  useEffect(() => {
+    if (isDesktop || n === 0) return
+    scrollMobileToIndex(activeIndex, true)
+  }, [activeIndex, isDesktop, n, scrollMobileToIndex])
+
+  const onMobileScroll = useCallback(() => {
+    if (scrollingFromSelect.current || isDesktop) return
+    const root = mobileScrollRef.current
+    if (!root) return
+    window.cancelAnimationFrame(mobileScrollRaf.current)
+    mobileScrollRaf.current = window.requestAnimationFrame(() => {
+      const center = root.scrollLeft + root.clientWidth / 2
+      let best = 0
+      let bestDist = Infinity
+      for (let i = 0; i < root.children.length; i++) {
+        const child = root.children[i] as HTMLElement
+        const midX = child.offsetLeft + child.offsetWidth / 2
+        const dist = Math.abs(midX - center)
+        if (dist < bestDist) {
+          bestDist = dist
+          best = i
+        }
+      }
+      const id = services[best]?.id
+      if (id && id !== activeId) {
+        pendingFlight.current = null
+        setActiveId(id)
+      }
+    })
+  }, [activeId, isDesktop, services])
+
+  const cancelScrollHint = useCallback(() => {
+    if (hintCancelled.current && hintTimers.current.length === 0) return
+    hintCancelled.current = true
+    for (const id of hintTimers.current) window.clearTimeout(id)
+    hintTimers.current = []
+    scrollingFromSelect.current = false
+  }, [])
+
+  useEffect(() => {
+    hintPlayed.current = false
+    hintCancelled.current = false
+    for (const id of hintTimers.current) window.clearTimeout(id)
+    hintTimers.current = []
+  }, [category.id])
+
+  useEffect(() => {
+    if (
+      isDesktop ||
+      reduceMotion ||
+      n < 2 ||
+      !mobileStripInView ||
+      hintPlayed.current
+    ) {
+      return
+    }
+
+    const root = mobileScrollRef.current
+    if (!root) return
+
+    hintPlayed.current = true
+    hintCancelled.current = false
+
+    const startId = window.setTimeout(() => {
+      if (hintCancelled.current || isDesktop) return
+      const width = root.clientWidth
+      if (width <= 0) return
+
+      const base = root.scrollLeft
+      const peek = width * 0.15
+      scrollingFromSelect.current = true
+      root.scrollTo({ left: base + peek, behavior: 'smooth' })
+
+      const backId = window.setTimeout(() => {
+        if (hintCancelled.current) {
+          scrollingFromSelect.current = false
+          return
+        }
+        root.scrollTo({ left: base, behavior: 'smooth' })
+        const doneId = window.setTimeout(() => {
+          scrollingFromSelect.current = false
+        }, 420)
+        hintTimers.current.push(doneId)
+      }, 560)
+      hintTimers.current.push(backId)
+    }, 700)
+    hintTimers.current.push(startId)
+
+    return () => {
+      for (const id of hintTimers.current) window.clearTimeout(id)
+      hintTimers.current = []
+      scrollingFromSelect.current = false
+    }
+  }, [isDesktop, mobileStripInView, n, reduceMotion, category.id])
+
   useLayoutEffect(() => {
+    if (!isDesktop) return
     const flight = pendingFlight.current
     pendingFlight.current = null
     const panel = panelCardRef.current
@@ -221,7 +350,7 @@ export function SwatchFan({
       rotate: 0,
       transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
     })
-  }, [activeId, controls, reduceMotion])
+  }, [activeId, controls, isDesktop, reduceMotion])
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -441,12 +570,84 @@ export function SwatchFan({
     </div>
   )
 
+  const navControls = (
+    <>
+      <button
+        type="button"
+        onClick={() => stepBy(-1)}
+        disabled={activeIndex === 0}
+        aria-label="Previous service"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
+      >
+        ←
+      </button>
+      <button
+        type="button"
+        onClick={() => stepBy(1)}
+        disabled={activeIndex >= n - 1}
+        aria-label="Next service"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
+      >
+        →
+      </button>
+    </>
+  )
+
+  const detailCaption = (
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[rgba(45,27,14,0.55)] via-[rgba(45,27,14,0.2)] to-transparent px-4 pt-16 pb-3.5">
+      <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-cream/90 uppercase">
+        {category.title}
+      </p>
+      <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-cream/90 tabular-nums">
+        {pad2(activeIndex + 1)} / {pad2(n)}
+      </p>
+    </div>
+  )
+
   const detailPanel = (
     <div className="flex w-full flex-col">
+      {/* Mobile: snap-scroll active image */}
+      <div className="relative aspect-[4/5] w-full max-w-[12rem] overflow-hidden rounded-xl border border-mahogany/25 bg-cream-dark shadow-[0_16px_40px_rgba(45,27,14,0.1)] md:max-w-[11rem] lg:hidden">
+        <div
+          ref={mobileScrollRef}
+          onScroll={onMobileScroll}
+          onPointerDown={cancelScrollHint}
+          onTouchStart={cancelScrollHint}
+          className="flex h-full w-full snap-x snap-mandatory overflow-x-auto touch-pan-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {services.map((service, i) => (
+            <div
+              key={service.id}
+              className="relative h-full w-full min-w-full shrink-0 snap-center"
+            >
+              <img
+                src={resolveDisplayImageUrl(service.image)}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+                draggable={false}
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[rgba(45,27,14,0.55)] via-[rgba(45,27,14,0.2)] to-transparent px-4 pt-16 pb-3.5">
+                <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-cream/90 uppercase">
+                  {category.title}
+                </p>
+                <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-cream/90 tabular-nums">
+                  {pad2(i + 1)} / {pad2(n)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 flex w-full max-w-[12rem] items-center justify-center gap-3 md:max-w-[11rem] lg:hidden">
+        {navControls}
+      </div>
+
+      {/* Desktop: single image + flight */}
       <motion.div
         ref={panelCardRef}
         animate={controls}
-        className="relative aspect-[4/5] w-full max-w-[12rem] overflow-hidden rounded-xl border border-mahogany/25 bg-cream-dark shadow-[0_16px_40px_rgba(45,27,14,0.1)] md:max-w-[11rem] lg:max-w-[50%]"
+        className="relative hidden aspect-[4/5] w-full max-w-[12rem] overflow-hidden rounded-xl border border-mahogany/25 bg-cream-dark shadow-[0_16px_40px_rgba(45,27,14,0.1)] md:max-w-[11rem] lg:block lg:max-w-[50%]"
         style={{ transformOrigin: '50% 50%' }}
         aria-hidden="true"
       >
@@ -463,16 +664,7 @@ export function SwatchFan({
             draggable={false}
           />
         </AnimatePresence>
-
-        {/* Caption strip */}
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[rgba(45,27,14,0.55)] via-[rgba(45,27,14,0.2)] to-transparent px-4 pt-16 pb-3.5">
-          <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-cream/90 uppercase">
-            {category.title}
-          </p>
-          <p className="font-sans text-[10px] font-semibold tracking-[0.18em] text-cream/90 tabular-nums">
-            {pad2(activeIndex + 1)} / {pad2(n)}
-          </p>
-        </div>
+        {detailCaption}
       </motion.div>
 
       <div className="relative mt-5 max-w-[12rem] md:mt-6 md:max-w-[11rem] lg:max-w-[50%]" aria-hidden="true">
@@ -541,25 +733,8 @@ export function SwatchFan({
         className={`flex flex-col items-center lg:col-span-6 ${fanOnRight ? 'lg:order-2' : 'lg:order-1'}`}
       >
         {fan}
-        <div className="mt-10 flex w-full items-center justify-center gap-3 md:mt-12">
-          <button
-            type="button"
-            onClick={() => stepBy(-1)}
-            disabled={activeIndex === 0}
-            aria-label="Previous service"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            onClick={() => stepBy(1)}
-            disabled={activeIndex >= n - 1}
-            aria-label="Next service"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
-          >
-            →
-          </button>
+        <div className="mt-10 hidden w-full items-center justify-center gap-3 md:mt-12 lg:flex">
+          {navControls}
         </div>
       </div>
     </div>
