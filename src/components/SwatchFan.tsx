@@ -122,9 +122,22 @@ export function SwatchFan({
   const CONTAINER_H = PIVOT_Y + (isDesktop ? 28 : 20)
   const originY = `${PIVOT_RATIO * 100}%`
 
-  const TARGET_ARC = isDesktop ? 64 : 46
+  const largeDeck = n >= 7
+  const TARGET_ARC = isDesktop
+    ? largeDeck
+      ? 88
+      : 64
+    : largeDeck
+      ? 62
+      : 46
   const MIN_STEP = isDesktop ? 14 : 10
-  const MAX_STEP = isDesktop ? 26 : 20
+  const MAX_STEP = isDesktop
+    ? largeDeck
+      ? 32
+      : 26
+    : largeDeck
+      ? 24
+      : 20
   const step =
     n <= 1 ? 0 : clamp(TARGET_ARC / (n - 1), MIN_STEP, MAX_STEP)
   const arc = step * Math.max(n - 1, 0)
@@ -138,6 +151,7 @@ export function SwatchFan({
   const hoverIndex = hovered
     ? services.findIndex((s) => s.id === hovered)
     : -1
+  const focusIndex = hoverIndex >= 0 ? hoverIndex : activeIndex
 
   const baseAngles = useMemo(
     () => computeFanAngles(n, activeIndex, arc),
@@ -315,15 +329,23 @@ export function SwatchFan({
           scaleY: 1,
         }
         const open = reduceMotion || unfolded
+        const stackRank = n - Math.abs(i - focusIndex)
+        const cardZ = selected
+          ? 2
+          : isFocused || isHovered
+            ? 50 + stackRank
+            : 20 + stackRank
 
         return (
           <div
             key={service.id}
-            className="absolute top-0 left-1/2 -translate-x-1/2"
+            className={`absolute top-0 left-1/2 -translate-x-1/2${
+              selected ? ' pointer-events-none' : ''
+            }`}
             style={{
               width: CARD_W,
               height: CARD_H,
-              zIndex: isFocused || isHovered ? 50 : selected ? 2 : 10 + i,
+              zIndex: cardZ,
             }}
           >
             <motion.button
@@ -488,30 +510,6 @@ export function SwatchFan({
             </p>
           </motion.div>
         </AnimatePresence>
-
-        <div className="mt-6 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => stepBy(-1)}
-            disabled={activeIndex === 0}
-            aria-label="Previous service"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            onClick={() => stepBy(1)}
-            disabled={activeIndex >= n - 1}
-            aria-label="Next service"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
-          >
-            →
-          </button>
-          <span className="ml-1 font-sans text-[10px] font-medium tracking-[0.16em] text-ink/40 uppercase">
-            {pad2(activeIndex + 1)} of {pad2(n)}
-          </span>
-        </div>
       </div>
 
       {services.map((s, i) => (
@@ -540,9 +538,29 @@ export function SwatchFan({
         {detailPanel}
       </div>
       <div
-        className={`lg:col-span-6 ${fanOnRight ? 'lg:order-2' : 'lg:order-1'}`}
+        className={`flex flex-col items-center lg:col-span-6 ${fanOnRight ? 'lg:order-2' : 'lg:order-1'}`}
       >
         {fan}
+        <div className="mt-10 flex w-full items-center justify-center gap-3 md:mt-12">
+          <button
+            type="button"
+            onClick={() => stepBy(-1)}
+            disabled={activeIndex === 0}
+            aria-label="Previous service"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            onClick={() => stepBy(1)}
+            disabled={activeIndex >= n - 1}
+            aria-label="Next service"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-mahogany/30 font-serif text-lg text-mahogany transition-colors hover:border-mahogany hover:bg-mahogany hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-mahogany"
+          >
+            →
+          </button>
+        </div>
       </div>
     </div>
   )
