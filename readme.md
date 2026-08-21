@@ -15,7 +15,7 @@ Runs Vite on `:5173` and the API on `:8787` (proxied as `/api`).
 
 ```bash
 npm run build   # builds dist/ + server.run.mjs
-npm start       # node server.cjs (same process listens on PORT)
+npm start       # node server.js → server.cjs (same process listens on PORT)
 ```
 
 ### Hostinger panel
@@ -24,7 +24,7 @@ npm start       # node server.cjs (same process listens on PORT)
 |---|---|
 | Framework | **Express** |
 | **Build script** | **`npm run build`** (required — do not leave blank) |
-| Entry file | **`server.cjs`** (required — LiteSpeed `require()`s the entry; do not use `server.js`) |
+| Entry file | **`server.js`** (`server.cjs` is the CommonJS bootstrap it loads) |
 | Output directory | leave blank (or `dist`) |
 | Node | `24.x` |
 | Package manager | `npm` |

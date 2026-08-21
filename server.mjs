@@ -1,7 +1,6 @@
 /**
- * Not the Hostinger entry. Use server.cjs.
+ * Alias entry — same bootstrap as server.js.
  */
-console.error(
-  '[server] Wrong entry file. Set Hostinger Entry to server.cjs (not server.mjs).',
-)
-process.exit(1)
+import { createRequire } from 'node:module'
+
+createRequire(import.meta.url)('./server.cjs')
