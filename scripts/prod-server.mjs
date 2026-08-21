@@ -1,6 +1,6 @@
 /**
- * Production Express server: Vite `dist/` + same /api handlers as scripts/dev-api.mjs.
- * Loaded by server.js after tsx is registered (Hostinger entry / `npm start`).
+ * Production server for single-host deploys (e.g. Hostinger Node).
+ * Serves Vite `dist/` + the same /api handlers used by scripts/dev-api.mjs.
  */
 import http from 'node:http'
 import path from 'node:path'
@@ -25,8 +25,8 @@ import adminCulture from '../api/_lib/routes/admin/culture.ts'
 import adminContact from '../api/_lib/routes/admin/contact.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const root = path.join(__dirname, '..')
-const dist = path.join(root, 'dist')
+const ROOT = path.resolve(__dirname, '..')
+const DIST = path.join(ROOT, 'dist')
 const PORT = Number(process.env.PORT) || 3000
 
 function resolveHandler(mod) {
@@ -41,7 +41,7 @@ function mount(mod) {
     try {
       await handler(req, res)
     } catch (err) {
-      console.error('[server]', err)
+      console.error('[prod-server]', err)
       if (!res.headersSent) {
         res.status(500).json({
           error: err instanceof Error ? err.message : 'Internal error',
@@ -76,18 +76,17 @@ app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'API route not found' })
 })
 
-app.use(express.static(dist, { index: false, fallthrough: true }))
+app.use(
+  express.static(DIST, {
+    index: false,
+    fallthrough: true,
+  }),
+)
 
-app.get(/^(?!\/api(?:\/|$)).*/, (_req, res) => {
-  res.sendFile(path.join(dist, 'index.html'), (err) => {
-    if (err) {
-      console.error('[server] missing dist/index.html — run npm run build first')
-      if (!res.headersSent) {
-        res
-          .status(500)
-          .send('Build missing. Run npm run build before starting the server.')
-      }
-    }
+app.get(/^(?!\/api(?:\/|$)).*/, (req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next()
+  res.sendFile(path.join(DIST, 'index.html'), (err) => {
+    if (err) next(err)
   })
 })
 
@@ -96,15 +95,18 @@ const server = http.createServer(app)
 server.on('error', (err) => {
   const code = err && typeof err === 'object' && 'code' in err ? err.code : ''
   if (code === 'EADDRINUSE') {
-    console.error(`[server] port ${PORT} already in use`)
+    console.error(
+      `[prod-server] failed to bind :${PORT}: address already in use`,
+    )
     process.exit(1)
   }
-  console.error('[server]', err)
+  console.error('[prod-server]', err)
   process.exit(1)
 })
 
 server.listen(PORT, () => {
-  console.log(`[server] listening on http://localhost:${PORT}`)
+  console.log(`[prod-server] listening on http://localhost:${PORT}`)
+  console.log(`[prod-server] serving static from ${DIST}`)
 })
 
 function shutdown() {
