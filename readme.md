@@ -11,27 +11,30 @@ npm run dev
 
 Runs Vite on `:5173` and the API on `:8787` (proxied as `/api`).
 
-## Production (single host — e.g. Hostinger Node)
-
-Build the static site, then start one Node process that serves **both** `dist/` and `/api`:
+## Production (single host — Hostinger Express)
 
 ```bash
-npm run build
-npm start
+npm run build   # builds dist/ + server.run.mjs
+npm start       # node server.js (same process listens on PORT)
 ```
 
-On Hostinger, use framework **Express** (not Vite):
+### Hostinger panel
 
 | Field | Value |
 |---|---|
+| Framework | **Express** |
+| **Build script** | **`npm run build`** (required — do not leave blank) |
+| Entry file | **`server.js`** |
+| Output directory | leave blank (or `dist`) |
+| Node | `24.x` |
 | Package manager | `npm` |
-| Entry file | `server.js` |
 
-`server.js` builds `dist/` if missing, then serves frontend + `/api` on one process.
+Set the same env vars as local `.env` (database, admin secrets, etc.). Hostinger sets `PORT`.
 
-Or locally: `npm start` (runs `prestart` build, then `node server.js`).
+### Verify after deploy
 
-- Listens on `PORT` (default `3000`)
-- Same-origin `/api/*` — no separate API host
+- Homepage: `https://YOUR_HOST/`
+- API: `https://YOUR_HOST/api/health` → `{"ok":true}`
+- SPA: `https://YOUR_HOST/careers` (refresh should work)
 
-Set the same env vars as local `.env` (database, admin secrets, etc.) in the host panel.
+Do **not** use `/heath` — that path does not exist.

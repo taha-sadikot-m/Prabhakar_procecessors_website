@@ -4,6 +4,7 @@
  */
 import http from 'node:http'
 import path from 'node:path'
+import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
 import health from '../api/_lib/routes/health.ts'
@@ -25,7 +26,10 @@ import adminCulture from '../api/_lib/routes/admin/culture.ts'
 import adminContact from '../api/_lib/routes/admin/contact.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const ROOT = path.resolve(__dirname, '..')
+// Source lives in scripts/; bundled output is server.run.mjs at repo root.
+const ROOT = existsSync(path.join(__dirname, 'package.json'))
+  ? __dirname
+  : path.resolve(__dirname, '..')
 const DIST = path.join(ROOT, 'dist')
 const PORT = Number(process.env.PORT) || 3000
 
@@ -104,8 +108,8 @@ server.on('error', (err) => {
   process.exit(1)
 })
 
-server.listen(PORT, () => {
-  console.log(`[prod-server] listening on http://localhost:${PORT}`)
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`[prod-server] listening on http://0.0.0.0:${PORT}`)
   console.log(`[prod-server] serving static from ${DIST}`)
 })
 
