@@ -41,6 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ),
     })
   } catch (err) {
+    console.error('[api/blog]', err)
     const message = err instanceof Error ? err.message : 'Failed to load blog'
     return json(res, 500, { error: message })
   }

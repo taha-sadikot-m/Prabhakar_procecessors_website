@@ -24,6 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })),
     })
   } catch (err) {
+    console.error('[api/testimonials]', err)
     const message =
       err instanceof Error ? err.message : 'Failed to load testimonials'
     return json(res, 500, { error: message })

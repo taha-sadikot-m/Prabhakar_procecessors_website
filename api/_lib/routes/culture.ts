@@ -36,6 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     })
   } catch (err) {
+    console.error('[api/culture]', err)
     const message =
       err instanceof Error ? err.message : 'Failed to load culture images'
     return json(res, 500, { error: message })

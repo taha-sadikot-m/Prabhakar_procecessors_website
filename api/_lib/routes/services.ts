@@ -38,6 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return json(res, 200, { categories: result })
   } catch (err) {
+    console.error('[api/services]', err)
     const message = err instanceof Error ? err.message : 'Failed to load services'
     return json(res, 500, { error: message })
   }

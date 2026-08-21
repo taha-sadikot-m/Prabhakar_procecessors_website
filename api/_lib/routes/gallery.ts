@@ -38,6 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     })
   } catch (err) {
+    console.error('[api/gallery]', err)
     const message = err instanceof Error ? err.message : 'Failed to load gallery'
     return json(res, 500, { error: message })
   }
