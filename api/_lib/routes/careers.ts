@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getDb } from '../db'
+import { careersNotifyTo, notifyOrLog } from '../email'
 import { handleOptions, json, newId, readJsonBody } from '../http'
 
 type CareersBody = {
@@ -137,6 +138,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ${remarks}
       )
     `
+
+    await notifyOrLog('careers', {
+      to: careersNotifyTo(),
+      subject: `New job application: ${department} — ${fullName}`,
+      replyTo: email,
+      text: [
+        'A new job application was submitted on the website.',
+        '',
+        `Department: ${department}`,
+        `City: ${city}`,
+        `Full name: ${fullName}`,
+        `Mobile: ${mobile}`,
+        `Email: ${email}`,
+        `Qualification: ${qualification}`,
+        `Experience: ${experience}`,
+        `Current company: ${currentCompany || '(none)'}`,
+        `Expected salary: ${expectedSalary || '(none)'}`,
+        `Resume: ${resumeUrl}`,
+        '',
+        'Remarks:',
+        remarks || '(none)',
+        '',
+        `Application ID: ${id}`,
+      ].join('\n'),
+    })
 
     return json(res, 200, { ok: true, id })
   } catch (err) {

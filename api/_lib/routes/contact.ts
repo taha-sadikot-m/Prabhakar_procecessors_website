@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getDb } from '../db'
+import { contactNotifyCc, contactNotifyTo, notifyOrLog } from '../email'
 import { handleOptions, json, newId, readJsonBody } from '../http'
 
 type ContactBody = {
@@ -64,6 +65,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       INSERT INTO contact_messages (id, name, email, phone, subject, message)
       VALUES (${id}, ${name}, ${email}, ${phone}, ${subject}, ${message})
     `
+
+    await notifyOrLog('contact', {
+      to: contactNotifyTo(),
+      cc: contactNotifyCc(),
+      subject: `New contact form: ${subject}`,
+      replyTo: email,
+      text: [
+        'A new contact form was submitted on the website.',
+        '',
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Phone: ${phone || '(none)'}`,
+        `Subject: ${subject}`,
+        '',
+        'Message:',
+        message,
+        '',
+        `Message ID: ${id}`,
+      ].join('\n'),
+    })
 
     return json(res, 200, { ok: true, id })
   } catch (err) {

@@ -593,6 +593,66 @@ async function handler6(req, res) {
   }
 }
 
+// api/_lib/email.ts
+import { Resend } from "resend";
+function parseList(value, fallback) {
+  if (!value?.trim()) return fallback;
+  return value.split(",").map((s) => s.trim()).filter(Boolean);
+}
+function contactNotifyTo() {
+  return parseList(process.env.CONTACT_NOTIFY_TO, [
+    "shaleen@prabhakarprocessors.com"
+  ]);
+}
+function contactNotifyCc() {
+  return parseList(process.env.CONTACT_NOTIFY_CC, [
+    "info@prabhakarprocessors.com"
+  ]);
+}
+function careersNotifyTo() {
+  return parseList(process.env.CAREERS_NOTIFY_TO, [
+    "prabhakarhr64@gmail.com"
+  ]);
+}
+async function sendMail(input) {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.RESEND_EMAIL_ADDRESS?.trim();
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not set");
+  }
+  if (!from) {
+    throw new Error("RESEND_EMAIL_ADDRESS is not set");
+  }
+  const to = Array.isArray(input.to) ? input.to : [input.to];
+  if (to.length === 0) {
+    throw new Error("No email recipients");
+  }
+  const ccRaw = input.cc ? Array.isArray(input.cc) ? input.cc : [input.cc] : [];
+  const cc = ccRaw.filter(Boolean);
+  const resend = new Resend(apiKey);
+  const { error } = await resend.emails.send({
+    from,
+    to,
+    subject: input.subject,
+    text: input.text,
+    ...cc.length > 0 ? { cc } : {},
+    ...input.replyTo ? { replyTo: input.replyTo } : {}
+  });
+  if (error) {
+    throw new Error(error.message || "Resend send failed");
+  }
+}
+async function notifyOrLog(label, input) {
+  try {
+    await sendMail(input);
+  } catch (err) {
+    console.error(
+      `[email] ${label} failed:`,
+      err instanceof Error ? err.message : err
+    );
+  }
+}
+
 // api/_lib/routes/contact.ts
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 async function ensureTable() {
@@ -643,6 +703,25 @@ async function handler7(req, res) {
       INSERT INTO contact_messages (id, name, email, phone, subject, message)
       VALUES (${id}, ${name}, ${email}, ${phone}, ${subject}, ${message})
     `;
+    await notifyOrLog("contact", {
+      to: contactNotifyTo(),
+      cc: contactNotifyCc(),
+      subject: `New contact form: ${subject}`,
+      replyTo: email,
+      text: [
+        "A new contact form was submitted on the website.",
+        "",
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Phone: ${phone || "(none)"}`,
+        `Subject: ${subject}`,
+        "",
+        "Message:",
+        message,
+        "",
+        `Message ID: ${id}`
+      ].join("\n")
+    });
     return json(res, 200, { ok: true, id });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to send your message";
@@ -766,6 +845,30 @@ async function handler8(req, res) {
         ${remarks}
       )
     `;
+    await notifyOrLog("careers", {
+      to: careersNotifyTo(),
+      subject: `New job application: ${department} \u2014 ${fullName}`,
+      replyTo: email,
+      text: [
+        "A new job application was submitted on the website.",
+        "",
+        `Department: ${department}`,
+        `City: ${city}`,
+        `Full name: ${fullName}`,
+        `Mobile: ${mobile}`,
+        `Email: ${email}`,
+        `Qualification: ${qualification}`,
+        `Experience: ${experience}`,
+        `Current company: ${currentCompany || "(none)"}`,
+        `Expected salary: ${expectedSalary || "(none)"}`,
+        `Resume: ${resumeUrl}`,
+        "",
+        "Remarks:",
+        remarks || "(none)",
+        "",
+        `Application ID: ${id}`
+      ].join("\n")
+    });
     return json(res, 200, { ok: true, id });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to submit application";
