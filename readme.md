@@ -24,12 +24,12 @@ On Hostinger, use framework **Express** (not Vite):
 
 | Field | Value |
 |---|---|
-| Build command | `npm run build` |
 | Package manager | `npm` |
-| Output directory | `dist` |
-| Entry file | `server.mjs` |
+| Entry file | `server.js` |
 
-Or run locally / via start script: `npm start` → `node server.mjs`.
+`server.js` builds `dist/` if missing, then serves frontend + `/api` on one process.
+
+Or locally: `npm start` (runs `prestart` build, then `node server.js`).
 
 - Listens on `PORT` (default `3000`)
 - Same-origin `/api/*` — no separate API host
