@@ -20,8 +20,17 @@ npm run build
 npm start
 ```
 
-- **Build command:** `npm run build`
-- **Start command:** `npm start` (required — do not use static-only Vite deploy)
+On Hostinger, use framework **Express** (not Vite):
+
+| Field | Value |
+|---|---|
+| Build command | `npm run build` |
+| Package manager | `npm` |
+| Output directory | `dist` |
+| Entry file | `server.mjs` |
+
+Or run locally / via start script: `npm start` → `node server.mjs`.
+
 - Listens on `PORT` (default `3000`)
 - Same-origin `/api/*` — no separate API host
 
