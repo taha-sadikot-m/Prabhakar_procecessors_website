@@ -13,9 +13,20 @@ Runs Vite on `:5173` and the API on `:8787` (proxied as `/api`).
 
 ## Production (single host — Hostinger Express)
 
+Hostinger runtime cannot run Vite/esbuild (`EACCES` on native binaries). **Build locally, commit the artifacts, then deploy.**
+
 ```bash
-npm run build   # builds dist/ + server.run.mjs
-npm start       # node server.js → server.cjs (same process listens on PORT)
+npm run build   # writes dist/ + server.run.mjs (tracked in git)
+npm start       # node server.js → server.cjs → server.run.mjs
+```
+
+Before every deploy that changes the UI or API server code:
+
+```bash
+npm run build
+git add dist server.run.mjs
+git commit -m "chore: refresh production build"
+git push
 ```
 
 ### Hostinger panel
@@ -23,9 +34,9 @@ npm start       # node server.js → server.cjs (same process listens on PORT)
 | Field | Value |
 |---|---|
 | Framework | **Express** |
-| **Build script** | **`build`** (script name — do **not** leave blank) |
-| Entry file | **`server.js`** (`server.cjs` is the CommonJS bootstrap it loads) |
-| Output directory | **leave blank** (Express serves `dist/` itself; do not set `dist`) |
+| **Build script** | **leave blank** (artifacts are already in the repo) |
+| Entry file | **`server.js`** |
+| Output directory | **leave blank** |
 | Node | `24.x` |
 | Package manager | `npm` |
 
