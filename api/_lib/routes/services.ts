@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getDb } from '../db'
 import { handleOptions, json } from '../http'
+import { ensureServicesSchema } from '../services-schema'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return
@@ -10,6 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const sql = getDb()
+    await ensureServicesSchema(sql)
     const categories = await sql`
       SELECT id, title, numeral, intro, sort_order
       FROM service_categories

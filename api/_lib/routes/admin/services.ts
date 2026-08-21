@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { requireAdmin } from '../../auth'
 import { getDb } from '../../db'
 import { handleOptions, json, newId, readJsonBody } from '../../http'
+import { ensureServicesSchema } from '../../services-schema'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return
@@ -13,6 +14,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const action = typeof req.query.action === 'string' ? req.query.action : ''
 
   try {
+    await ensureServicesSchema(sql)
+
     if (req.method === 'GET') {
       const categories = await sql`
         SELECT id, title, numeral, intro, sort_order
@@ -81,10 +84,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await sql`
         UPDATE service_categories
         SET
-          title = ${ (body.title ?? '').trim() },
-          numeral = ${ (body.numeral ?? '').trim() },
-          intro = ${ (body.intro ?? '').trim() },
-          sort_order = ${ body.sortOrder ?? 0 },
+          title = ${(body.title ?? '').trim()},
+          numeral = ${(body.numeral ?? '').trim()},
+          intro = ${(body.intro ?? '').trim()},
+          sort_order = ${body.sortOrder ?? 0},
           updated_at = NOW()
         WHERE id = ${body.id}
       `
@@ -164,6 +167,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return json(res, 400, { error: 'Unknown action' })
   } catch (err) {
+    console.error('[api/admin/services]', err)
     const message = err instanceof Error ? err.message : 'Services admin error'
     return json(res, 500, { error: message })
   }

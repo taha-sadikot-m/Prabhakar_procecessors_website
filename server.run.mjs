@@ -71,6 +71,37 @@ function getDb() {
   return sql;
 }
 
+// api/_lib/services-schema.ts
+async function ensureServicesSchema(sql2) {
+  await sql2`
+    CREATE TABLE IF NOT EXISTS service_categories (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      numeral TEXT NOT NULL DEFAULT '',
+      intro TEXT NOT NULL DEFAULT '',
+      sort_order INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql2`
+    CREATE TABLE IF NOT EXISTS service_cards (
+      id TEXT PRIMARY KEY,
+      category_id TEXT NOT NULL REFERENCES service_categories(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      image_url TEXT NOT NULL DEFAULT '',
+      sort_order INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql2`
+    CREATE INDEX IF NOT EXISTS idx_service_cards_category
+      ON service_cards(category_id, sort_order)
+  `;
+}
+
 // api/_lib/routes/services.ts
 async function handler2(req, res) {
   if (handleOptions(req, res)) return;
@@ -79,6 +110,7 @@ async function handler2(req, res) {
   }
   try {
     const sql2 = getDb();
+    await ensureServicesSchema(sql2);
     const categories = await sql2`
       SELECT id, title, numeral, intro, sort_order
       FROM service_categories
@@ -103,6 +135,7 @@ async function handler2(req, res) {
     }));
     return json(res, 200, { categories: result });
   } catch (err) {
+    console.error("[api/services]", err);
     const message = err instanceof Error ? err.message : "Failed to load services";
     return json(res, 500, { error: message });
   }
@@ -369,6 +402,7 @@ async function handler3(req, res) {
       })
     });
   } catch (err) {
+    console.error("[api/gallery]", err);
     const message = err instanceof Error ? err.message : "Failed to load gallery";
     return json(res, 500, { error: message });
   }
@@ -453,6 +487,7 @@ async function handler5(req, res) {
       }))
     });
   } catch (err) {
+    console.error("[api/testimonials]", err);
     const message = err instanceof Error ? err.message : "Failed to load testimonials";
     return json(res, 500, { error: message });
   }
@@ -464,6 +499,11 @@ function asTheme(value) {
     return value;
   }
   return void 0;
+}
+function preferWebpCover(url) {
+  const trimmed = url.trim();
+  if (!trimmed.startsWith("/") || !/\.png$/i.test(trimmed)) return trimmed;
+  return trimmed.replace(/\.png$/i, ".webp");
 }
 function asStringArray(value) {
   if (!Array.isArray(value)) return [];
@@ -520,7 +560,7 @@ function mapBlogRow(row) {
     updatedAt,
     readMinutes: Number(row.read_minutes) || 5,
     category: String(row.category ?? ""),
-    coverImage: String(row.cover_image ?? ""),
+    coverImage: preferWebpCover(String(row.cover_image ?? "")),
     coverAlt: String(row.cover_alt ?? ""),
     seoTitle: String(row.seo_title ?? ""),
     seoDescription: String(row.seo_description ?? ""),
@@ -588,6 +628,7 @@ async function handler6(req, res) {
       )
     });
   } catch (err) {
+    console.error("[api/blog]", err);
     const message = err instanceof Error ? err.message : "Failed to load blog";
     return json(res, 500, { error: message });
   }
@@ -925,6 +966,7 @@ async function handler9(req, res) {
       })
     });
   } catch (err) {
+    console.error("[api/culture]", err);
     const message = err instanceof Error ? err.message : "Failed to load culture images";
     return json(res, 500, { error: message });
   }
@@ -1043,6 +1085,7 @@ async function handler11(req, res) {
   const sql2 = getDb();
   const action = typeof req.query.action === "string" ? req.query.action : "";
   try {
+    await ensureServicesSchema(sql2);
     if (req.method === "GET") {
       const categories = await sql2`
         SELECT id, title, numeral, intro, sort_order
@@ -1153,6 +1196,7 @@ async function handler11(req, res) {
     }
     return json(res, 400, { error: "Unknown action" });
   } catch (err) {
+    console.error("[api/admin/services]", err);
     const message = err instanceof Error ? err.message : "Services admin error";
     return json(res, 500, { error: message });
   }

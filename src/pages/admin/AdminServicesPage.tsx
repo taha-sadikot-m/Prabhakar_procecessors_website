@@ -101,7 +101,11 @@ export function AdminServicesPage() {
       await load()
       setModal({ type: 'none' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Request failed')
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Request failed. Check you are logged in and Hostinger DATABASE_URL / JWT_SECRET match production.',
+      )
     } finally {
       setBusy(false)
     }
