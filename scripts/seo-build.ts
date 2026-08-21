@@ -27,6 +27,12 @@ if (existsSync(envPath) && typeof process.loadEnvFile === 'function') {
 
 const SITE = company.website.replace(/\/$/, '')
 
+function preferWebpCover(url: string): string {
+  const trimmed = url.trim()
+  if (!trimmed.startsWith('/') || !/\.png$/i.test(trimmed)) return trimmed
+  return trimmed.replace(/\.png$/i, '.webp')
+}
+
 function mapDbPost(row: Record<string, unknown>): BlogPost {
   const keywordsRaw = row.keywords
   const sectionsRaw = row.sections
@@ -66,7 +72,7 @@ function mapDbPost(row: Record<string, unknown>): BlogPost {
     updatedAt,
     readMinutes: Number(row.read_minutes) || 5,
     category: String(row.category ?? ''),
-    coverImage: String(row.cover_image ?? ''),
+    coverImage: preferWebpCover(String(row.cover_image ?? '')),
     coverAlt: String(row.cover_alt ?? ''),
     seoTitle: String(row.seo_title ?? ''),
     seoDescription: String(row.seo_description ?? ''),

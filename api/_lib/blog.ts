@@ -23,6 +23,13 @@ function asTheme(value: unknown): BlogCtaTheme | undefined {
   return undefined
 }
 
+/** Prefer local WebP when DB still stores a .png path after the asset migration. */
+export function preferWebpCover(url: string): string {
+  const trimmed = url.trim()
+  if (!trimmed.startsWith('/') || !/\.png$/i.test(trimmed)) return trimmed
+  return trimmed.replace(/\.png$/i, '.webp')
+}
+
 export type BlogPostDto = {
   id: string
   slug: string
@@ -121,7 +128,7 @@ export function mapBlogRow(row: Record<string, unknown>): BlogPostDto {
     updatedAt,
     readMinutes: Number(row.read_minutes) || 5,
     category: String(row.category ?? ''),
-    coverImage: String(row.cover_image ?? ''),
+    coverImage: preferWebpCover(String(row.cover_image ?? '')),
     coverAlt: String(row.cover_alt ?? ''),
     seoTitle: String(row.seo_title ?? ''),
     seoDescription: String(row.seo_description ?? ''),
