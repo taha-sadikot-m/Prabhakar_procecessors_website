@@ -75,9 +75,9 @@ export function Journey() {
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <picture className="absolute inset-0 block h-full w-full">
-          <source media="(min-width: 768px)" srcSet="/second_section/desktop.png" />
+          <source media="(min-width: 768px)" srcSet="/second_section/desktop.webp" />
           <img
-            src="/second_section/mobile.png"
+            src="/second_section/mobile.webp"
             alt=""
             className="absolute inset-0 h-full w-full object-cover object-bottom md:object-right md:object-center"
           />

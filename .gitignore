@@ -58,3 +58,6 @@ public/gallery-videos/*.jpg
 # Unused prototype site under DOCS (also covered by DOCS/ above)
 DOCS/website/dist/
 DOCS/website/vite.config.js.timestamp-*
+
+# Local PNG backups after WebP migration (not deployed)
+spared_png/

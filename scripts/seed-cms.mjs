@@ -32,35 +32,35 @@ const categories = [
         name: 'Dyed Finish',
         description:
           'Even, lasting colour with a clean finished hand across the full width.',
-        image: '/service_section/swatch-01-piece-dyeing.png',
+        image: '/service_section/swatch-01-piece-dyeing.webp',
       },
       {
         id: 'dyed-padding',
         name: 'Dyed Padding / Shaded Dyeing',
         description:
           'Pad dyeing for controlled shade depth, including gradient and shaded effects.',
-        image: '/service_section/swatch-02-solid-dyeing.png',
+        image: '/service_section/swatch-02-solid-dyeing.webp',
       },
       {
         id: 'prism',
         name: 'Prism',
         description:
           'Multi-tone prism dyeing that builds dimensional colour across the cloth.',
-        image: '/service_section/swatch-03-cationic-dyeing.png',
+        image: '/service_section/swatch-03-cationic-dyeing.webp',
       },
       {
         id: 'batik-dyeing',
         name: 'Batik Dyeing',
         description:
           'Resist-dye batik for distinctive pattern and colour boundaries.',
-        image: '/service_section/swatch-04-screen-printing.png',
+        image: '/service_section/swatch-04-screen-printing.webp',
       },
       {
         id: 'cross-dyeing',
         name: 'Cross Dyeing',
         description:
           'Dual-fibre cross dyeing for two-tone effects in a single bath.',
-        image: '/service_section/swatch-02-solid-dyeing.png',
+        image: '/service_section/swatch-02-solid-dyeing.webp',
       },
     ],
   },
@@ -77,70 +77,70 @@ const categories = [
         name: 'Padding Discharge Print',
         description:
           'Discharge on a dyed ground for a soft-hand, detailed print.',
-        image: '/service_section/swatch-05-discharge-printing.png',
+        image: '/service_section/swatch-05-discharge-printing.webp',
       },
       {
         id: 'moorga-print',
         name: 'Moorga Print',
         description:
           'Moorga print for distinctive texture and pattern character.',
-        image: '/service_section/swatch-04-screen-printing.png',
+        image: '/service_section/swatch-04-screen-printing.webp',
       },
       {
         id: 'over-print',
         name: 'Over Print',
         description:
           'Overprinting on dyed or printed grounds for layered colour and motif.',
-        image: '/service_section/swatch-06-digital-printing.png',
+        image: '/service_section/swatch-06-digital-printing.webp',
       },
       {
         id: 'jari-print',
         name: 'Jari Print',
         description:
           'Metallic jari accents that add occasion-wear richness to fabric.',
-        image: '/service_section/swatch-12-foil-jari-print.png',
+        image: '/service_section/swatch-12-foil-jari-print.webp',
       },
       {
         id: 'foil-print',
         name: 'Foil Print',
         description:
           'Foil print for lustre and high-impact metallic highlights.',
-        image: '/service_section/swatch-12-foil-jari-print.png',
+        image: '/service_section/swatch-12-foil-jari-print.webp',
       },
       {
         id: 'rotary-allover',
         name: 'Rotary Allover Print',
         description:
           'Continuous rotary printing for seamless allover patterns at production scale.',
-        image: '/service_section/swatch-11-rotary-allover.png',
+        image: '/service_section/swatch-11-rotary-allover.webp',
       },
       {
         id: 'hand-print',
         name: 'Hand Print',
         description:
           'Hand printing for artisan-scale motifs and short runs.',
-        image: '/service_section/swatch-07-shearing.png',
+        image: '/service_section/swatch-07-shearing.webp',
       },
       {
         id: 'flatbed-print',
         name: 'Flatbed Print',
         description:
           'Flatbed printing for precise registration and larger repeat control.',
-        image: '/service_section/swatch-08-sueding.png',
+        image: '/service_section/swatch-08-sueding.webp',
       },
       {
         id: 'pigment-print',
         name: 'Pigment Print',
         description:
           'Pigment printing for vibrant colour with a stable, wash-ready hold.',
-        image: '/service_section/swatch-09-water-repellency.png',
+        image: '/service_section/swatch-09-water-repellency.webp',
       },
       {
         id: 'spray-print',
         name: 'Spray Print',
         description:
           'Spray print for soft-edge colour and atmospheric effects.',
-        image: '/service_section/swatch-10-soil-release.png',
+        image: '/service_section/swatch-10-soil-release.webp',
       },
     ],
   },
@@ -635,25 +635,25 @@ async function main() {
   const cultureSeed = [
     {
       id: 'cult-benefit-1',
-      driveUrl: '/careers_section/benefit-security.png',
+      driveUrl: '/careers_section/benefit-security.webp',
       caption: 'Security & stability',
       sortOrder: 0,
     },
     {
       id: 'cult-benefit-2',
-      driveUrl: '/careers_section/benefit-workplace.png',
+      driveUrl: '/careers_section/benefit-workplace.webp',
       caption: 'Workplace',
       sortOrder: 1,
     },
     {
       id: 'cult-benefit-3',
-      driveUrl: '/careers_section/benefit-learning.png',
+      driveUrl: '/careers_section/benefit-learning.webp',
       caption: 'Learning',
       sortOrder: 2,
     },
     {
       id: 'cult-benefit-4',
-      driveUrl: '/careers_section/benefit-life.png',
+      driveUrl: '/careers_section/benefit-life.webp',
       caption: 'Life at the mill',
       sortOrder: 3,
     },

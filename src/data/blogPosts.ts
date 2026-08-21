@@ -43,7 +43,7 @@ const posts: BlogPost[] = [
     updatedAt: '2026-07-18',
     readMinutes: 5,
     category: 'Process',
-    coverImage: '/about_section/process/stage-dyeing.png',
+    coverImage: '/about_section/process/stage-dyeing.webp',
     coverAlt:
       'Dyeing floor at Prabhakar Processors in Surat, fabric in process for shade-controlled dyeing',
     seoTitle: 'Shade Matching in Textile Dyeing | Prabhakar Processors',
@@ -97,7 +97,7 @@ const posts: BlogPost[] = [
     updatedAt: '2026-06-02',
     readMinutes: 4,
     category: 'Quality',
-    coverImage: '/about_section/process/stage-inspection.png',
+    coverImage: '/about_section/process/stage-inspection.webp',
     coverAlt:
       'Final fabric inspection at Prabhakar Processors before dispatch from Kadodara, Surat',
     seoTitle: 'Fabric Inspection Before Dispatch | Prabhakar Processors',
@@ -150,7 +150,7 @@ const posts: BlogPost[] = [
     updatedAt: '2026-04-21',
     readMinutes: 6,
     category: 'Process',
-    coverImage: '/about_section/process/stage-printing.png',
+    coverImage: '/about_section/process/stage-printing.webp',
     coverAlt:
       'Textile printing in progress at Prabhakar Processors, artwork translated onto fabric',
     seoTitle: 'Textile Printing From Artwork To Fabric | Prabhakar',
@@ -203,7 +203,7 @@ const posts: BlogPost[] = [
     updatedAt: '2026-03-08',
     readMinutes: 4,
     category: 'Partnership',
-    coverImage: '/about_section/about-heritage.png',
+    coverImage: '/about_section/about-heritage.webp',
     coverAlt:
       'Prabhakar Processors heritage and partnership, textile processing mill in Surat since 2009',
     seoTitle: 'Textile Processing Partnership | Prabhakar Processors',

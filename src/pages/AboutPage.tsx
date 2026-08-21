@@ -276,7 +276,7 @@ function Principles() {
               <div
                 className="pointer-events-none absolute inset-0 opacity-[0.08]"
                 style={{
-                  backgroundImage: 'url(/service_section/bg-ikat-texture.png)',
+                  backgroundImage: 'url(/service_section/bg-ikat-texture.webp)',
                   backgroundSize: 'cover',
                 }}
                 aria-hidden="true"
@@ -346,7 +346,7 @@ function Principles() {
                 <div
                   className="pointer-events-none absolute inset-0 opacity-[0.08]"
                   style={{
-                    backgroundImage: 'url(/service_section/bg-ikat-texture.png)',
+                    backgroundImage: 'url(/service_section/bg-ikat-texture.webp)',
                     backgroundSize: 'cover',
                   }}
                   aria-hidden="true"

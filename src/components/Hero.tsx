@@ -35,14 +35,14 @@ export function Hero() {
           <picture className="absolute inset-0 block h-full w-full">
             <source
               media="(min-width: 1024px)"
-              srcSet="/hero_section_image/desktop.png"
+              srcSet="/hero_section_image/desktop.webp"
             />
             <source
               media="(min-width: 768px)"
-              srcSet="/hero_section_image/tablet_version.png"
+              srcSet="/hero_section_image/tablet_version.webp"
             />
             <img
-              src="/hero_section_image/mobile_version.png"
+              src="/hero_section_image/mobile_version.webp"
               alt=""
               className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
             />

@@ -74,8 +74,8 @@ export const transformation = {
       subheading: 'Full of Potential.',
       description:
         "Every exceptional fabric begins in its simplest form. We collect grey fabric directly from your facility or Surat's textile markets, preparing it for transformation.",
-      desktopImage: '/third_section/1_desktop.png',
-      mobileImage: '/third_section/1_mobile.png',
+      desktopImage: '/third_section/1_desktop.webp',
+      mobileImage: '/third_section/1_mobile.webp',
     },
     {
       step: '02',
@@ -84,8 +84,8 @@ export const transformation = {
       subheading: 'Dyed Every Day.',
       description:
         'Piece dyeing. Solid dyeing. Cationic dyeing. Every shade engineered for consistency and lasting brilliance.',
-      desktopImage: '/third_section/2_desktop.png',
-      mobileImage: '/third_section/2_mobile.png',
+      desktopImage: '/third_section/2_desktop.webp',
+      mobileImage: '/third_section/2_mobile.webp',
     },
     {
       step: '03',
@@ -94,8 +94,8 @@ export const transformation = {
       subheading: 'Printed Every Day.',
       description:
         'Screen. Rotary. Flatbed. Digital. Pigment. Foil. Jari. Prism. Moorga. Every print is crafted with exceptional precision.',
-      desktopImage: '/third_section/3_desktop.png',
-      mobileImage: '/third_section/3_mobile.png',
+      desktopImage: '/third_section/3_desktop.webp',
+      mobileImage: '/third_section/3_mobile.webp',
     },
     {
       step: '04',
@@ -104,8 +104,8 @@ export const transformation = {
       subheading: 'Defines Everything.',
       description:
         'Sueding. Shearing. Water repellency. Soil release. The finishing process perfects the texture, performance and feel of every fabric.',
-      desktopImage: '/third_section/4_desktop.png',
-      mobileImage: '/third_section/4_mobile.png',
+      desktopImage: '/third_section/4_desktop.webp',
+      mobileImage: '/third_section/4_mobile.webp',
     },
     {
       step: '05',
@@ -114,8 +114,8 @@ export const transformation = {
       subheading: 'Delivered With Confidence.',
       description:
         'Every roll is carefully inspected, packed and delivered on time because reliability matters as much as craftsmanship.',
-      desktopImage: '/third_section/5_desktop.png',
-      mobileImage: '/third_section/5_mobile.png',
+      desktopImage: '/third_section/5_desktop.webp',
+      mobileImage: '/third_section/5_mobile.webp',
     },
   ],
 }
@@ -126,8 +126,8 @@ export const quality = {
   body: 'Every metre that leaves Prabhakar Processors carries our commitment to consistency. Shade, print, finish, and inspection are verified so the fabric performs exactly as expected.',
   cta: 'See Our Capabilities',
   ctaHref: '/about#capabilities',
-  desktopImage: '/4th_section/desktop.png',
-  mobileImage: '/4th_section/mobile.png',
+  desktopImage: '/4th_section/desktop.webp',
+  mobileImage: '/4th_section/mobile.webp',
   annotations: [
     {
       id: 'colour',
@@ -164,8 +164,8 @@ export const ecosystem = {
   body: 'From collecting raw grey fabric to delivering finished textiles ready for production, every stage is managed with precision, reliability and transparency. Our integrated workflow simplifies operations, reduces coordination and ensures your fabric moves efficiently from start to finish.',
   cta: 'Explore Services',
   ctaHref: '/services',
-  desktopBackground: '/plain_background/desktop_background.png',
-  mobileBackground: '/plain_background/mobile_background.png',
+  desktopBackground: '/plain_background/desktop_background.webp',
+  mobileBackground: '/plain_background/mobile_background.webp',
   milestones: [
     {
       id: 'customer',
@@ -221,32 +221,32 @@ export const serve = {
       category: 'Garment Manufacturers',
       headline: 'Consistency at Scale.',
       body: 'Reliable production that keeps your manufacturing lines moving without compromise.',
-      desktopImage: '/6th_section/desktop_1.png',
-      mobileImage: '/6th_section/mobile_1.png',
+      desktopImage: '/6th_section/desktop_1.webp',
+      mobileImage: '/6th_section/mobile_1.webp',
     },
     {
       id: 'fashion',
       category: 'Fashion Brands',
       headline: 'Colours That Stay True.',
       body: 'Distinctive shades and premium finishes designed to elevate every collection.',
-      desktopImage: '/6th_section/desktop_2.png',
-      mobileImage: '/6th_section/mobile_2.png',
+      desktopImage: '/6th_section/desktop_2.webp',
+      mobileImage: '/6th_section/mobile_2.webp',
     },
     {
       id: 'export',
       category: 'Textile Exporters',
       headline: 'Quality That Travels.',
       body: 'Global-quality processing that meets demanding international expectations.',
-      desktopImage: '/6th_section/desktop_3.png',
-      mobileImage: '/6th_section/mobile_3.png',
+      desktopImage: '/6th_section/desktop_3.webp',
+      mobileImage: '/6th_section/mobile_3.webp',
     },
     {
       id: 'home',
       category: 'Home Textile Businesses',
       headline: 'Crafted for Everyday Comfort.',
       body: 'Soft textures, lasting colours and refined finishes built for modern living.',
-      desktopImage: '/6th_section/desktop_4.png',
-      mobileImage: '/6th_section/mobile_4.png',
+      desktopImage: '/6th_section/desktop_4.webp',
+      mobileImage: '/6th_section/mobile_4.webp',
     },
   ],
 }
@@ -257,8 +257,8 @@ export const partnerships = {
   body: 'Trusted by manufacturers, exporters and brands who value consistency, reliability and long-term collaboration. Every relationship begins with a single order and grows into something far more enduring.',
   cta: 'Read Testimonials',
   ctaHref: '/testimonials',
-  desktopBackground: '/7th_section/desktop_image.png',
-  mobileBackground: '/7th_section/mobile_image.png',
+  desktopBackground: '/7th_section/desktop_image.webp',
+  mobileBackground: '/7th_section/mobile_image.webp',
   partners: [
     {
       id: 'garment',
@@ -341,19 +341,19 @@ export const future = {
       id: 'technology',
       title: 'Modern Technology',
       body: 'Advanced equipment delivering precision at every stage of production, from dye liquor preparation to final fabric inspection.',
-      image: '/8th_section/1.png',
+      image: '/8th_section/1.webp',
     },
     {
       id: 'innovation',
       title: 'Continuous Innovation',
       body: 'Refining processes, adopting new techniques and improving efficiency, so that every batch is better than the last.',
-      image: '/8th_section/2.png',
+      image: '/8th_section/2.webp',
     },
     {
       id: 'responsible',
       title: 'Responsible Manufacturing',
       body: 'Thoughtful production practices focused on resource efficiency and long-term sustainability for every stakeholder.',
-      image: '/8th_section/3.png',
+      image: '/8th_section/3.webp',
     },
   ],
 }
@@ -366,8 +366,8 @@ export const people = {
   attribution: 'Founder, Prabhakar Processors Pvt Ltd',
   cta: 'Join Our Team',
   ctaHref: '/careers',
-  desktopImage: '/9th_section/3IN1_desktop.png',
-  mobileImage: '/9th_section/3In1_mobile.png',
+  desktopImage: '/9th_section/3IN1_desktop.webp',
+  mobileImage: '/9th_section/3In1_mobile.webp',
 }
 
 export const closing = {
@@ -378,8 +378,8 @@ export const closing = {
   ctaHref: '/contact',
   secondaryCta: 'Read The Blog',
   secondaryHref: '/blog',
-  desktopImage: '/10th_section/desktop.png',
-  mobileImage: '/10th_section/mobile.png',
+  desktopImage: '/10th_section/desktop.webp',
+  mobileImage: '/10th_section/mobile.webp',
   contacts: [
     {
       label: '+91 99099 70508',
@@ -411,14 +411,14 @@ export const aboutPage = {
     'Premium dyeing and printing from Surat, precision, consistency, and trust in every metre since 2009.',
   provenance: 'Since 2009 · Surat, India',
   hero: {
-    desktopImage: '/about_section/about-hero-desktop.png',
-    mobileImage: '/about_section/about-hero-mobile.png',
+    desktopImage: '/about_section/about-hero-desktop.webp',
+    mobileImage: '/about_section/about-hero-mobile.webp',
   },
   story: {
     eyebrow: 'Our Story',
     title: 'Crafted In Surat. Trusted Across India.',
     body: 'Born in India’s textile capital, Prabhakar Processors transforms grey fabric into finished cloth with modern technology, skilled hands, and a customer-first promise.',
-    image: '/about_section/about-heritage.png',
+    image: '/about_section/about-heritage.webp',
     imageAlt: 'Precision textile machinery and finished fabric detail',
   },
   timeline: [
@@ -487,31 +487,31 @@ export const aboutPage = {
         id: 'pickup',
         title: 'Pickup',
         description: 'Grey fabric collected from markets and customer locations.',
-        image: '/about_section/process/stage-pickup.png',
+        image: '/about_section/process/stage-pickup.webp',
       },
       {
         id: 'dyeing',
         title: 'Dyeing',
         description: 'Consistent shades with controlled liquor and careful finishing.',
-        image: '/about_section/process/stage-dyeing.png',
+        image: '/about_section/process/stage-dyeing.webp',
       },
       {
         id: 'printing',
         title: 'Printing',
         description: 'Precise prints with clarity, depth, and lasting colour.',
-        image: '/about_section/process/stage-printing.png',
+        image: '/about_section/process/stage-printing.webp',
       },
       {
         id: 'inspection',
         title: 'Inspection',
         description: 'Stage-wise checks before fabric leaves our floor.',
-        image: '/about_section/process/stage-inspection.png',
+        image: '/about_section/process/stage-inspection.webp',
       },
       {
         id: 'delivery',
         title: 'Delivery',
         description: 'Finished cloth returned safely and on schedule.',
-        image: '/about_section/process/stage-delivery.png',
+        image: '/about_section/process/stage-delivery.webp',
       },
     ],
   },
@@ -525,17 +525,17 @@ export const aboutPage = {
       {
         name: 'Anand Poddar',
         role: 'Director',
-        image: '/9th_section/Anand Poddar.png',
+        image: '/9th_section/Anand Poddar.webp',
       },
       {
         name: 'Vikas Poddar',
         role: 'Director',
-        image: '/9th_section/Vikas Poddar.png',
+        image: '/9th_section/Vikas Poddar.webp',
       },
       {
         name: 'Shaleen Poddar',
         role: 'Director',
-        image: '/9th_section/Shaleen Poddar.png',
+        image: '/9th_section/Shaleen Poddar.webp',
       },
     ],
   },
@@ -547,8 +547,8 @@ export const aboutPage = {
     primaryHref: '/services',
     secondaryCta: 'Read The Blog',
     secondaryHref: '/blog',
-    desktopImage: '/about_section/about-closing-desktop.png',
-    mobileImage: '/about_section/about-closing-mobile.png',
+    desktopImage: '/about_section/about-closing-desktop.webp',
+    mobileImage: '/about_section/about-closing-mobile.webp',
   },
 }
 
@@ -559,12 +559,12 @@ export const servicesPage = {
   body: 'A comprehensive portfolio of dyeing and printing, each service crafted with the same precision we bring to every metre.',
   meta: '2 disciplines · 15 services',
   hero: {
-    desktopImage: '/services_section/services-hero-desktop.png',
-    mobileImage: '/services_section/services-hero-mobile.png',
+    desktopImage: '/services_section/services-hero-desktop.webp',
+    mobileImage: '/services_section/services-hero-mobile.webp',
   },
   backgrounds: {
-    ikat: '/service_section/bg-ikat-texture.png',
-    jali: '/service_section/bg-jali-lattice.png',
+    ikat: '/service_section/bg-ikat-texture.webp',
+    jali: '/service_section/bg-jali-lattice.webp',
   },
   categories: [
     {
@@ -579,35 +579,35 @@ export const servicesPage = {
           name: 'Dyed Finish',
           description:
             'Even, lasting colour with a clean finished hand across the full width.',
-          image: '/service_section/swatch-01-piece-dyeing.png',
+          image: '/service_section/swatch-01-piece-dyeing.webp',
         },
         {
           id: 'dyed-padding',
           name: 'Dyed Padding / Shaded Dyeing',
           description:
             'Pad dyeing for controlled shade depth, including gradient and shaded effects.',
-          image: '/service_section/swatch-02-solid-dyeing.png',
+          image: '/service_section/swatch-02-solid-dyeing.webp',
         },
         {
           id: 'prism',
           name: 'Prism',
           description:
             'Multi-tone prism dyeing that builds dimensional colour across the cloth.',
-          image: '/service_section/swatch-03-cationic-dyeing.png',
+          image: '/service_section/swatch-03-cationic-dyeing.webp',
         },
         {
           id: 'batik-dyeing',
           name: 'Batik Dyeing',
           description:
             'Resist-dye batik for distinctive pattern and colour boundaries.',
-          image: '/service_section/swatch-04-screen-printing.png',
+          image: '/service_section/swatch-04-screen-printing.webp',
         },
         {
           id: 'cross-dyeing',
           name: 'Cross Dyeing',
           description:
             'Dual-fibre cross dyeing for two-tone effects in a single bath.',
-          image: '/service_section/swatch-02-solid-dyeing.png',
+          image: '/service_section/swatch-02-solid-dyeing.webp',
         },
       ],
     },
@@ -623,70 +623,70 @@ export const servicesPage = {
           name: 'Padding Discharge Print',
           description:
             'Discharge on a dyed ground for a soft-hand, detailed print.',
-          image: '/service_section/swatch-05-discharge-printing.png',
+          image: '/service_section/swatch-05-discharge-printing.webp',
         },
         {
           id: 'moorga-print',
           name: 'Moorga Print',
           description:
             'Moorga print for distinctive texture and pattern character.',
-          image: '/service_section/swatch-04-screen-printing.png',
+          image: '/service_section/swatch-04-screen-printing.webp',
         },
         {
           id: 'over-print',
           name: 'Over Print',
           description:
             'Overprinting on dyed or printed grounds for layered colour and motif.',
-          image: '/service_section/swatch-06-digital-printing.png',
+          image: '/service_section/swatch-06-digital-printing.webp',
         },
         {
           id: 'jari-print',
           name: 'Jari Print',
           description:
             'Metallic jari accents that add occasion-wear richness to fabric.',
-          image: '/service_section/swatch-12-foil-jari-print.png',
+          image: '/service_section/swatch-12-foil-jari-print.webp',
         },
         {
           id: 'foil-print',
           name: 'Foil Print',
           description:
             'Foil print for lustre and high-impact metallic highlights.',
-          image: '/service_section/swatch-12-foil-jari-print.png',
+          image: '/service_section/swatch-12-foil-jari-print.webp',
         },
         {
           id: 'rotary-allover',
           name: 'Rotary Allover Print',
           description:
             'Continuous rotary printing for seamless allover patterns at production scale.',
-          image: '/service_section/swatch-11-rotary-allover.png',
+          image: '/service_section/swatch-11-rotary-allover.webp',
         },
         {
           id: 'hand-print',
           name: 'Hand Print',
           description:
             'Hand printing for artisan-scale motifs and short runs.',
-          image: '/service_section/swatch-07-shearing.png',
+          image: '/service_section/swatch-07-shearing.webp',
         },
         {
           id: 'flatbed-print',
           name: 'Flatbed Print',
           description:
             'Flatbed printing for precise registration and larger repeat control.',
-          image: '/service_section/swatch-08-sueding.png',
+          image: '/service_section/swatch-08-sueding.webp',
         },
         {
           id: 'pigment-print',
           name: 'Pigment Print',
           description:
             'Pigment printing for vibrant colour with a stable, wash-ready hold.',
-          image: '/service_section/swatch-09-water-repellency.png',
+          image: '/service_section/swatch-09-water-repellency.webp',
         },
         {
           id: 'spray-print',
           name: 'Spray Print',
           description:
             'Spray print for soft-edge colour and atmospheric effects.',
-          image: '/service_section/swatch-10-soil-release.png',
+          image: '/service_section/swatch-10-soil-release.webp',
         },
       ],
     },
@@ -709,15 +709,15 @@ export const servicesPage = {
     primaryHref: '/contact',
     secondaryCta: 'Read The Blog',
     secondaryHref: '/blog',
-    desktopImage: '/services_section/services-closing-desktop.png',
-    mobileImage: '/services_section/services-closing-mobile.png',
+    desktopImage: '/services_section/services-closing-desktop.webp',
+    mobileImage: '/services_section/services-closing-mobile.webp',
   },
 }
 
 export const galleryPage = {
   hero: {
-    desktopImage: '/gallery_section/gallery-hero-desktop.png',
-    mobileImage: '/gallery_section/gallery-hero-mobile.png',
+    desktopImage: '/gallery_section/gallery-hero-desktop.webp',
+    mobileImage: '/gallery_section/gallery-hero-mobile.webp',
   },
 }
 
@@ -728,8 +728,8 @@ export const careersPage = {
   body: 'At Prabhakar Processors, we are committed to creating a workplace where employees feel valued, supported, and empowered to grow.',
   meta: '19 departments · Surat, Gujarat · Since 2009',
   hero: {
-    desktopImage: '/careers_section/careers-hero-desktop.png',
-    mobileImage: '/careers_section/careers-hero-mobile.png',
+    desktopImage: '/careers_section/careers-hero-desktop.webp',
+    mobileImage: '/careers_section/careers-hero-mobile.webp',
   },
   rail: [
     { id: 'benefits', label: 'Benefits' },
@@ -743,7 +743,7 @@ export const careersPage = {
       {
         id: 'security',
         title: 'Security & Pay',
-        image: '/careers_section/benefit-security.png',
+        image: '/careers_section/benefit-security.webp',
         items: [
           'Competitive Salary & Timely Payments',
           'Employee Provident Fund (PF)',
@@ -754,7 +754,7 @@ export const careersPage = {
       {
         id: 'workplace',
         title: 'Workplace & Safety',
-        image: '/careers_section/benefit-workplace.png',
+        image: '/careers_section/benefit-workplace.webp',
         items: [
           'Safe & Healthy Working Environment',
           'Comfortable Working Environment',
@@ -766,7 +766,7 @@ export const careersPage = {
       {
         id: 'learning',
         title: 'Learning & Growth',
-        image: '/careers_section/benefit-learning.png',
+        image: '/careers_section/benefit-learning.webp',
         items: [
           'Professional Training & Skill Development',
           'Advanced SOPs & Training',
@@ -777,7 +777,7 @@ export const careersPage = {
       {
         id: 'life',
         title: 'Life & Community',
-        image: '/careers_section/benefit-life.png',
+        image: '/careers_section/benefit-life.webp',
         items: [
           'Supportive & Team-Oriented Work Culture',
           'Mess & Canteen Facilities',
@@ -871,7 +871,7 @@ export const careersPage = {
     primaryCta: 'Start Application',
     primaryHref: '#apply',
     secondaryCta: 'Email HR',
-    texture: '/service_section/bg-ikat-texture.png',
+    texture: '/service_section/bg-ikat-texture.webp',
   },
 }
 
@@ -881,8 +881,8 @@ export const testimonialsPage = {
   highlight: 'Partnerships',
   body: 'Manufacturers, exporters, and brands who value consistency choose Prabhakar Processors for the long term. Relationships measured in years, not orders.',
   hero: {
-    desktopImage: '/partners_section/partners-hero-desktop.png',
-    mobileImage: '/partners_section/partners-hero-mobile.png',
+    desktopImage: '/partners_section/partners-hero-desktop.webp',
+    mobileImage: '/partners_section/partners-hero-mobile.webp',
   },
   quotes: [
     {
@@ -930,7 +930,7 @@ export const testimonialsPage = {
     primaryHref: '/contact',
     secondaryCta: 'View Services',
     secondaryHref: '/services',
-    texture: '/service_section/bg-ikat-texture.png',
+    texture: '/service_section/bg-ikat-texture.webp',
   },
 }
 
@@ -958,8 +958,8 @@ export const journalPage = {
     },
   ],
   hero: {
-    desktopImage: '/instagram_section/instagram-hero-desktop.png',
-    mobileImage: '/instagram_section/instagram-hero-mobile.png',
+    desktopImage: '/instagram_section/instagram-hero-desktop.webp',
+    mobileImage: '/instagram_section/instagram-hero-mobile.webp',
   },
   closing: {
     headline: ['Follow The', 'Process.'],
@@ -967,7 +967,7 @@ export const journalPage = {
     primaryCta: 'Follow On Instagram',
     secondaryCta: 'Contact Us',
     secondaryHref: '/contact',
-    texture: '/service_section/bg-ikat-texture.png',
+    texture: '/service_section/bg-ikat-texture.webp',
   },
 }
 
@@ -981,7 +981,7 @@ export const blogPage = {
   seoDescription:
     'Notes from Prabhakar Processors on dyeing, printing, fabric inspection, and partnership, practical insights from our Surat mill.',
   hero: {
-    texture: '/service_section/bg-jali-lattice.png',
+    texture: '/service_section/bg-jali-lattice.webp',
     primaryCta: 'Discuss A Requirement',
     primaryHref: '/contact',
     secondaryCta: 'Browse Notes',
@@ -995,7 +995,7 @@ export const blogPage = {
     primaryHref: '/contact',
     secondaryCta: 'View Services',
     secondaryHref: '/services',
-    texture: '/service_section/bg-ikat-texture.png',
+    texture: '/service_section/bg-ikat-texture.webp',
   },
 }
 
