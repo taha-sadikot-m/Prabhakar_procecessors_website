@@ -23,9 +23,9 @@ npm start       # node server.js → server.cjs (same process listens on PORT)
 | Field | Value |
 |---|---|
 | Framework | **Express** |
-| **Build script** | **`npm run build`** (required — do not leave blank) |
+| **Build script** | **`build`** (script name — do **not** leave blank) |
 | Entry file | **`server.js`** (`server.cjs` is the CommonJS bootstrap it loads) |
-| Output directory | leave blank (or `dist`) |
+| Output directory | **leave blank** (Express serves `dist/` itself; do not set `dist`) |
 | Node | `24.x` |
 | Package manager | `npm` |
 

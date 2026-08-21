@@ -12,14 +12,29 @@ const serverBundle = path.join(root, 'server.run.mjs')
 
 function runBuild() {
   console.log('[server] running npm run build…')
-  const result = spawnSync('npm', ['run', 'build'], {
+  const result = spawnSync('npm run build', {
     cwd: root,
     env: process.env,
-    stdio: 'inherit',
+    encoding: 'utf8',
     shell: true,
+    maxBuffer: 20 * 1024 * 1024,
   })
+
+  if (result.stdout) {
+    console.log(result.stdout)
+  }
+  if (result.stderr) {
+    console.error(result.stderr)
+  }
+  if (result.error) {
+    console.error('[server] build spawn error:', result.error)
+  }
+
   if (result.status !== 0) {
-    console.error('[server] build failed')
+    console.error('[server] build failed', {
+      status: result.status,
+      signal: result.signal,
+    })
     process.exit(result.status ?? 1)
   }
 }
