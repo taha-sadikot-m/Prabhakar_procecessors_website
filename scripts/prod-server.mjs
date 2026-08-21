@@ -31,6 +31,7 @@ const ROOT = existsSync(path.join(__dirname, 'package.json'))
   ? __dirname
   : path.resolve(__dirname, '..')
 const DIST = path.join(ROOT, 'dist')
+const PUBLIC = path.join(ROOT, 'public')
 const PORT = Number(process.env.PORT) || 3000
 
 function resolveHandler(mod) {
@@ -80,6 +81,14 @@ app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'API route not found' })
 })
 
+// Images and other static files live in public/ (not duplicated into dist/).
+app.use(
+  express.static(PUBLIC, {
+    index: false,
+    fallthrough: true,
+  }),
+)
+
 app.use(
   express.static(DIST, {
     index: false,
@@ -110,7 +119,8 @@ server.on('error', (err) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[prod-server] listening on http://0.0.0.0:${PORT}`)
-  console.log(`[prod-server] serving static from ${DIST}`)
+  console.log(`[prod-server] serving public from ${PUBLIC}`)
+  console.log(`[prod-server] serving app bundle from ${DIST}`)
 })
 
 function shutdown() {

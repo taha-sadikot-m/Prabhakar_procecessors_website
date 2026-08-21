@@ -9,14 +9,14 @@ npm install
 npm run dev
 ```
 
-Runs Vite on `:5173` and the API on `:8787` (proxied as `/api`).
+Runs Vite on `:5173` and the API on `:8787` (proxied as `/api`). Images stay in `public/`.
 
 ## Production (single host — Hostinger Express)
 
-Hostinger runtime cannot run Vite/esbuild (`EACCES` on native binaries). **Build locally, commit the artifacts, then deploy.**
+Hostinger runtime cannot run Vite/esbuild. **Build locally**, then deploy a **slim** `dist/` (JS/CSS/HTML only). Images are served from `public/` (already in the repo) — they are **not** copied into `dist/`.
 
 ```bash
-npm run build   # writes dist/ + server.run.mjs (tracked in git)
+npm run build   # slim dist/ + server.run.mjs
 npm start       # node server.js → server.cjs → server.run.mjs
 ```
 
@@ -34,7 +34,7 @@ git push
 | Field | Value |
 |---|---|
 | Framework | **Express** |
-| **Build script** | **leave blank** (artifacts are already in the repo) |
+| **Build script** | **leave blank** |
 | Entry file | **`server.js`** |
 | Output directory | **leave blank** |
 | Node | `24.x` |
@@ -47,5 +47,3 @@ Set the same env vars as local `.env` (database, admin secrets, etc.). Hostinger
 - Homepage: `https://YOUR_HOST/`
 - API: `https://YOUR_HOST/api/health` → `{"ok":true}`
 - SPA: `https://YOUR_HOST/careers` (refresh should work)
-
-Do **not** use `/heath` — that path does not exist.

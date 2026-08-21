@@ -1590,6 +1590,7 @@ async function handler17(req, res) {
 var __dirname = path.dirname(fileURLToPath(import.meta.url));
 var ROOT = existsSync(path.join(__dirname, "package.json")) ? __dirname : path.resolve(__dirname, "..");
 var DIST = path.join(ROOT, "dist");
+var PUBLIC = path.join(ROOT, "public");
 var PORT = Number(process.env.PORT) || 3e3;
 function resolveHandler(mod) {
   if (typeof mod === "function") return mod;
@@ -1634,6 +1635,12 @@ app.use("/api", (_req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
 app.use(
+  express.static(PUBLIC, {
+    index: false,
+    fallthrough: true
+  })
+);
+app.use(
   express.static(DIST, {
     index: false,
     fallthrough: true
@@ -1659,7 +1666,8 @@ server.on("error", (err) => {
 });
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`[prod-server] listening on http://0.0.0.0:${PORT}`);
-  console.log(`[prod-server] serving static from ${DIST}`);
+  console.log(`[prod-server] serving public from ${PUBLIC}`);
+  console.log(`[prod-server] serving app bundle from ${DIST}`);
 });
 function shutdown() {
   server.close(() => process.exit(0));

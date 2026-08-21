@@ -25,6 +25,8 @@ lerna-debug.log*
 
 DOCS
 
+
+
 # Vite
 .vite
 
@@ -52,3 +54,7 @@ Desktop.ini
 tools/ffmpeg/
 public/gallery-videos/*.mp4
 public/gallery-videos/*.jpg
+
+# Unused prototype site under DOCS (also covered by DOCS/ above)
+DOCS/website/dist/
+DOCS/website/vite.config.js.timestamp-*
