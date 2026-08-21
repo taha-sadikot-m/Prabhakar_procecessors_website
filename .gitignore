@@ -23,6 +23,8 @@ lerna-debug.log*
 # TypeScript
 *.tsbuildinfo
 
+DOCS
+
 # Vite
 .vite
 
