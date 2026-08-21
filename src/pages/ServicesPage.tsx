@@ -211,9 +211,11 @@ function CategorySection({
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.08}>
-          <SwatchFan category={category} fanOnRight={fanOnRight} />
-        </FadeIn>
+        {category.services.length > 0 ? (
+          <FadeIn delay={0.08}>
+            <SwatchFan category={category} fanOnRight={fanOnRight} />
+          </FadeIn>
+        ) : null}
       </div>
     </section>
   )
@@ -354,7 +356,10 @@ export function ServicesPage() {
     fetchPublicServices()
       .then((data) => {
         if (cancelled) return
-        if (data.categories?.length) setCategories(data.categories)
+        const next = (data.categories ?? []).filter(
+          (c) => Array.isArray(c.services) && c.services.length > 0,
+        )
+        if (next.length) setCategories(next)
       })
       .catch(() => {
         /* keep static fallback */

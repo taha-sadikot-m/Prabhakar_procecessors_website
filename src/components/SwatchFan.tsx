@@ -83,6 +83,14 @@ export function SwatchFan({
   const [unfolded, setUnfolded] = useState(false)
   const [entranceDone, setEntranceDone] = useState(false)
 
+  // Keep selection valid when CMS replaces category.services (or empties it).
+  useEffect(() => {
+    setActiveId((prev) => {
+      if (services.some((s) => s.id === prev)) return prev
+      return services[0]?.id ?? ''
+    })
+  }, [services])
+
   const fanRef = useRef<HTMLDivElement>(null)
   const inView = useInView(fanRef, { once: true, margin: '-80px' })
   const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({})
@@ -383,6 +391,10 @@ export function SwatchFan({
     stepBy(dx < 0 ? 1 : -1)
   }
 
+  if (n === 0 || !active) {
+    return null
+  }
+
   const fan = (
     <div
       ref={fanRef}
@@ -652,17 +664,19 @@ export function SwatchFan({
         aria-hidden="true"
       >
         <AnimatePresence mode="wait" initial={false}>
-          <motion.img
-            key={active.id}
-            src={resolveDisplayImageUrl(active.image)}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0.12 : 0.25 }}
-            draggable={false}
-          />
+          {active ? (
+            <motion.img
+              key={active.id}
+              src={resolveDisplayImageUrl(active.image)}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduceMotion ? 0.12 : 0.25 }}
+              draggable={false}
+            />
+          ) : null}
         </AnimatePresence>
         {detailCaption}
       </motion.div>
