@@ -37,7 +37,7 @@ const PUBLIC = path.join(ROOT, 'public')
 const PORT = Number(process.env.PORT) || 3000
 
 const STATIC_EXT =
-  /\.(?:webp|svg|js|css|woff2?|png|jpe?g|gif|ico|avif|map)$/i
+  /\.(?:webp|svg|js|css|woff2?|png|jpe?g|gif|ico|avif|webm|map)$/i
 
 function resolveHandler(mod) {
   if (typeof mod === 'function') return mod

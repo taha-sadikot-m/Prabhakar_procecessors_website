@@ -198,6 +198,8 @@ function InlineDrivePlayer({
           <img
             src={poster}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
@@ -219,6 +221,8 @@ function InlineDrivePlayer({
         <img
           src={poster}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
         />
       )}
@@ -234,7 +238,7 @@ function InlineDrivePlayer({
         autoPlay
         loop
         playsInline
-        preload="auto"
+        preload={wantPlaying ? 'auto' : 'metadata'}
         controls={false}
         aria-label={label}
         onLoadedMetadata={(e) => {
@@ -355,6 +359,7 @@ function GalleryTile({
             referrerPolicy="no-referrer"
             className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
             loading="lazy"
+            decoding="async"
             onLoad={(e) => {
               const el = e.currentTarget
               if (el.naturalWidth && el.naturalHeight) {

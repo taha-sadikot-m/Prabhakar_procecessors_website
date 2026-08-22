@@ -1910,7 +1910,7 @@ var ROOT = existsSync(path2.join(__dirname, "package.json")) ? __dirname : path2
 var DIST = path2.join(ROOT, "dist");
 var PUBLIC = path2.join(ROOT, "public");
 var PORT = Number(process.env.PORT) || 3e3;
-var STATIC_EXT = /\.(?:webp|svg|js|css|woff2?|png|jpe?g|gif|ico|avif|map)$/i;
+var STATIC_EXT = /\.(?:webp|svg|js|css|woff2?|png|jpe?g|gif|ico|avif|webm|map)$/i;
 function resolveHandler(mod) {
   if (typeof mod === "function") return mod;
   if (mod && typeof mod.default === "function") return mod.default;

@@ -4,6 +4,10 @@ import { isDriveMediaUrl, resolveDisplayImageUrl } from '../../lib/media-url'
 
 type PreviewKind = 'drive' | 'image' | 'auto'
 
+function isLocalVideoUrl(url: string) {
+  return /^\/.+\.(?:mp4|webm)(?:$|\?)/i.test(url.trim())
+}
+
 export function AdminMediaPreview({
   src,
   kind = 'auto',
@@ -18,8 +22,18 @@ export function AdminMediaPreview({
   const trimmed = src.trim()
   if (!trimmed) return null
 
-  const resolvedKind: 'drive' | 'image' =
-    kind === 'auto' ? (isDriveMediaUrl(trimmed) ? 'drive' : 'image') : kind
+  const resolvedKind: 'drive' | 'image' | 'local-video' =
+    kind === 'auto'
+      ? isDriveMediaUrl(trimmed)
+        ? 'drive'
+        : isLocalVideoUrl(trimmed)
+          ? 'local-video'
+          : 'image'
+      : kind === 'drive'
+        ? 'drive'
+        : isLocalVideoUrl(trimmed)
+          ? 'local-video'
+          : 'image'
 
   return (
     <div
@@ -28,6 +42,8 @@ export function AdminMediaPreview({
     >
       {resolvedKind === 'drive' ? (
         <DrivePreview src={trimmed} alt={alt} />
+      ) : resolvedKind === 'local-video' ? (
+        <LocalVideoPreview src={trimmed} alt={alt} />
       ) : (
         <ImagePreview src={resolveDisplayImageUrl(trimmed)} alt={alt} />
       )}
@@ -53,6 +69,48 @@ function ImagePreview({ src, alt }: { src: string; alt: string }) {
       loading="lazy"
       className="absolute inset-0 h-full w-full object-cover"
       onError={() => setFailed(true)}
+    />
+  )
+}
+
+function LocalVideoPreview({ src, alt }: { src: string; alt: string }) {
+  const [mode, setMode] = useState<'poster' | 'video' | 'unavailable'>('poster')
+  const urls = resolveDriveUrls(src)
+  const posterSrc = urls.thumbUrl
+  const videoSrc = urls.videoUrl || urls.viewUrl || src
+
+  useEffect(() => {
+    setMode('poster')
+  }, [src])
+
+  if (mode === 'unavailable') {
+    return <Unavailable />
+  }
+
+  if (mode === 'video') {
+    return (
+      <video
+        src={videoSrc}
+        muted
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 h-full w-full object-cover"
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget
+          if (el.currentTime < 0.05) el.currentTime = 0.1
+        }}
+        onError={() => setMode('unavailable')}
+      />
+    )
+  }
+
+  return (
+    <img
+      src={posterSrc}
+      alt={alt}
+      loading="lazy"
+      className="absolute inset-0 h-full w-full object-cover"
+      onError={() => setMode(videoSrc ? 'video' : 'unavailable')}
     />
   )
 }

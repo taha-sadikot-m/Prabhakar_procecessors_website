@@ -529,6 +529,8 @@ export function SwatchFan({
               <motion.img
                 src={resolveDisplayImageUrl(service.image)}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover"
                 animate={{ scale: isHovered ? 1.06 : 1 }}
                 transition={spring}
@@ -635,6 +637,8 @@ export function SwatchFan({
               <img
                 src={resolveDisplayImageUrl(service.image)}
                 alt=""
+                loading={i === activeIndex ? 'eager' : 'lazy'}
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover"
                 draggable={false}
               />
@@ -669,6 +673,9 @@ export function SwatchFan({
               key={active.id}
               src={resolveDisplayImageUrl(active.image)}
               alt=""
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
               className="absolute inset-0 h-full w-full object-cover"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
