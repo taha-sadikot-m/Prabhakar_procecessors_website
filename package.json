@@ -16,6 +16,7 @@
     "preview": "vite preview",
     "seo": "node --import tsx scripts/seo-build.ts",
     "seed:cms": "node --env-file=.env scripts/seed-cms.mjs",
+    "migrate:service-images": "node --env-file=.env --import tsx scripts/migrate-service-images.mjs",
     "gallery:transcode": "node scripts/transcode-gallery-videos.mjs"
   },
   "dependencies": {
@@ -37,6 +38,7 @@
     "react-helmet-async": "^3.0.0",
     "react-router-dom": "^7.18.2",
     "resend": "^6.21.0",
+    "sharp": "^0.35.3",
     "tailwindcss": "^4.1.11",
     "tsx": "^4.23.9",
     "typescript": "~5.8.3",
@@ -48,8 +50,7 @@
     "@types/node": "^26.2.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
-    "concurrently": "^10.0.4",
-    "sharp": "^0.35.3"
+    "concurrently": "^10.0.4"
   },
   "overrides": {
     "rollup": "npm:@rollup/wasm-node@4.62.5"

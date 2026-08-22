@@ -219,6 +219,26 @@ export function adminDeleteCard(id: string) {
   )
 }
 
+export async function adminUploadImage(
+  file: File,
+  id?: string,
+): Promise<{ url: string }> {
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') resolve(reader.result)
+      else reject(new Error('Failed to read file'))
+    }
+    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.readAsDataURL(file)
+  })
+  return request<{ url: string }>('/api/admin/upload', {
+    method: 'POST',
+    auth: true,
+    body: JSON.stringify({ dataUrl, id }),
+  })
+}
+
 export function adminGetGallery() {
   return request<{ items: AdminGalleryItemDto[] }>('/api/admin/gallery', {
     auth: true,

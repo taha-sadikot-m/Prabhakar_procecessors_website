@@ -25,6 +25,7 @@ import adminBlog from '../api/_lib/routes/admin/blog.ts'
 import adminCareers from '../api/_lib/routes/admin/careers.ts'
 import adminCulture from '../api/_lib/routes/admin/culture.ts'
 import adminContact from '../api/_lib/routes/admin/contact.ts'
+import adminUpload from '../api/_lib/routes/admin/upload.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Source lives in scripts/; bundled output is server.run.mjs at repo root.
@@ -83,7 +84,7 @@ function setStaticCacheHeaders(res, filePath) {
 const app = express()
 app.disable('x-powered-by')
 app.use(compression())
-app.use(express.json({ limit: '2mb' }))
+app.use(express.json({ limit: '6mb' }))
 
 // Hostinger/LiteSpeed otherwise caches GET /api/* for ~7 days.
 app.use('/api', (_req, res, next) => {
@@ -113,6 +114,7 @@ app.all('/api/admin/blog', mount(adminBlog))
 app.all('/api/admin/careers', mount(adminCareers))
 app.all(['/api/admin/culture', '/api/admin/culture/'], mount(adminCulture))
 app.all('/api/admin/contact', mount(adminContact))
+app.all('/api/admin/upload', mount(adminUpload))
 
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'API route not found' })

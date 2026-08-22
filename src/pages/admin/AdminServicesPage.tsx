@@ -5,6 +5,7 @@ import {
   adminGetServices,
   adminSaveCard,
   adminSaveCategory,
+  adminUploadImage,
 } from '../../lib/cms-api'
 import {
   AdminActions,
@@ -72,6 +73,7 @@ export function AdminServicesPage() {
   const [modal, setModal] = useState<Modal>({ type: 'none' })
   const [catForm, setCatForm] = useState(emptyCategory)
   const [cardForm, setCardForm] = useState(emptyCard)
+  const [uploading, setUploading] = useState(false)
 
   const load = useCallback(async () => {
     setError(null)
@@ -421,6 +423,43 @@ export function AdminServicesPage() {
             onChange={(v) => setCardForm((s) => ({ ...s, imageUrl: v }))}
             mono
           />
+          <label className="block md:col-span-2">
+            <span className="mb-1.5 block font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+              Upload image (WebP)
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={busy || uploading}
+              className="block w-full font-sans text-sm text-ink file:mr-3 file:rounded-sm file:border-0 file:bg-mahogany file:px-3 file:py-1.5 file:font-sans file:text-xs file:font-semibold file:tracking-wide file:text-cream file:uppercase"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                e.target.value = ''
+                if (!file) return
+                void (async () => {
+                  setUploading(true)
+                  setError(null)
+                  try {
+                    const stem =
+                      modal.type === 'editCard' ? modal.cardId : undefined
+                    const { url } = await adminUploadImage(file, stem)
+                    setCardForm((s) => ({ ...s, imageUrl: url }))
+                  } catch (err) {
+                    setError(
+                      err instanceof Error ? err.message : 'Upload failed',
+                    )
+                  } finally {
+                    setUploading(false)
+                  }
+                })()
+              }}
+            />
+            {uploading && (
+              <p className="mt-1.5 font-sans text-xs text-ink-muted">
+                Converting to WebP…
+              </p>
+            )}
+          </label>
           <AdminTextArea
             label="Description"
             value={cardForm.description}
@@ -441,7 +480,7 @@ export function AdminServicesPage() {
         <AdminActions>
           <AdminButton
             className="mt-5"
-            disabled={busy || !cardForm.name.trim() || !selected}
+            disabled={busy || uploading || !cardForm.name.trim() || !selected}
             onClick={() =>
               run(async () => {
                 if (!selected) return

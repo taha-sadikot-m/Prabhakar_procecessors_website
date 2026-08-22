@@ -1,6 +1,6 @@
 // scripts/prod-server.mjs
 import http from "node:http";
-import path from "node:path";
+import path2 from "node:path";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import compression from "compression";
@@ -1815,11 +1815,66 @@ async function handler17(req, res) {
   }
 }
 
+// api/_lib/routes/admin/upload.ts
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import sharp from "sharp";
+var MAX_BYTES = 5.5 * 1024 * 1024;
+function uploadsDir() {
+  return path.join(process.cwd(), "public", "uploads", "services");
+}
+function safeFileStem(id) {
+  return id.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 120) || "image";
+}
+function parseDataUrl(dataUrl) {
+  const match = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl.trim());
+  if (!match) {
+    throw new Error("Expected a base64 data URL");
+  }
+  const mime = match[1].toLowerCase();
+  if (!mime.startsWith("image/")) {
+    throw new Error("Only image uploads are allowed");
+  }
+  const buf = Buffer.from(match[2], "base64");
+  if (!buf.length) throw new Error("Empty image data");
+  if (buf.length > MAX_BYTES) {
+    throw new Error("Image too large (max ~5.5MB)");
+  }
+  return buf;
+}
+async function handler18(req, res) {
+  if (handleOptions(req, res)) return;
+  if (!await requireAdmin(req)) {
+    return json(res, 401, { error: "Unauthorized" });
+  }
+  if (req.method !== "POST") {
+    return json(res, 405, { error: "Method not allowed" });
+  }
+  try {
+    const body = readJsonBody(req);
+    const dataUrl = (body.dataUrl ?? "").trim();
+    if (!dataUrl) return json(res, 400, { error: "dataUrl required" });
+    const raw = parseDataUrl(dataUrl);
+    const stem = safeFileStem((body.id ?? newId("img")).trim());
+    const webp = await sharp(raw).rotate().resize({ width: 1600, withoutEnlargement: true }).webp({ quality: 75 }).toBuffer();
+    const dir = uploadsDir();
+    mkdirSync(dir, { recursive: true });
+    const filename = `${stem}.webp`;
+    writeFileSync(path.join(dir, filename), webp);
+    const url = `/uploads/services/${filename}`;
+    return json(res, 201, { url });
+  } catch (err) {
+    console.error("[api/admin/upload]", err);
+    const message = err instanceof Error ? err.message : "Upload failed";
+    return json(res, 400, { error: message });
+  }
+}
+
 // scripts/prod-server.mjs
-var __dirname = path.dirname(fileURLToPath(import.meta.url));
-var ROOT = existsSync(path.join(__dirname, "package.json")) ? __dirname : path.resolve(__dirname, "..");
-var DIST = path.join(ROOT, "dist");
-var PUBLIC = path.join(ROOT, "public");
+var __dirname = path2.dirname(fileURLToPath(import.meta.url));
+var ROOT = existsSync(path2.join(__dirname, "package.json")) ? __dirname : path2.resolve(__dirname, "..");
+var DIST = path2.join(ROOT, "dist");
+var PUBLIC = path2.join(ROOT, "public");
 var PORT = Number(process.env.PORT) || 3e3;
 var STATIC_EXT = /\.(?:webp|svg|js|css|woff2?|png|jpe?g|gif|ico|avif|map)$/i;
 function resolveHandler(mod) {
@@ -1828,10 +1883,10 @@ function resolveHandler(mod) {
   throw new Error("API handler export is not a function");
 }
 function mount(mod) {
-  const handler18 = resolveHandler(mod);
+  const handler19 = resolveHandler(mod);
   return async (req, res) => {
     try {
-      await handler18(req, res);
+      await handler19(req, res);
     } catch (err) {
       console.error("[prod-server]", err);
       if (!res.headersSent) {
@@ -1852,7 +1907,7 @@ function setStaticCacheHeaders(res, filePath) {
     res.setHeader("Cache-Control", "no-cache");
     return;
   }
-  if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+  if (filePath.includes(`${path2.sep}assets${path2.sep}`)) {
     setLongCache(res, true);
     return;
   }
@@ -1861,7 +1916,7 @@ function setStaticCacheHeaders(res, filePath) {
 var app = express();
 app.disable("x-powered-by");
 app.use(compression());
-app.use(express.json({ limit: "2mb" }));
+app.use(express.json({ limit: "6mb" }));
 app.use("/api", (_req, res, next) => {
   res.setHeader(
     "Cache-Control",
@@ -1888,6 +1943,7 @@ app.all("/api/admin/blog", mount(handler14));
 app.all("/api/admin/careers", mount(handler15));
 app.all(["/api/admin/culture", "/api/admin/culture/"], mount(handler16));
 app.all("/api/admin/contact", mount(handler17));
+app.all("/api/admin/upload", mount(handler18));
 app.use("/api", (_req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
@@ -1915,7 +1971,7 @@ app.use(
 app.get(/^(?!\/api(?:\/|$)).*/, (req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
   res.setHeader("Cache-Control", "no-cache");
-  res.sendFile(path.join(DIST, "index.html"), (err) => {
+  res.sendFile(path2.join(DIST, "index.html"), (err) => {
     if (err) next(err);
   });
 });

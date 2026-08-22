@@ -21,6 +21,7 @@ import adminBlog from '../api/_lib/routes/admin/blog.ts'
 import adminCareers from '../api/_lib/routes/admin/careers.ts'
 import adminCulture from '../api/_lib/routes/admin/culture.ts'
 import adminContact from '../api/_lib/routes/admin/contact.ts'
+import adminUpload from '../api/_lib/routes/admin/upload.ts'
 
 const PORT = Number(process.env.DEV_API_PORT) || 8787
 
@@ -47,7 +48,7 @@ function mount(mod) {
 }
 
 const app = express()
-app.use(express.json({ limit: '2mb' }))
+app.use(express.json({ limit: '6mb' }))
 
 app.use('/api', (_req, res, next) => {
   res.setHeader(
@@ -76,6 +77,7 @@ app.all('/api/admin/blog', mount(adminBlog))
 app.all('/api/admin/careers', mount(adminCareers))
 app.all(['/api/admin/culture', '/api/admin/culture/'], mount(adminCulture))
 app.all('/api/admin/contact', mount(adminContact))
+app.all('/api/admin/upload', mount(adminUpload))
 
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'API route not found' })
