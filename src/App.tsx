@@ -1,11 +1,9 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
+import { HomePage } from './pages/HomePage'
 import { AdminLayout } from './pages/admin/AdminLayout'
 
-const HomePage = lazy(() =>
-  import('./pages/HomePage').then((m) => ({ default: m.HomePage })),
-)
 const AboutPage = lazy(() =>
   import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })),
 )

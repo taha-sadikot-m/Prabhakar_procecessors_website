@@ -70,6 +70,8 @@ export function Future() {
                   <motion.img
                     src={panel.image}
                     alt=""
+                    width={800}
+                    height={600}
                     loading="lazy"
                     decoding="async"
                     className="h-full w-full object-cover"

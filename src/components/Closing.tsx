@@ -45,6 +45,8 @@ export function Closing() {
           <img
             src={closing.mobileImage}
             alt=""
+            width={768}
+            height={1024}
             loading="lazy"
             decoding="async"
             className="h-full w-full object-cover object-center"

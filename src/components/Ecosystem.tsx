@@ -282,6 +282,8 @@ export function Ecosystem() {
         <img
           src={ecosystem.mobileBackground}
           alt=""
+          width={768}
+          height={1024}
           loading="lazy"
           decoding="async"
           className="h-full w-full object-cover object-center"

@@ -122,6 +122,8 @@ export function Transformation() {
               <img
                 src={s.mobileImage}
                 alt=""
+                width={768}
+                height={1024}
                 loading="lazy"
                 decoding="async"
                 className="h-full w-full object-cover object-center"
