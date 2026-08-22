@@ -1,0 +1,7 @@
+# Long cache for static assets when LiteSpeed/Apache serves files from disk
+# (bypassing Node). Do not cache HTML or /api.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(webp|svg|js|css|woff2?|png|jpe?g|gif|ico|avif)$">
+    Header set Cache-Control "public, max-age=31536000"
+  </FilesMatch>
+</IfModule>

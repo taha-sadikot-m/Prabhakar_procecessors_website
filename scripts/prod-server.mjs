@@ -6,6 +6,7 @@ import http from 'node:http'
 import path from 'node:path'
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import compression from 'compression'
 import express from 'express'
 import health from '../api/_lib/routes/health.ts'
 import services from '../api/_lib/routes/services.ts'
@@ -34,6 +35,9 @@ const DIST = path.join(ROOT, 'dist')
 const PUBLIC = path.join(ROOT, 'public')
 const PORT = Number(process.env.PORT) || 3000
 
+const STATIC_EXT =
+  /\.(?:webp|svg|js|css|woff2?|png|jpe?g|gif|ico|avif|map)$/i
+
 function resolveHandler(mod) {
   if (typeof mod === 'function') return mod
   if (mod && typeof mod.default === 'function') return mod.default
@@ -56,7 +60,29 @@ function mount(mod) {
   }
 }
 
+function setLongCache(res, immutable = false) {
+  const value = immutable
+    ? 'public, max-age=31536000, immutable'
+    : 'public, max-age=31536000'
+  res.setHeader('Cache-Control', value)
+  res.setHeader('Expires', new Date(Date.now() + 31536000 * 1000).toUTCString())
+}
+
+function setStaticCacheHeaders(res, filePath) {
+  if (filePath.endsWith('.html')) {
+    res.setHeader('Cache-Control', 'no-cache')
+    return
+  }
+  if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+    setLongCache(res, true)
+    return
+  }
+  setLongCache(res, false)
+}
+
 const app = express()
+app.disable('x-powered-by')
+app.use(compression())
 app.use(express.json({ limit: '2mb' }))
 
 // Hostinger/LiteSpeed otherwise caches GET /api/* for ~7 days.
@@ -92,21 +118,15 @@ app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'API route not found' })
 })
 
-function setStaticCacheHeaders(res, filePath) {
-  if (filePath.endsWith('.html')) {
-    res.setHeader('Cache-Control', 'no-cache')
-    return
+// Belt-and-suspenders: set long cache for static extensions even if LiteSpeed
+// or an intermediate strips express.static setHeaders.
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) return next()
+  if ((req.method === 'GET' || req.method === 'HEAD') && STATIC_EXT.test(req.path)) {
+    setLongCache(res, req.path.includes('/assets/'))
   }
-  // Vite hashed bundles under dist/assets/
-  if (filePath.includes(`${path.sep}assets${path.sep}`)) {
-    res.setHeader(
-      'Cache-Control',
-      'public, max-age=31536000, immutable',
-    )
-    return
-  }
-  res.setHeader('Cache-Control', 'public, max-age=31536000')
-}
+  next()
+})
 
 // Images and other static files live in public/ (not duplicated into dist/).
 app.use(

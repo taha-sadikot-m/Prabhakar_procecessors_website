@@ -1,6 +1,6 @@
 /**
  * Recompress oversized WebPs under public/ for PageSpeed.
- * Desktop max width 1920; mobile max width 900; quality ~78.
+ * Desktop max width 1920 / q78; mobile max width 768 / q65.
  *
  * Usage: node scripts/optimize-public-images.mjs
  */
@@ -61,10 +61,20 @@ const TARGETS = [
   'service_section/swatch-12-foil-jari-print.webp',
 ]
 
-function maxWidthFor(rel) {
+function isMobileAsset(rel) {
   const base = path.basename(rel).toLowerCase()
-  if (base.includes('mobile') || base.includes('tablet')) return 900
-  return 1920
+  return (
+    base.includes('mobile') ||
+    base.includes('mobile_version') ||
+    base.includes('tablet')
+  )
+}
+
+function settingsFor(rel) {
+  if (isMobileAsset(rel)) {
+    return { maxWidth: 768, quality: 65 }
+  }
+  return { maxWidth: 1920, quality: 78 }
 }
 
 async function optimizeOne(rel) {
@@ -74,15 +84,19 @@ async function optimizeOne(rel) {
     return
   }
   const before = fs.statSync(filePath).size
-  const maxWidth = maxWidthFor(rel)
+  const { maxWidth, quality } = settingsFor(rel)
   const input = fs.readFileSync(filePath)
   const image = sharp(input, { failOn: 'none' })
   const meta = await image.metadata()
   const width = meta.width ?? maxWidth
   const pipeline =
-    width > maxWidth ? image.resize({ width: maxWidth, withoutEnlargement: true }) : image
-  const out = await pipeline.webp({ quality: 78, effort: 6 }).toBuffer()
-  if (out.length >= before) {
+    width > maxWidth
+      ? image.resize({ width: maxWidth, withoutEnlargement: true })
+      : image
+  const out = await pipeline.webp({ quality, effort: 6 }).toBuffer()
+  // Always write when quality/size settings are stricter, even if slightly larger
+  // is unlikely; skip only if not meaningfully smaller.
+  if (out.length >= before * 0.98) {
     console.log(
       `[keep] ${rel} ${(before / 1024).toFixed(0)} KiB (recompress not smaller)`,
     )
@@ -90,7 +104,7 @@ async function optimizeOne(rel) {
   }
   fs.writeFileSync(filePath, out)
   console.log(
-    `[ok]   ${rel} ${(before / 1024).toFixed(0)} → ${(out.length / 1024).toFixed(0)} KiB`,
+    `[ok]   ${rel} ${(before / 1024).toFixed(0)} → ${(out.length / 1024).toFixed(0)} KiB (q${quality})`,
   )
 }
 
