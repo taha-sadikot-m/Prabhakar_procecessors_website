@@ -6,13 +6,24 @@ import { requireAdmin } from '../../auth'
 import { handleOptions, json, newId, readJsonBody } from '../../http'
 
 const MAX_BYTES = 5.5 * 1024 * 1024
+const ALLOWED_FOLDERS = new Set(['services', 'culture'] as const)
+type UploadFolder = 'services' | 'culture'
 
-function uploadsDir() {
-  return path.join(process.cwd(), 'public', 'uploads', 'services')
+function uploadsDir(folder: UploadFolder) {
+  return path.join(process.cwd(), 'public', 'uploads', folder)
 }
 
 function safeFileStem(id: string) {
   return id.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 120) || 'image'
+}
+
+function parseFolder(raw: unknown): UploadFolder {
+  const value = typeof raw === 'string' ? raw.trim() : ''
+  if (!value) return 'services'
+  if (ALLOWED_FOLDERS.has(value as UploadFolder)) {
+    return value as UploadFolder
+  }
+  throw new Error('folder must be services or culture')
 }
 
 function parseDataUrl(dataUrl: string): Buffer {
@@ -42,10 +53,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const body = readJsonBody<{ dataUrl?: string; id?: string }>(req)
+    const body = readJsonBody<{
+      dataUrl?: string
+      id?: string
+      folder?: string
+    }>(req)
     const dataUrl = (body.dataUrl ?? '').trim()
     if (!dataUrl) return json(res, 400, { error: 'dataUrl required' })
 
+    const folder = parseFolder(body.folder)
     const raw = parseDataUrl(dataUrl)
     const stem = safeFileStem((body.id ?? newId('img')).trim())
     const webp = await sharp(raw)
@@ -54,12 +70,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .webp({ quality: 75 })
       .toBuffer()
 
-    const dir = uploadsDir()
+    const dir = uploadsDir(folder)
     mkdirSync(dir, { recursive: true })
     const filename = `${stem}.webp`
     writeFileSync(path.join(dir, filename), webp)
 
-    const url = `/uploads/services/${filename}`
+    const url = `/uploads/${folder}/${filename}`
     return json(res, 201, { url })
   } catch (err) {
     console.error('[api/admin/upload]', err)

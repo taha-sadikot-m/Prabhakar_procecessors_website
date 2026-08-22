@@ -222,6 +222,7 @@ export function adminDeleteCard(id: string) {
 export async function adminUploadImage(
   file: File,
   id?: string,
+  folder: 'services' | 'culture' = 'services',
 ): Promise<{ url: string }> {
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
@@ -235,7 +236,7 @@ export async function adminUploadImage(
   return request<{ url: string }>('/api/admin/upload', {
     method: 'POST',
     auth: true,
-    body: JSON.stringify({ dataUrl, id }),
+    body: JSON.stringify({ dataUrl, id, folder }),
   })
 }
 

@@ -17,6 +17,7 @@
     "seo": "node --import tsx scripts/seo-build.ts",
     "seed:cms": "node --env-file=.env scripts/seed-cms.mjs",
     "migrate:service-images": "node --env-file=.env --import tsx scripts/migrate-service-images.mjs",
+    "migrate:culture-images": "node --env-file=.env --import tsx scripts/migrate-culture-images.mjs",
     "gallery:transcode": "node scripts/transcode-gallery-videos.mjs"
   },
   "dependencies": {

@@ -5,6 +5,7 @@ import {
   adminGetCulture,
   adminGetJobApplications,
   adminSaveCultureItem,
+  adminUploadImage,
   type AdminCultureImageDto,
   type JobApplicationDto,
 } from '../../lib/cms-api'
@@ -75,6 +76,7 @@ export function AdminCareersPage() {
     type: 'none',
   })
   const [cultureForm, setCultureForm] = useState(emptyCulture)
+  const [uploading, setUploading] = useState(false)
 
   const load = useCallback(async () => {
     setError(null)
@@ -144,7 +146,7 @@ export function AdminCareersPage() {
       >
         {tab === 'applications'
           ? 'Job applications from /careers. Open a row to review details and preview the resume link in-panel.'
-          : 'Culture photos shown in the rotating stack on /careers#culture. Paste a Google Drive file link.'}
+          : 'Culture photos shown in the rotating stack on /careers#culture. Upload a WebP (or any image) or paste a URL.'}
       </AdminPageHeader>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -234,7 +236,7 @@ export function AdminCareersPage() {
         )
       ) : cultureItems.length === 0 ? (
         <AdminEmpty>
-          No culture photos yet. Add a Drive image link to begin.
+          No culture photos yet. Upload an image to begin.
         </AdminEmpty>
       ) : (
         <AdminList>
@@ -243,7 +245,7 @@ export function AdminCareersPage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
                   <AdminMediaPreview
-                    kind="drive"
+                    kind="auto"
                     src={item.driveUrl}
                     alt={item.caption || 'Culture photo'}
                   />
@@ -374,17 +376,61 @@ export function AdminCareersPage() {
         <div className="grid gap-4">
           {cultureForm.driveUrl.trim() && (
             <AdminMediaPreview
-              kind="drive"
+              kind="auto"
               src={cultureForm.driveUrl}
               alt={cultureForm.caption || 'Culture photo'}
             />
           )}
           <AdminField
-            label="Drive URL"
+            label="Image URL"
             value={cultureForm.driveUrl}
             onChange={(v) => setCultureForm((s) => ({ ...s, driveUrl: v }))}
-            placeholder="https://drive.google.com/file/d/…"
+            placeholder="/uploads/culture/… or Drive link"
+            mono
           />
+          <label className="block">
+            <span className="mb-1.5 block font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+              Upload image (WebP)
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={busy || uploading}
+              className="block w-full font-sans text-sm text-ink file:mr-3 file:rounded-sm file:border-0 file:bg-mahogany file:px-3 file:py-1.5 file:font-sans file:text-xs file:font-semibold file:tracking-wide file:text-cream file:uppercase"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                e.target.value = ''
+                if (!file) return
+                void (async () => {
+                  setUploading(true)
+                  setError(null)
+                  try {
+                    const stem =
+                      cultureModal.type === 'edit'
+                        ? cultureModal.itemId
+                        : undefined
+                    const { url } = await adminUploadImage(
+                      file,
+                      stem,
+                      'culture',
+                    )
+                    setCultureForm((s) => ({ ...s, driveUrl: url }))
+                  } catch (err) {
+                    setError(
+                      err instanceof Error ? err.message : 'Upload failed',
+                    )
+                  } finally {
+                    setUploading(false)
+                  }
+                })()
+              }}
+            />
+            {uploading && (
+              <p className="mt-1.5 font-sans text-xs text-ink-muted">
+                Converting to WebP…
+              </p>
+            )}
+          </label>
           <AdminField
             label="Caption (optional)"
             value={cultureForm.caption}
@@ -409,7 +455,7 @@ export function AdminCareersPage() {
             </AdminButton>
             <AdminButton
               variant="primary"
-              disabled={busy || !cultureForm.driveUrl.trim()}
+              disabled={busy || uploading || !cultureForm.driveUrl.trim()}
               onClick={() => {
                 const body = {
                   driveUrl: cultureForm.driveUrl.trim(),
