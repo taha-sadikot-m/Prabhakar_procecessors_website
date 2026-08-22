@@ -219,11 +219,16 @@ export function adminDeleteCard(id: string) {
   )
 }
 
-export async function adminUploadImage(
+export async function adminUploadMedia(
   file: File,
-  id?: string,
-  folder: 'services' | 'culture' = 'services',
+  options: {
+    id?: string
+    folder?: 'services' | 'culture' | 'gallery'
+    mediaType?: 'image' | 'video'
+  } = {},
 ): Promise<{ url: string }> {
+  const folder = options.folder ?? 'services'
+  const mediaType = options.mediaType ?? 'image'
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
@@ -236,8 +241,22 @@ export async function adminUploadImage(
   return request<{ url: string }>('/api/admin/upload', {
     method: 'POST',
     auth: true,
-    body: JSON.stringify({ dataUrl, id, folder }),
+    body: JSON.stringify({
+      dataUrl,
+      id: options.id,
+      folder,
+      mediaType,
+    }),
   })
+}
+
+/** @deprecated Prefer adminUploadMedia — kept for services/culture call sites. */
+export async function adminUploadImage(
+  file: File,
+  id?: string,
+  folder: 'services' | 'culture' | 'gallery' = 'services',
+): Promise<{ url: string }> {
+  return adminUploadMedia(file, { id, folder, mediaType: 'image' })
 }
 
 export function adminGetGallery() {

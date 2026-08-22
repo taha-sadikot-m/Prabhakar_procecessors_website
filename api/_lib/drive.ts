@@ -45,14 +45,14 @@ export function driveVideoUrl(fileId: string) {
   return `/api/drive-media?id=${encodeURIComponent(fileId)}`
 }
 
-function isLocalMp4(url: string) {
-  return /^\/.+\.mp4(?:$|\?)/i.test(url.trim())
+function isLocalVideo(url: string) {
+  return /^\/.+\.(?:mp4|webm)(?:$|\?)/i.test(url.trim())
 }
 
 export function resolveDriveUrls(driveUrl: string) {
   const trimmed = (driveUrl || '').trim()
-  if (isLocalMp4(trimmed)) {
-    const poster = trimmed.replace(/\.mp4(?:$|\?)/i, '.jpg')
+  if (isLocalVideo(trimmed)) {
+    const poster = trimmed.replace(/\.(?:mp4|webm)(?:$|\?)/i, '.jpg')
     return {
       fileId: null as string | null,
       previewUrl: trimmed,

@@ -3,6 +3,7 @@ import {
   adminDeleteGalleryItem,
   adminGetGallery,
   adminSaveGalleryItem,
+  adminUploadMedia,
   type AdminGalleryItemDto,
   type GalleryMediaType,
 } from '../../lib/cms-api'
@@ -47,6 +48,7 @@ export function AdminGalleryPage() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
   const [modal, setModal] = useState<Modal>({ type: 'none' })
   const [itemForm, setItemForm] = useState(emptyItem)
 
@@ -100,8 +102,8 @@ export function AdminGalleryPage() {
           </AdminButton>
         }
       >
-        Drive images and videos shown on /gallery. Set media type so play
-        buttons only appear on videos.
+        Images and videos on /gallery. Upload local WebP/WebM (or paste a URL).
+        Set media type so play controls only appear on videos.
       </AdminPageHeader>
 
       {error && <AdminError>{error}</AdminError>}
@@ -109,7 +111,7 @@ export function AdminGalleryPage() {
       {loading ? (
         <AdminLoading label="Loading gallery…" />
       ) : items.length === 0 ? (
-        <AdminEmpty>No media yet. Add a Drive file link to begin.</AdminEmpty>
+        <AdminEmpty>No media yet. Upload a file to begin.</AdminEmpty>
       ) : (
         <AdminList>
           {items.map((item) => (
@@ -117,7 +119,7 @@ export function AdminGalleryPage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
                   <AdminMediaPreview
-                    kind="drive"
+                    kind="auto"
                     src={item.driveUrl}
                     alt={item.description ?? 'Gallery media'}
                   />
@@ -176,17 +178,11 @@ export function AdminGalleryPage() {
         <div className="grid gap-4">
           {itemForm.driveUrl.trim() && (
             <AdminMediaPreview
-              kind="drive"
+              kind="auto"
               src={itemForm.driveUrl}
               alt={itemForm.description || 'Gallery media'}
             />
           )}
-          <AdminField
-            label="Google Drive URL"
-            value={itemForm.driveUrl}
-            onChange={(v) => setItemForm((s) => ({ ...s, driveUrl: v }))}
-            mono
-          />
           <AdminSelect
             label="Media type"
             value={itemForm.mediaType}
@@ -195,6 +191,58 @@ export function AdminGalleryPage() {
             }
             options={[...MEDIA_TYPE_OPTIONS]}
           />
+          <AdminField
+            label="Image / Video URL"
+            value={itemForm.driveUrl}
+            onChange={(v) => setItemForm((s) => ({ ...s, driveUrl: v }))}
+            placeholder="/uploads/gallery/… or Drive link"
+            mono
+          />
+          <label className="block">
+            <span className="mb-1.5 block font-sans text-[10px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+              Upload file
+            </span>
+            <input
+              type="file"
+              accept={
+                itemForm.mediaType === 'image'
+                  ? 'image/*'
+                  : 'video/webm,video/mp4,video/*'
+              }
+              disabled={busy || uploading}
+              className="block w-full font-sans text-sm text-ink file:mr-3 file:rounded-sm file:border-0 file:bg-mahogany file:px-3 file:py-1.5 file:font-sans file:text-xs file:font-semibold file:tracking-wide file:text-cream file:uppercase"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                e.target.value = ''
+                if (!file) return
+                void (async () => {
+                  setUploading(true)
+                  setError(null)
+                  try {
+                    const stem =
+                      modal.type === 'edit' ? modal.itemId : undefined
+                    const { url } = await adminUploadMedia(file, {
+                      id: stem,
+                      folder: 'gallery',
+                      mediaType: itemForm.mediaType,
+                    })
+                    setItemForm((s) => ({ ...s, driveUrl: url }))
+                  } catch (err) {
+                    setError(
+                      err instanceof Error ? err.message : 'Upload failed',
+                    )
+                  } finally {
+                    setUploading(false)
+                  }
+                })()
+              }}
+            />
+            {uploading && (
+              <p className="mt-1.5 font-sans text-xs text-ink-muted">
+                Uploading…
+              </p>
+            )}
+          </label>
           <AdminField
             label="Description (optional)"
             value={itemForm.description}
@@ -214,7 +262,12 @@ export function AdminGalleryPage() {
         <AdminActions>
           <AdminButton
             className="mt-5"
-            disabled={busy || !itemForm.driveUrl.trim() || !itemForm.mediaType}
+            disabled={
+              busy ||
+              uploading ||
+              !itemForm.driveUrl.trim() ||
+              !itemForm.mediaType
+            }
             onClick={() =>
               run(async () => {
                 const mediaType = asMediaType(itemForm.mediaType)

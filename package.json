@@ -18,6 +18,10 @@
     "seed:cms": "node --env-file=.env scripts/seed-cms.mjs",
     "migrate:service-images": "node --env-file=.env --import tsx scripts/migrate-service-images.mjs",
     "migrate:culture-images": "node --env-file=.env --import tsx scripts/migrate-culture-images.mjs",
+    "migrate:gallery-media": "node --env-file=.env scripts/migrate-gallery-media.mjs",
+    "download:gallery-media": "node --env-file=.env --import tsx scripts/download-gallery-media.mjs",
+    "convert:gallery-images": "node scripts/convert-gallery-images-webp.mjs",
+    "convert:gallery-videos": "node scripts/convert-gallery-videos-webm.mjs",
     "gallery:transcode": "node scripts/transcode-gallery-videos.mjs"
   },
   "dependencies": {
