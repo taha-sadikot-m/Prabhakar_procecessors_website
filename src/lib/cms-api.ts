@@ -16,7 +16,7 @@ async function request<T>(
       headers.set('X-Admin-Token', token)
     }
   }
-  const res = await fetch(path, { ...options, headers })
+  const res = await fetch(path, { ...options, headers, cache: 'no-store' })
   const data = (await res.json().catch(() => ({}))) as T & { error?: string }
   if (!res.ok) {
     if (res.status === 401) {

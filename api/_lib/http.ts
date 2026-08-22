@@ -1,5 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
+export function setNoStore(res: VercelResponse) {
+  res.setHeader(
+    'Cache-Control',
+    'private, no-store, no-cache, must-revalidate',
+  )
+  res.setHeader('Pragma', 'no-cache')
+  res.setHeader('Expires', '0')
+}
+
 export function setCors(res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader(
@@ -8,12 +17,13 @@ export function setCors(res: VercelResponse) {
   )
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization',
+    'Content-Type, Authorization, X-Admin-Token',
   )
 }
 
 export function handleOptions(req: VercelRequest, res: VercelResponse) {
   setCors(res)
+  setNoStore(res)
   if (req.method === 'OPTIONS') {
     res.statusCode = 204
     res.end()
@@ -28,6 +38,7 @@ export function json(
   body: unknown,
 ) {
   setCors(res)
+  setNoStore(res)
   res.statusCode = status
   res.setHeader('Content-Type', 'application/json; charset=utf-8')
   res.end(JSON.stringify(body))

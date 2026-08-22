@@ -20,6 +20,14 @@ function getDb() {
 }
 
 // api/_lib/http.ts
+function setNoStore(res) {
+  res.setHeader(
+    "Cache-Control",
+    "private, no-store, no-cache, must-revalidate"
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+}
 function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -28,11 +36,12 @@ function setCors(res) {
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization"
+    "Content-Type, Authorization, X-Admin-Token"
   );
 }
 function handleOptions(req, res) {
   setCors(res);
+  setNoStore(res);
   if (req.method === "OPTIONS") {
     res.statusCode = 204;
     res.end();
@@ -42,6 +51,7 @@ function handleOptions(req, res) {
 }
 function json(res, status, body) {
   setCors(res);
+  setNoStore(res);
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.end(JSON.stringify(body));
@@ -1832,6 +1842,15 @@ function mount(mod) {
 }
 var app = express();
 app.use(express.json({ limit: "2mb" }));
+app.use("/api", (_req, res, next) => {
+  res.setHeader(
+    "Cache-Control",
+    "private, no-store, no-cache, must-revalidate"
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+});
 app.all("/api/health", mount(handler));
 app.all("/api/services", mount(handler2));
 app.all("/api/gallery", mount(handler3));
