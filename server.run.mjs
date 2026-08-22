@@ -5,6 +5,20 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import express from "express";
 
+// api/_lib/db.ts
+import { neon } from "@neondatabase/serverless";
+var sql = null;
+function getDb() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error("DATABASE_URL is not configured");
+  }
+  if (!sql) {
+    sql = neon(url);
+  }
+  return sql;
+}
+
 // api/_lib/http.ts
 function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -49,26 +63,76 @@ function newId(prefix) {
 }
 
 // api/_lib/routes/health.ts
+function dbHost() {
+  const url = process.env.DATABASE_URL;
+  if (!url) return null;
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
 async function handler(req, res) {
   if (handleOptions(req, res)) return;
   if (req.method !== "GET") {
     return json(res, 405, { error: "Method not allowed" });
   }
-  return json(res, 200, { ok: true });
-}
-
-// api/_lib/db.ts
-import { neon } from "@neondatabase/serverless";
-var sql = null;
-function getDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error("DATABASE_URL is not configured");
+  const host = dbHost();
+  if (!process.env.DATABASE_URL) {
+    return json(res, 200, {
+      ok: true,
+      db: { ok: false, error: "DATABASE_URL is not configured" }
+    });
   }
-  if (!sql) {
-    sql = neon(url);
+  try {
+    const sql2 = getDb();
+    const [
+      serviceCategories,
+      serviceCards,
+      galleryItems,
+      cultureImages,
+      testimonials,
+      blogPosts,
+      contactMessages,
+      jobApplications
+    ] = await Promise.all([
+      sql2`SELECT COUNT(*)::int AS c FROM service_categories`,
+      sql2`SELECT COUNT(*)::int AS c FROM service_cards`,
+      sql2`SELECT COUNT(*)::int AS c FROM gallery_items`,
+      sql2`SELECT COUNT(*)::int AS c FROM culture_images`,
+      sql2`SELECT COUNT(*)::int AS c FROM testimonials`,
+      sql2`SELECT COUNT(*)::int AS c FROM blog_posts`,
+      sql2`SELECT COUNT(*)::int AS c FROM contact_messages`,
+      sql2`SELECT COUNT(*)::int AS c FROM job_applications`
+    ]);
+    return json(res, 200, {
+      ok: true,
+      db: {
+        ok: true,
+        host,
+        counts: {
+          service_categories: Number(serviceCategories[0]?.c ?? 0),
+          service_cards: Number(serviceCards[0]?.c ?? 0),
+          gallery_items: Number(galleryItems[0]?.c ?? 0),
+          culture_images: Number(cultureImages[0]?.c ?? 0),
+          testimonials: Number(testimonials[0]?.c ?? 0),
+          blog_posts: Number(blogPosts[0]?.c ?? 0),
+          contact_messages: Number(contactMessages[0]?.c ?? 0),
+          job_applications: Number(jobApplications[0]?.c ?? 0)
+        }
+      }
+    });
+  } catch (err) {
+    console.error("[api/health]", err);
+    return json(res, 200, {
+      ok: true,
+      db: {
+        ok: false,
+        host,
+        error: err instanceof Error ? err.message : "Database check failed"
+      }
+    });
   }
-  return sql;
 }
 
 // api/_lib/services-schema.ts
@@ -1027,12 +1091,19 @@ async function verifyAdminToken(token) {
     return false;
   }
 }
+function headerValue(value) {
+  if (!value) return null;
+  return Array.isArray(value) ? value[0] ?? null : value;
+}
 function readBearer(req) {
-  const header = req.headers.authorization;
-  if (!header || typeof header !== "string") return null;
-  const [scheme, token] = header.split(" ");
-  if (scheme?.toLowerCase() !== "bearer" || !token) return null;
-  return token;
+  const header = headerValue(req.headers.authorization);
+  if (header) {
+    const [scheme, token] = header.split(" ");
+    if (scheme?.toLowerCase() === "bearer" && token) return token;
+  }
+  const alt = headerValue(req.headers["x-admin-token"]);
+  if (alt?.trim()) return alt.trim();
+  return null;
 }
 async function requireAdmin(req) {
   const token = readBearer(req);

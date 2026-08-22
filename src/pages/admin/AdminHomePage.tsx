@@ -14,64 +14,108 @@ import {
   AdminStatCard,
 } from './admin-ui'
 
+type Counts = {
+  categories: number
+  services: number
+  media: number
+  quotes: number
+  posts: number
+  publishedPosts: number
+  applications: number
+  messages: number
+}
+
+const emptyCounts: Counts = {
+  categories: 0,
+  services: 0,
+  media: 0,
+  quotes: 0,
+  posts: 0,
+  publishedPosts: 0,
+  applications: 0,
+  messages: 0,
+}
+
 export function AdminHomePage() {
-  const [counts, setCounts] = useState({
-    categories: 0,
-    services: 0,
-    media: 0,
-    quotes: 0,
-    posts: 0,
-    publishedPosts: 0,
-    applications: 0,
-    messages: 0,
-  })
+  const [counts, setCounts] = useState<Counts>(emptyCounts)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([
-      adminGetServices(),
-      adminGetGallery(),
-      adminGetTestimonials(),
-      adminGetBlogPosts(),
-      adminGetJobApplications(),
-      adminGetContactMessages(),
-    ])
-      .then(
-        ([
-          services,
-          gallery,
-          testimonials,
-          blog,
-          careers,
-          contact,
-        ]) => {
-        if (cancelled) return
-        const categories = services.categories ?? []
-        const posts = blog.posts ?? []
-        setCounts({
-          categories: categories.length,
-          services: categories.reduce(
-            (n, c) => n + (c.services?.length ?? 0),
-            0,
-          ),
-          media: gallery.items?.length ?? 0,
-          quotes: testimonials.quotes?.length ?? 0,
-          posts: posts.length,
-          publishedPosts: posts.filter((p) => p.published).length,
-          applications: careers.applications?.length ?? 0,
-          messages: contact.messages?.length ?? 0,
-        })
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load overview')
+
+    async function load() {
+      const labels = [
+        'Services',
+        'Gallery',
+        'Testimonials',
+        'Blog',
+        'Careers',
+        'Contact',
+      ] as const
+      const results = await Promise.allSettled([
+        adminGetServices(),
+        adminGetGallery(),
+        adminGetTestimonials(),
+        adminGetBlogPosts(),
+        adminGetJobApplications(),
+        adminGetContactMessages(),
+      ])
+
+      if (cancelled) return
+
+      const next = { ...emptyCounts }
+      const failures: string[] = []
+
+      results.forEach((result, index) => {
+        const label = labels[index]
+        if (result.status === 'rejected') {
+          const msg =
+            result.reason instanceof Error
+              ? result.reason.message
+              : 'Request failed'
+          failures.push(`${label}: ${msg}`)
+          return
+        }
+
+        const value = result.value
+        switch (label) {
+          case 'Services': {
+            const categories = value.categories ?? []
+            next.categories = categories.length
+            next.services = categories.reduce(
+              (n, c) => n + (c.services?.length ?? 0),
+              0,
+            )
+            break
+          }
+          case 'Gallery':
+            next.media = value.items?.length ?? 0
+            break
+          case 'Testimonials':
+            next.quotes = value.quotes?.length ?? 0
+            break
+          case 'Blog': {
+            const posts = value.posts ?? []
+            next.posts = posts.length
+            next.publishedPosts = posts.filter((p) => p.published).length
+            break
+          }
+          case 'Careers':
+            next.applications = value.applications?.length ?? 0
+            break
+          case 'Contact':
+            next.messages = value.messages?.length ?? 0
+            break
         }
       })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+
+      setCounts(next)
+      setError(failures.length > 0 ? failures.join(' · ') : null)
+      setLoading(false)
+    }
+
+    void load()
     return () => {
       cancelled = true
     }

@@ -10,11 +10,20 @@ async function request<T>(
   }
   if (options.auth) {
     const token = getAdminToken()
-    if (token) headers.set('Authorization', `Bearer ${token}`)
+    if (token) {
+      // Send both: some Hostinger/LiteSpeed setups strip Authorization.
+      headers.set('Authorization', `Bearer ${token}`)
+      headers.set('X-Admin-Token', token)
+    }
   }
   const res = await fetch(path, { ...options, headers })
   const data = (await res.json().catch(() => ({}))) as T & { error?: string }
   if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error(
+        data.error || 'Session expired — log in again.',
+      )
+    }
     throw new Error(data.error || `Request failed (${res.status})`)
   }
   return data

@@ -68,12 +68,24 @@ export async function verifyAdminToken(token: string) {
   }
 }
 
+function headerValue(
+  value: string | string[] | undefined,
+): string | null {
+  if (!value) return null
+  return Array.isArray(value) ? (value[0] ?? null) : value
+}
+
+/** Prefer Authorization Bearer; fall back to X-Admin-Token (LiteSpeed often strips Authorization). */
 export function readBearer(req: VercelRequest): string | null {
-  const header = req.headers.authorization
-  if (!header || typeof header !== 'string') return null
-  const [scheme, token] = header.split(' ')
-  if (scheme?.toLowerCase() !== 'bearer' || !token) return null
-  return token
+  const header = headerValue(req.headers.authorization)
+  if (header) {
+    const [scheme, token] = header.split(' ')
+    if (scheme?.toLowerCase() === 'bearer' && token) return token
+  }
+
+  const alt = headerValue(req.headers['x-admin-token'])
+  if (alt?.trim()) return alt.trim()
+  return null
 }
 
 export async function requireAdmin(req: VercelRequest) {
