@@ -247,6 +247,8 @@ function MobileQuality({ reduceMotion }: { reduceMotion: boolean | null }) {
       <img
         src={quality.mobileImage}
         alt=""
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover object-center"
         draggable={false}
       />
@@ -408,6 +410,8 @@ export function Quality() {
         <motion.img
           src={quality.desktopImage}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-right"
           draggable={false}
           initial={reduceMotion ? false : { scale: 0.98 }}

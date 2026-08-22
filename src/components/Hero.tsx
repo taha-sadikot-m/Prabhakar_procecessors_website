@@ -44,6 +44,8 @@ export function Hero() {
             <img
               src="/hero_section_image/mobile_version.webp"
               alt=""
+              fetchPriority="high"
+              decoding="async"
               className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
             />
           </picture>

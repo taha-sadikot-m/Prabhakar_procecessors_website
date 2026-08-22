@@ -145,6 +145,8 @@ export function People() {
           <img
             src={people.mobileImage}
             alt="Leadership: Anand, Vikas, and Shaleen Poddar"
+            loading="lazy"
+            decoding="async"
             className="block h-auto w-full"
             draggable={false}
           />
@@ -178,6 +180,8 @@ export function People() {
             <img
               src={people.desktopImage}
               alt=""
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover object-right"
               draggable={false}
             />

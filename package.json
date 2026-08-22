@@ -19,6 +19,8 @@
     "gallery:transcode": "node scripts/transcode-gallery-videos.mjs"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/montserrat": "^5.3.0",
     "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/vite": "^4.1.11",
     "@vercel/node": "^5.9.6",
@@ -44,7 +46,8 @@
     "@types/node": "^26.2.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
-    "concurrently": "^10.0.4"
+    "concurrently": "^10.0.4",
+    "sharp": "^0.35.3"
   },
   "overrides": {
     "rollup": "npm:@rollup/wasm-node@4.62.5"

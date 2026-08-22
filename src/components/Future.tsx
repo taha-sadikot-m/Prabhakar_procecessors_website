@@ -70,6 +70,8 @@ export function Future() {
                   <motion.img
                     src={panel.image}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                     initial={reduceMotion ? false : { scale: 0.97 }}
                     whileInView={{ scale: 1 }}

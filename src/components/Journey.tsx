@@ -79,6 +79,8 @@ export function Journey() {
           <img
             src="/second_section/mobile.webp"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover object-bottom md:object-right md:object-center"
           />
         </picture>

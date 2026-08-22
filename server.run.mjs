@@ -1871,20 +1871,37 @@ app.all("/api/admin/contact", mount(handler17));
 app.use("/api", (_req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
+function setStaticCacheHeaders(res, filePath) {
+  if (filePath.endsWith(".html")) {
+    res.setHeader("Cache-Control", "no-cache");
+    return;
+  }
+  if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=31536000, immutable"
+    );
+    return;
+  }
+  res.setHeader("Cache-Control", "public, max-age=31536000");
+}
 app.use(
   express.static(PUBLIC, {
     index: false,
-    fallthrough: true
+    fallthrough: true,
+    setHeaders: setStaticCacheHeaders
   })
 );
 app.use(
   express.static(DIST, {
     index: false,
-    fallthrough: true
+    fallthrough: true,
+    setHeaders: setStaticCacheHeaders
   })
 );
 app.get(/^(?!\/api(?:\/|$)).*/, (req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
+  res.setHeader("Cache-Control", "no-cache");
   res.sendFile(path.join(DIST, "index.html"), (err) => {
     if (err) next(err);
   });

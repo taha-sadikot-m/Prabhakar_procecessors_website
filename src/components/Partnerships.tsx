@@ -460,6 +460,8 @@ export function Partnerships() {
             <img
               src={partnerships.mobileBackground}
               alt=""
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover object-center"
               draggable={false}
             />

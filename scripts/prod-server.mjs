@@ -92,11 +92,28 @@ app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'API route not found' })
 })
 
+function setStaticCacheHeaders(res, filePath) {
+  if (filePath.endsWith('.html')) {
+    res.setHeader('Cache-Control', 'no-cache')
+    return
+  }
+  // Vite hashed bundles under dist/assets/
+  if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+    res.setHeader(
+      'Cache-Control',
+      'public, max-age=31536000, immutable',
+    )
+    return
+  }
+  res.setHeader('Cache-Control', 'public, max-age=31536000')
+}
+
 // Images and other static files live in public/ (not duplicated into dist/).
 app.use(
   express.static(PUBLIC, {
     index: false,
     fallthrough: true,
+    setHeaders: setStaticCacheHeaders,
   }),
 )
 
@@ -104,11 +121,13 @@ app.use(
   express.static(DIST, {
     index: false,
     fallthrough: true,
+    setHeaders: setStaticCacheHeaders,
   }),
 )
 
 app.get(/^(?!\/api(?:\/|$)).*/, (req, res, next) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next()
+  res.setHeader('Cache-Control', 'no-cache')
   res.sendFile(path.join(DIST, 'index.html'), (err) => {
     if (err) next(err)
   })
